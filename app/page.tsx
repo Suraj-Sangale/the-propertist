@@ -1,69 +1,94 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import React, { useRef, useEffect } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import SmoothScroll from "@/components/SmoothScroll";
+import Navbar from "@/components/Navbar";
+import Hero from "@/components/Hero";
+import OverlapFeatures from "@/components/OverlapFeatures";
+import WhyChooseSection from "@/components/WhyChooseSection";
+import PropertyTypesSection from "@/components/PropertyTypesSection";
+import TrustStatsSection from "@/components/TrustStatsSection";
+import LatestPropertiesSection from "@/components/LatestPropertiesSection";
+import Footer from "@/components/Footer";
+
+export default function HomePage() {
+  const heroWrapperRef = useRef<HTMLDivElement>(null);
+  const whiteSectionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+
+    const whiteSection = whiteSectionRef.current;
+    const heroWrapper = heroWrapperRef.current;
+
+    if (!whiteSection || !heroWrapper) return;
+
+    // Cinematic overlap transition using ScrollTrigger
+    const overlapTrigger = ScrollTrigger.create({
+      trigger: whiteSection,
+      start: "top 90%",
+      end: "top 20%",
+      scrub: 1,
+      onUpdate: (self) => {
+        // As white section moves upward over hero, add subtle elevation and scale stability
+        const progress = self.progress;
+        gsap.to(whiteSection, {
+          boxShadow: `0 -${15 + progress * 25}px ${40 + progress * 30}px -10px rgba(15, 23, 42, ${
+            0.06 + progress * 0.1
+          })`,
+          overwrite: "auto",
+        });
+      },
+    });
+
+    return () => {
+      overlapTrigger.kill();
+    };
+  }, []);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <SmoothScroll>
+      <div className="relative min-h-screen bg-white selection:bg-blue-600 selection:text-white font-sans antialiased text-slate-900">
+        {/* Fixed / Frosted Navbar */}
+        <Navbar />
+
+        {/* 1. Hero Section Container */}
+        <div ref={heroWrapperRef} className="relative z-10">
+          <Hero />
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+
+        {/* 2. White Content Section (Overlaps the bottom of the Hero) */}
+        <main
+          ref={whiteSectionRef}
+          className="relative z-20 -mt-12 sm:-mt-16 md:-mt-24 rounded-t-[36px] sm:rounded-t-[48px] md:rounded-t-[60px] bg-white shadow-[0_-25px_60px_-15px_rgba(15,23,42,0.12)] border-t border-slate-100/90 pt-4"
+        >
+          {/* Overlap Feature Ribbon */}
+          <OverlapFeatures />
+
+          {/* 3. Why Choose HomeSpace Section */}
+          <div className="border-t border-slate-100/60">
+            <WhyChooseSection />
+          </div>
+
+          {/* 4. Explore by Property Type Section */}
+          <div className="bg-slate-50/60 border-y border-slate-100/80">
+            <PropertyTypesSection />
+          </div>
+
+          {/* 5. Statistics / Trust Section */}
+          <TrustStatsSection />
+
+          {/* 6. Latest / Featured Properties Section */}
+          <div className="border-t border-slate-100/60">
+            <LatestPropertiesSection />
+          </div>
+        </main>
+
+        {/* Footer */}
+        <Footer />
+      </div>
+    </SmoothScroll>
   );
 }
