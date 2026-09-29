@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import StatsBanner from "./StatsBanner";
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
@@ -125,6 +126,7 @@ const PROPERTIES = [
 
   },
 ];
+
 
 // ─── SVG helpers ─────────────────────────────────────────────────────────────
 
@@ -504,6 +506,7 @@ export default function HomeSpace() {
           <div className="hs-hero-curve" />
         </section>
 
+
         {/* ── FEATURES + FEATURED ──────────────────────────────────────── */}
         <div className="hs-wrap hs-features-section">
           {/* FEATURES */}
@@ -552,6 +555,9 @@ export default function HomeSpace() {
               </article>
             ))}
           </div>
+          
+        {/* ── STATS ────────────────────────────────────────────────────── */}
+        <StatsBanner />
         </div>
       </div>
     </>
