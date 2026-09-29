@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HomeSpace – Discover a Better Way to Find Home</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--blue:#2f3cf0;--blue-d:#2531d6;--ink:#0d0d12;--muted:#5b6172;--navy:#3a4a6b}
+body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);background:#fff;overflow-x:hidden}
+img{display:block;object-fit:cover;background:linear-gradient(135deg,#dfe6f3,#c4d0e6)}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1320px;margin:0 auto;padding:0 24px;position:relative}
+
+/* HERO */
+.hero{position:relative;height:640px}
+.hero-bg{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+.hero::after{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(255,255,255,.55) 0%,rgba(255,255,255,.15) 45%,transparent 65%)}
+.hero-curve{position:absolute;left:0;right:0;bottom:-1px;height:130px;background:#fff;z-index:2;clip-path:path("M0 60 C 250 20 500 90 800 70 S 1300 130 1600 160 L1600 200 L0 200 Z");width:100%}
+.hero .wrap{z-index:3}
+
+nav{display:flex;align-items:center;height:80px;gap:56px}
+.logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:21px;color:#111}
+.logo svg{width:28px;height:28px;fill:var(--blue)}
+.menu{display:flex;gap:38px;font-size:13px;font-weight:500}
+.nav-r{margin-left:auto;display:flex;align-items:center;gap:22px}
+.btn-list{background:var(--navy);color:#fff;font-size:13px;font-weight:500;padding:11px 20px;border-radius:999px}
+.avatar{width:32px;height:32px;border-radius:50%}
+.nav-r .user{display:flex;align-items:center;gap:14px}
+
+.pill{display:inline-block;background:rgba(232,236,255,.85);color:#22308f;font-size:13px;font-weight:500;padding:9px 16px;border-radius:999px;border:1px solid #cfd6f5}
+.trust{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:#444;margin-left:18px}
+.trust i{width:8px;height:8px;border-radius:50%;background:#f7931e}
+.hero-top{margin-top:16px}
+h1{font-size:64px;line-height:1.05;font-weight:800;letter-spacing:-1.5px;margin:28px 0 22px}
+h1 span{color:var(--blue)}
+.lead{font-size:16px;line-height:1.65;color:#222;max-width:470px}
+
+/* search */
+.search-area{position:absolute;left:24px;top:350px;width:1015px}
+.tabs{display:inline-flex;gap:8px;background:#fff;padding:12px 14px 10px;border-radius:26px 26px 0 0;position:relative;margin-left:0}
+.tabs button{border:0;font:500 12px 'Inter';padding:12px 26px;border-radius:999px;background:#f1f3f8;cursor:pointer}
+.tabs button.on{background:var(--blue);color:#fff}
+.bar{background:#fff;border-radius:0 26px 26px 26px;padding:14px;display:flex;gap:14px;align-items:center;box-shadow:0 20px 50px rgba(20,30,80,.12)}
+.field{display:flex;align-items:center;gap:12px;background:#f3f5f9;border-radius:14px;height:48px;padding:0 16px;font-size:12.5px;color:#666}
+.field.grow{flex:1}
+.field.sel{width:190px;justify-content:space-between}
+.field small{display:block;font-size:11px;color:#666}
+.field b{display:block;font-size:12.5px;color:#111;font-weight:600}
+.field svg{width:20px;height:20px;stroke:#222;fill:none;stroke-width:2}
+.go{background:var(--blue);color:#fff;border:0;border-radius:12px;height:48px;width:150px;font:600 14px 'Inter';cursor:pointer}
+.go:hover{background:var(--blue-d)}
+.popular{display:flex;align-items:center;gap:12px;margin-top:16px;color:#fff;font-size:13px;font-weight:500}
+.popular a{border:1px solid rgba(255,255,255,.55);background:rgba(20,30,50,.3);backdrop-filter:blur(6px);padding:8px 17px;border-radius:999px;font-size:12px}
+
+/* floating villa card */
+.float-card{position:absolute;right:400px;top:70px;width:155px;background:#fff;border-radius:16px;padding:8px;display:flex;gap:9px;align-items:center;transform:rotate(-7deg);box-shadow:0 12px 30px rgba(0,0,0,.2);z-index:4}
+.float-card img{width:50px;height:50px;border-radius:9px}
+.float-card b{font-size:12px;display:block}
+.float-card span{font-size:11px;color:#777}
+.float-card::after{content:"";position:absolute;left:70px;bottom:-40px;width:14px;height:14px;background:var(--blue);border:3px solid #fff;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+
+/* category tilt cards */
+.cats{position:absolute;right:20px;top:480px;display:flex;gap:26px;z-index:4;transform:rotate(-4deg)}
+.cat{width:130px;height:225px;background:#fff;border-radius:18px;padding:8px 8px 0;box-shadow:0 20px 40px rgba(30,40,90,.2);position:relative;transform:perspective(600px) rotateY(-12deg)}
+.cat img{width:100%;height:148px;border-radius:12px}
+.cat b{display:block;font-size:12px;margin-top:10px;transform:rotate(8deg);transform-origin:left}
+.cat small{font-size:11px;color:#666;display:block;transform:rotate(8deg);transform-origin:left;margin-top:2px}
+
+/* features */
+.features{display:flex;gap:44px;margin-top:-4px;padding:0 0 0 0;position:relative;z-index:3}
+.feat{display:flex;align-items:center;gap:14px}
+.ic{width:48px;height:48px;border-radius:50%;display:grid;place-items:center}
+.ic svg{width:22px;height:22px}
+.feat b{font-size:12.5px;display:block;font-weight:600}
+.feat small{font-size:11.5px;color:#555}
+
+/* featured */
+.sec-h{display:flex;align-items:flex-end;justify-content:space-between;margin:52px 0 22px}
+.sec-h h2{font-size:24px;font-weight:700}
+.sec-h p{font-size:14.5px;color:var(--muted);margin-top:4px}
+.sec-h .r{display:flex;align-items:center;gap:14px;margin-right:400px}
+.view{border:1px solid #d5d9e4;background:#fff;border-radius:999px;padding:10px 20px;font-size:13px;font-weight:500}
+.arrow{width:32px;height:32px;border-radius:50%;border:1px solid #e3e6ee;display:grid;place-items:center;font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:26px;padding-bottom:40px}
+.card{background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 8px 30px rgba(30,40,90,.12);position:relative}
+.card>img{width:100%;height:142px}
+.tag{position:absolute;left:12px;top:12px;font-size:11.5px;font-weight:500;padding:6px 13px;border-radius:999px}
+.t1{background:#6a4df0;color:#fff}.t2{background:#d3f4e0;color:#166a3a}.t3{background:#eef4d4;color:#3f5a10}.t4{background:#dfe4ff;color:#2a3aa8}
+.heart{position:absolute;right:12px;top:12px;width:30px;height:30px;border-radius:50%;background:#fff;display:grid;place-items:center}
+.heart svg{width:15px;height:15px;stroke:#111;fill:none;stroke-width:2}
+.body{padding:12px 18px 18px}
+.price{font-size:20px;font-weight:700}
+.type{font-size:15px;margin-top:4px}
+.loc{font-size:12px;color:#555;margin-top:8px;display:flex;gap:6px;align-items:center}
+.meta{display:flex;justify-content:space-between;margin-top:16px;font-size:12px;color:#555}
+.meta span{display:flex;gap:7px;align-items:center}
+.meta svg{width:15px;height:15px;stroke:#666;fill:none;stroke-width:1.8}
+
+@media(max-width:1100px){
+ .search-area,.float-card,.cats{position:static;width:auto;margin:20px 0}
+ .hero{height:auto;padding-bottom:40px}.hero-curve{display:none}
+ .grid{grid-template-columns:repeat(2,1fr)}.features{flex-wrap:wrap}.sec-h .r{margin-right:0}
+ .menu{display:none}h1{font-size:44px}.bar{flex-wrap:wrap}.popular{flex-wrap:wrap}.cats{flex-wrap:wrap;transform:none}
+}
+@media(max-width:600px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <img class="hero-bg" src="http://localhost:5000/images/heroBg.png" alt="">
+  <div class="wrap">
+    <nav>
+      <a class="logo" href="#"><svg viewBox="0 0 24 24"><path d="M12 2 1 11h3v10h6v-6h4v6h6V11h3z"/></svg>HomeSpace</a>
+      <div class="menu"><a href="#">Buy</a><a href="#">Rent</a><a href="#">Projects</a><a href="#">Agents</a><a href="#">Services &#8964;</a></div>
+      <div class="nav-r">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2f3cf0" stroke-width="2"><path d="M12 21s-8-5.5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.5-8 11-8 11z"/></svg>
+        <a class="btn-list" href="#">List Property</a>
+        <div class="user"><img class="avatar" src="" alt=""><span style="font-size:11px">&#8964;</span></div>
+      </div>
+    </nav>
+
+    <div class="hero-top"><span class="pill">Find Your Perfect Place</span><span class="trust"><i></i>Trusted by 1M+ home seekers</span></div>
+    <h1>Discover a Better<br>Way to Find <span>Home</span></h1>
+    <p class="lead">Explore verified properties, compare prices, and find your dream home with ease. From apartments to villas, we've got you covered.</p>
+
+   
+
+    <div class="search-area">
+      <div class="tabs"><button class="on">Buy</button><button>Rent</button><button>New Projects</button></div>
+      <div class="bar">
+        <div class="field grow"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>Search by city, locality, project or builder...</div>
+        <div class="field sel"><span style="display:flex;gap:12px;align-items:center"><svg viewBox="0 0 24 24"><path d="M3 11 12 3l9 8v10H3z" fill="#222"/></svg><span><small>Property Type</small><b>Any</b></span></span><span>&#8964;</span></div>
+        <div class="field sel"><span style="display:flex;gap:12px;align-items:center"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg><span><small>Budget</small><b>Any</b></span></span><span>&#8964;</span></div>
+        <button class="go">Search</button>
+      </div>
+      <div class="popular">Popular Searches:
+        <a href="#">2 BHK in Mumbai</a><a href="#">3 BHK in Pune</a><a href="#">Villas in Bangalore</a><a href="#">Commercial in Delhi</a>
+      </div>
+    </div>
+
+    <div class="cats">
+      <div class="cat"><img src="http://localhost:5000/images/projects/Untitled-design-18.webp" alt=""><b>Luxury Apartments</b><small>In Mumbai</small></div>
+      <div class="cat"><img src="http://localhost:5000/images/projects/Untitled-design-19.webp" alt=""><b>Independent Houses</b><small>In Bangalore</small></div>
+      <div class="cat"><img src="http://localhost:5000/images/projects/Untitled-design-20.webp" alt=""><b>Plots &amp; Land</b><small>In Pune</small></div>
+    </div>
+  </div>
+  <div class="hero-curve"></div>
+</section>
+
+<!-- FEATURES + FEATURED -->
+<div class="wrap">
+  <div class="features">
+    <div class="feat"><div class="ic" style="background:#e8edff"><svg viewBox="0 0 24 24" fill="#2f3cf0"><path d="M12 3 2 12h3v9h5v-6h4v6h5v-9h3z"/></svg></div><div><b>Verified Listings</b><small>100% authentic properties</small></div></div>
+    <div class="feat"><div class="ic" style="background:#dcf5e5"><svg viewBox="0 0 24 24" fill="#26a75a"><path d="M12 2 4 5v6c0 5 3.4 9.3 8 11 4.6-1.7 8-6 8-11V5z"/><path d="m8.5 12 2.5 2.5 4.5-5" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div><b>Trusted Agents</b><small>RERA approved professionals</small></div></div>
+    <div class="feat"><div class="ic" style="background:#fdebd9"><svg viewBox="0 0 24 24" fill="#f7931e"><path d="m12 2 3 6.5 7 .8-5.2 4.8 1.5 7-6.3-3.6L5.7 21l1.5-7L2 9.3l7-.8z"/></svg></div><div><b>Best Prices</b><small>Compare &amp; save more</small></div></div>
+    <div class="feat"><div class="ic" style="background:#ece3fb"><svg viewBox="0 0 24 24" fill="#7b3fe4"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.500a2.5 2.500 0 0 1 0 5z"/></svg></div><div><b>Prime Locations</b><small>Homes in top neighbourhoods</small></div></div>
+  </div>
+
+  <div class="sec-h">
+    <div><h2>Featured Properties</h2><p>Handpicked properties just for you</p></div>
+    <div class="r"><a class="view" href="#">View All &nbsp;&rarr;</a><span class="arrow">&#8249;</span></div>
+  </div>
+
+  <div class="grid">
+    <article class="card">
+      <img src="" alt=""><span class="tag t1">Featured</span><span class="heart"><svg viewBox="0 0 24 24"><path d="M12 21s-8-5.500-8-11a4.500 4.500 0 0 1 8-2.800A4.500 4.500 0 0 1 20 10c0 5.500-8 11-8 11z"/></svg></span>
+      <div class="body"><div class="price">₹ 1.25 Cr</div><div class="type">2 BHK Apartment</div><div class="loc">&#9679; Thane West, Mumbai</div>
+        <div class="meta"><span><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/></svg>1200 sq.ft</span><span><svg viewBox="0 0 24 24"><path d="M3 18V8h18v10M3 14h18"/></svg>2 Beds</span><span><svg viewBox="0 0 24 24"><path d="M4 12h16v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/></svg>2 Baths</span></div></div>
+    </article>
+    <article class="card">
+      <img src="" alt=""><span class="tag t2">New</span><span class="heart"><svg viewBox="0 0 24 24"><path d="M12 21s-8-5.500-8-11a4.500 4.500 0 0 1 8-2.800A4.500 4.500 0 0 1 20 10c0 5.500-8 11-8 11z"/></svg></span>
+      <div class="body"><div class="price">₹ 3.2 Cr</div><div class="type">4 BHK Villa</div><div class="loc">&#9679; Whitefield, Bangalore</div>
+        <div class="meta"><span><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/></svg>2400 sq.ft</span><span><svg viewBox="0 0 24 24"><path d="M3 18V8h18v10M3 14h18"/></svg>4 Beds</span><span><svg viewBox="0 0 24 24"><path d="M4 12h16v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/></svg>4 Baths</span></div></div>
+    </article>
+    <article class="card">
+      <img src="" alt=""><span class="tag t3">Ready to Move</span><span class="heart"><svg viewBox="0 0 24 24"><path d="M12 21s-8-5.500-8-11a4.500 4.500 0 0 1 8-2.800A4.500 4.500 0 0 1 20 10c0 5.500-8 11-8 11z"/></svg></span>
+      <div class="body"><div class="price">₹ 85 Lakh</div><div class="type">3 BHK Apartment</div><div class="loc">&#9679; Wakad, Pune</div>
+        <div class="meta"><span><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/></svg>1450 sq.ft</span><span><svg viewBox="0 0 24 24"><path d="M3 18V8h18v10M3 14h18"/></svg>3 Beds</span><span><svg viewBox="0 0 24 24"><path d="M4 12h16v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/></svg>3 Baths</span></div></div>
+    </article>
+    <article class="card">
+      <img src="" alt=""><span class="tag t4">High Rental Yield</span><span class="heart"><svg viewBox="0 0 24 24"><path d="M12 21s-8-5.500-8-11a4.500 4.500 0 0 1 8-2.800A4.500 4.500 0 0 1 20 10c0 5.500-8 11-8 11z"/></svg></span>
+      <div class="body"><div class="price">₹ 2.1 Cr</div><div class="type">3 BHK Apartment</div><div class="loc">&#9679; Sector 62, Gurgaon</div>
+        <div class="meta"><span><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/></svg>1800 sq.ft</span><span><svg viewBox="0 0 24 24"><path d="M3 18V8h18v10M3 14h18"/></svg>3 Beds</span><span><svg viewBox="0 0 24 24"><path d="M4 12h16v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/></svg>3 Baths</span></div></div>
+    </article>
+  </div>
+</div>
+
+</body>
+</html>
