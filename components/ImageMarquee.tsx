@@ -68,8 +68,6 @@ export default function ImageMarquee() {
       c.addEventListener("mouseleave", onLeave);
     });
 
-    const CARD_W = 330; // must match CSS flex-basis
-
     // ── Per-card smoothed state (lerp targets) ───────────────────────────────
     const smoothed = cards.map(() => ({
       scale: 1, rotateY: 0, ty: 0,
@@ -97,6 +95,9 @@ export default function ImageMarquee() {
       // ── COMPUTE targets + LERP smoothed state ──────────────────────────────
       const k = 0.85;
       const kNorm = 1 - Math.sqrt(1 - k * k);
+      const isMobile = vw <= 768;
+      const minScale = isMobile ? 0.9 : 0.8;
+      const scaleRange = 1.0 - minScale;
       const rotFactor = vw < 600 ? 0.42 : 0.58; // slightly gentler 3D tilt on narrow screens
 
       cards.forEach((card, i) => {
@@ -109,8 +110,8 @@ export default function ImageMarquee() {
         // Circular arc: 0 at center, 1 at edge, with 0 derivative at center (flat apex)
         const circ = (1 - Math.sqrt(Math.max(0, 1 - Math.pow(uAbs * k, 2)))) / kNorm;
 
-        // Scale: 0.7x at center, smooth circular curve up to 1.0x at edges
-        const targetScale = 0.7 + 0.3 * circ;
+        // Scale: 0.8x (mobile) / 0.7x (desktop) at center, smooth circular curve up to 1.0x at edges
+        const targetScale = minScale + scaleRange * circ;
 
         // Cylinder tangent rotation: 0deg at center, smooth circular angle toward center
         const targetRotateY = -Math.sign(u) * (Math.asin(uAbs * 0.75) * (180 / Math.PI) * rotFactor);
