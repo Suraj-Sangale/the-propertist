@@ -424,8 +424,12 @@ export default function Gallery() {
         document.getAnimations?.().forEach(a => { if (a.id?.startsWith("intro:")) a.cancel(); });
         root!.removeAttribute("data-intro");
       }
-      if (lastAnim) lastAnim.finished.then(settle).catch(settle);
-      else settle();
+      const finalAnim = lastAnim as Animation | null;
+      if (finalAnim && "finished" in finalAnim) {
+        (finalAnim.finished as Promise<Animation>).then(settle).catch(settle);
+      } else {
+        settle();
+      }
     } else {
       root.removeAttribute("data-intro");
     }

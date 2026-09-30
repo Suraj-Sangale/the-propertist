@@ -8,9 +8,12 @@ import type { SwiperOptions } from "swiper/types";
 import "swiper/css";
 import "swiper/css/navigation";
 
-type CarouselOptions = SwiperOptions & {
+export type CarouselOptions = SwiperOptions & {
   navigation?: boolean | object;
   autoplay?: boolean | object;
+  onSwiper?: (swiper: any) => void;
+  onInit?: (swiper: any) => void;
+  [key: string]: any;
 };
 
 interface CommonSwiperProps {
@@ -34,7 +37,7 @@ export default function CommonSwiper({
 
   const safeId = id.replace(/:/g, "");
 
-  const options: SwiperOptions = {
+  const options: any = {
     slidesPerView: 1,
     centeredSlides: false,
     spaceBetween: 0,
@@ -48,13 +51,19 @@ export default function CommonSwiper({
         }
       : false,
     onSwiper: (swiper: any) => {
+      if (typeof carouselOptions?.onSwiper === "function") {
+        carouselOptions.onSwiper(swiper);
+      }
       if (carouselOptions?.autoplay && swiper.autoplay) {
         setTimeout(() => {
           swiper.autoplay?.start();
         }, 100);
       }
     },
-    onInit: (swiper:any) => {
+    onInit: (swiper: any) => {
+      if (typeof carouselOptions?.onInit === "function") {
+        carouselOptions.onInit(swiper);
+      }
       if (carouselOptions?.autoplay && swiper.autoplay) {
         swiper.autoplay?.start();
       }
