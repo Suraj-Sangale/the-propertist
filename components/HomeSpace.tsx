@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import PropertyCarousel from "./PropertyCarousel";
+import type { Property } from "./PropertyCarousel";
 import StatsBanner from "./StatsBanner";
 
 // ─── Data ────────────────────────────────────────────────────────────────────
@@ -78,7 +80,7 @@ const FEATURES = [
   },
 ];
 
-const PROPERTIES = [
+const PROPERTIES: Property[] = [
   {
     tag: "Featured",
     tagClass: "t1",
@@ -125,6 +127,229 @@ const PROPERTIES = [
     imgLink:"/images/projects/Untitled-design-18.webp"
 
   },
+  {
+    tag: "Featured",
+    tagClass: "t1",
+    price: "₹ 1.25 Cr",
+    type: "2 BHK Apartment",
+    loc: "Thane West, Mumbai",
+    area: "1200 sq.ft",
+    beds: "2 Beds",
+    baths: "2 Baths",
+    imgLink: "/images/projects/property-01.webp"
+  },
+  {
+    tag: "New",
+    tagClass: "t2",
+    price: "₹ 3.2 Cr",
+    type: "4 BHK Villa",
+    loc: "Whitefield, Bangalore",
+    area: "2400 sq.ft",
+    beds: "4 Beds",
+    baths: "4 Baths",
+    imgLink: "/images/projects/property-02.webp"
+  },
+  {
+    tag: "Ready to Move",
+    tagClass: "t3",
+    price: "₹ 85 Lakh",
+    type: "3 BHK Apartment",
+    loc: "Wakad, Pune",
+    area: "1450 sq.ft",
+    beds: "3 Beds",
+    baths: "3 Baths",
+    imgLink: "/images/projects/property-03.webp"
+  },
+  {
+    tag: "High Rental Yield",
+    tagClass: "t4",
+    price: "₹ 2.1 Cr",
+    type: "3 BHK Apartment",
+    loc: "Sector 62, Gurgaon",
+    area: "1800 sq.ft",
+    beds: "3 Beds",
+    baths: "3 Baths",
+    imgLink: "/images/projects/Untitled-design-18.webp"
+  },
+
+  {
+    tag: "Premium",
+    tagClass: "t5",
+    price: "₹ 1.85 Cr",
+    type: "3 BHK Apartment",
+    loc: "Powai, Mumbai",
+    area: "1650 sq.ft",
+    beds: "3 Beds",
+    baths: "3 Baths",
+    imgLink: "/images/projects/property-05.webp"
+  },
+  {
+    tag: "New Launch",
+    tagClass: "t2",
+    price: "₹ 92 Lakh",
+    type: "2 BHK Apartment",
+    loc: "Kharadi, Pune",
+    area: "1150 sq.ft",
+    beds: "2 Beds",
+    baths: "2 Baths",
+    imgLink: "/images/projects/property-06.webp"
+  },
+  {
+    tag: "Luxury",
+    tagClass: "t1",
+    price: "₹ 4.75 Cr",
+    type: "5 BHK Villa",
+    loc: "Sarjapur Road, Bangalore",
+    area: "3800 sq.ft",
+    beds: "5 Beds",
+    baths: "5 Baths",
+    imgLink: "/images/projects/property-07.webp"
+  },
+  {
+    tag: "Ready to Move",
+    tagClass: "t3",
+    price: "₹ 1.15 Cr",
+    type: "2 BHK Apartment",
+    loc: "Hinjewadi, Pune",
+    area: "1180 sq.ft",
+    beds: "2 Beds",
+    baths: "2 Baths",
+    imgLink: "/images/projects/property-08.webp"
+  },
+  {
+    tag: "Featured",
+    tagClass: "t1",
+    price: "₹ 2.65 Cr",
+    type: "4 BHK Apartment",
+    loc: "Andheri West, Mumbai",
+    area: "2100 sq.ft",
+    beds: "4 Beds",
+    baths: "4 Baths",
+    imgLink: "/images/projects/property-09.webp"
+  },
+  {
+    tag: "Hot Property",
+    tagClass: "t4",
+    price: "₹ 1.45 Cr",
+    type: "3 BHK Apartment",
+    loc: "Baner, Pune",
+    area: "1550 sq.ft",
+    beds: "3 Beds",
+    baths: "3 Baths",
+    imgLink: "/images/projects/property-10.webp"
+  },
+
+  {
+    tag: "New",
+    tagClass: "t2",
+    price: "₹ 2.9 Cr",
+    type: "4 BHK Villa",
+    loc: "Electronic City, Bangalore",
+    area: "2750 sq.ft",
+    beds: "4 Beds",
+    baths: "4 Baths",
+    imgLink: "/images/projects/property-11.webp"
+  },
+  {
+    tag: "Premium",
+    tagClass: "t5",
+    price: "₹ 3.4 Cr",
+    type: "3 BHK Apartment",
+    loc: "Worli, Mumbai",
+    area: "1950 sq.ft",
+    beds: "3 Beds",
+    baths: "3 Baths",
+    imgLink: "/images/projects/property-12.webp"
+  },
+  {
+    tag: "Ready to Move",
+    tagClass: "t3",
+    price: "₹ 78 Lakh",
+    type: "2 BHK Apartment",
+    loc: "Ravet, Pune",
+    area: "1050 sq.ft",
+    beds: "2 Beds",
+    baths: "2 Baths",
+    imgLink: "/images/projects/property-13.webp"
+  },
+  {
+    tag: "High Rental Yield",
+    tagClass: "t4",
+    price: "₹ 1.72 Cr",
+    type: "3 BHK Apartment",
+    loc: "Golf Course Road, Gurgaon",
+    area: "1720 sq.ft",
+    beds: "3 Beds",
+    baths: "3 Baths",
+    imgLink: "/images/projects/property-14.webp"
+  },
+  {
+    tag: "Luxury",
+    tagClass: "t1",
+    price: "₹ 5.2 Cr",
+    type: "5 BHK Villa",
+    loc: "Whitefield, Bangalore",
+    area: "4200 sq.ft",
+    beds: "5 Beds",
+    baths: "5 Baths",
+    imgLink: "/images/projects/property-15.webp"
+  },
+
+  {
+    tag: "Featured",
+    tagClass: "t1",
+    price: "₹ 1.08 Cr",
+    type: "2 BHK Apartment",
+    loc: "Mira Road, Mumbai",
+    area: "1100 sq.ft",
+    beds: "2 Beds",
+    baths: "2 Baths",
+    imgLink: "/images/projects/property-16.webp"
+  },
+  {
+    tag: "New Launch",
+    tagClass: "t2",
+    price: "₹ 1.35 Cr",
+    type: "3 BHK Apartment",
+    loc: "Wagholi, Pune",
+    area: "1420 sq.ft",
+    beds: "3 Beds",
+    baths: "3 Baths",
+    imgLink: "/images/projects/property-17.webp"
+  },
+  {
+    tag: "Premium",
+    tagClass: "t5",
+    price: "₹ 2.25 Cr",
+    type: "3 BHK Apartment",
+    loc: "Bandra East, Mumbai",
+    area: "1750 sq.ft",
+    beds: "3 Beds",
+    baths: "3 Baths",
+    imgLink: "/images/projects/property-18.webp"
+  },
+  {
+    tag: "Ready to Move",
+    tagClass: "t3",
+    price: "₹ 1.95 Cr",
+    type: "4 BHK Apartment",
+    loc: "Noida Sector 137, Noida",
+    area: "2200 sq.ft",
+    beds: "4 Beds",
+    baths: "4 Baths",
+    imgLink: "/images/projects/property-19.webp"
+  },
+  {
+    tag: "High Rental Yield",
+    tagClass: "t4",
+    price: "₹ 1.55 Cr",
+    type: "2 BHK Apartment",
+    loc: "Golf Course Extension, Gurgaon",
+    area: "1250 sq.ft",
+    beds: "2 Beds",
+    baths: "2 Baths",
+    imgLink: "/images/projects/property-20.webp"
+  }
 ];
 
 
@@ -218,8 +443,14 @@ export default function HomeSpace() {
         .hs-wrap { max-width: 1320px; margin: 0rem auto; padding: 0 24px; position: relative; }
 .hs-features-section { margin-top: 4rem; }
         /* HERO */
-        .hs-hero { position: relative; height: 640px; }
-        .hs-hero-bg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
+        .hs-hero {
+          position: relative;
+          height: 640px;
+          background-image: url('/images/heroBg.png');
+          background-attachment: fixed;
+          background-size: cover;
+          background-position: center;
+        }
         .hs-hero::after {
           content: "";
           position: absolute; inset: 0; z-index: 1;
@@ -334,21 +565,39 @@ export default function HomeSpace() {
         }
         .hs-view:hover { background: #f3f5f9; }
         .hs-arrow {
-          width: 32px; height: 32px; border-radius: 50%;
-          border: 1px solid #e3e6ee; display: grid; place-items: center;
-          font-size: 14px; cursor: pointer; transition: background .15s;
+          width: 34px; height: 34px; border-radius: 50%;
+          border: 1px solid #d5d9e4; background: #fff;
+          display: grid; place-items: center;
+          font-size: 16px; cursor: pointer;
+          transition: background .15s, border-color .15s, box-shadow .15s;
+          box-shadow: 0 1px 4px rgba(30,40,90,.07);
+          line-height: 1; color: #333;
         }
-        .hs-arrow:hover { background: #f3f5f9; }
+        .hs-arrow:hover { background: #f3f5f9; border-color: #b0b8cc; box-shadow: 0 2px 8px rgba(30,40,90,.12); }
 
-        /* GRID */
-        .hs-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 26px; padding-bottom: 40px; }
+        /* SECTION PILL */
+        .hs-sec-pill {
+          display: inline-block;
+          background: #eef4d4; color: #3f5a10;
+          font-size: 11.5px; font-weight: 600;
+          padding: 5px 13px; border-radius: 999px;
+          margin-bottom: 8px;
+        }
+
+        /* SWIPER CAROUSEL */
+        .hs-swiper-wrap { overflow: hidden; }
+        .cs-swiper { overflow: visible !important; }
+        .cs-swiper .swiper-slide { height: auto; }
+
+        /* CARD */
         .hs-card {
           background: #fff; border-radius: 18px; overflow: hidden;
           box-shadow: 0 8px 30px rgba(30,40,90,.12); position: relative;
           transition: transform .2s, box-shadow .2s;
+          height: 100%;
         }
         .hs-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(30,40,90,.18); }
-        .hs-card > img { width: 100%; height: 142px; }
+        .hs-card > img { width: 100%; height: 166px; object-fit: cover; }
         .hs-tag { position: absolute; left: 12px; top: 12px; font-size: 11.5px; font-weight: 500; padding: 6px 13px; border-radius: 999px; }
         .t1 { background: #6a4df0; color: #fff; }
         .t2 { background: #d3f4e0; color: #166a3a; }
@@ -365,7 +614,7 @@ export default function HomeSpace() {
         .hs-price { font-size: 20px; font-weight: 700; }
         .hs-type { font-size: 15px; margin-top: 4px; }
         .hs-loc { font-size: 12px; color: #555; margin-top: 8px; display: flex; gap: 6px; align-items: center; }
-        .hs-meta { display: flex; justify-content: space-between; margin-top: 16px; font-size: 12px; color: #555; }
+        .hs-meta { display: flex; justify-content: space-between; margin-top: 16px; font-size: 12px; color: #555; border-top: 1px solid #f0f2f7; padding-top: 14px; }
         .hs-meta span { display: flex; gap: 7px; align-items: center; }
 
         /* RESPONSIVE */
@@ -387,8 +636,6 @@ export default function HomeSpace() {
       <div className="hs-root">
         {/* ── HERO ─────────────────────────────────────────────────────── */}
         <section className="hs-hero">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="hs-hero-bg" src="/images/heroBg.png" alt="" />
 
           <div className="hs-wrap">
             {/* NAV */}
@@ -522,39 +769,7 @@ export default function HomeSpace() {
             ))}
           </div>
 
-          {/* SECTION HEADER */}
-          <div className="hs-sec-h">
-            <div>
-              <h2>Featured Properties</h2>
-              <p>Handpicked properties just for you</p>
-            </div>
-            <div className="hs-sec-r">
-              <a className="hs-view" href="#">View All &nbsp;→</a>
-              {/* <span className="hs-arrow">‹</span> */}
-            </div>
-          </div>
-
-          {/* PROPERTY GRID */}
-          <div className="hs-grid">
-            {PROPERTIES.map((p) => (
-              <article className="hs-card" key={p.price + p.loc}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={p.imgLink} alt={p.type} />
-                <span className={`hs-tag ${p.tagClass}`}>{p.tag}</span>
-                <span className="hs-heart"><IconHeart /></span>
-                <div className="hs-body">
-                  <div className="hs-price">{p.price}</div>
-                  <div className="hs-type">{p.type}</div>
-                  <div className="hs-loc">● {p.loc}</div>
-                  <div className="hs-meta">
-                    <span><IconArea />{p.area}</span>
-                    <span><IconBed />{p.beds}</span>
-                    <span><IconBath />{p.baths}</span>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
+          <PropertyCarousel properties={PROPERTIES} />
           
         {/* ── STATS ────────────────────────────────────────────────────── */}
         <StatsBanner />
