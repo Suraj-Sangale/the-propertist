@@ -179,7 +179,6 @@ export default function ImageMarquee() {
           font-weight: 800;
           color: #0f172a;
           letter-spacing: -0.01em;
-          margin: 0 0 clamp(20px, 3.5vw, 36px);
         }
 
         /* ─── Track ────────────────────────────────────── */

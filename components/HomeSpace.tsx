@@ -4,10 +4,9 @@ import { useState } from "react";
 import PropertyCarousel from "./PropertyCarousel";
 import type { Property } from "./PropertyCarousel";
 import StatsBanner from "./StatsBanner";
+import ImageMarquee from "./ImageMarquee";
 
 // ─── Data ────────────────────────────────────────────────────────────────────
-
-const NAV_LINKS = ["Buy", "Rent", "Projects", "Agents", "Services ⌄"];
 
 const SEARCH_TABS = ["Buy", "Rent", "New Projects"];
 
@@ -445,7 +444,8 @@ export default function HomeSpace() {
         /* HERO */
         .hs-hero {
           position: relative;
-          height: 640px;
+          min-height: 680px;
+          padding-top: 100px;
           background-image: url('/images/heroBg.png');
           background-attachment: fixed;
           background-size: cover;
@@ -464,22 +464,6 @@ export default function HomeSpace() {
         }
         .hs-hero .hs-wrap { z-index: 3; }
 
-        /* NAV */
-        .hs-nav { display: flex; align-items: center; height: 80px; gap: 56px; }
-        .hs-logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 21px; color: #111; }
-        .hs-logo svg { width: 28px; height: 28px; fill: #2f3cf0; }
-        .hs-menu { display: flex; gap: 38px; font-size: 13px; font-weight: 500; }
-        .hs-nav-r { margin-left: auto; display: flex; align-items: center; gap: 22px; }
-        .hs-btn-list {
-          background: #3a4a6b; color: #fff;
-          font-size: 13px; font-weight: 500;
-          padding: 11px 20px; border-radius: 999px;
-          transition: background .15s;
-        }
-        .hs-btn-list:hover { background: #2d3a55; }
-        .hs-avatar { width: 32px; height: 32px; border-radius: 50%; background: #dfe6f3; }
-        .hs-user { display: flex; align-items: center; gap: 14px; }
-
         /* HERO CONTENT */
         .hs-pill {
           display: inline-block;
@@ -491,12 +475,12 @@ export default function HomeSpace() {
         .hs-trust { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; color: #444; margin-left: 18px; }
         .hs-trust-dot { width: 8px; height: 8px; border-radius: 50%; background: #f7931e; display: inline-block; }
         .hs-hero-top { margin-top: 16px; }
-        .hs-h1 { font-size: 54px; line-height: 1.05; font-weight: 800; letter-spacing: -1.5px; margin: 28px 0 22px; }
+        .hs-h1 { font-size: 54px; line-height: 1.05; font-weight: 800; letter-spacing: -1.5px; margin: 10px 0 22px; }
         .hs-h1 span { color: #2f3cf0; }
         .hs-lead { font-size: 14px; line-height: 1.65; color: #222; max-width: 470px; }
 
         /* SEARCH */
-        .hs-search-area { position: absolute; left: 24px; top: 350px; width: 1015px; }
+        .hs-search-area { position: absolute; left: 24px; top: 375px; width: 1015px; }
         .hs-tabs { display: inline-flex; gap: 8px; background: #fff; padding: 12px 14px 10px; border-radius: 26px 26px 0 0; }
         .hs-tabs button {
           border: 0; font: 500 12px 'Inter'; padding: 12px 26px;
@@ -638,31 +622,6 @@ export default function HomeSpace() {
         <section className="hs-hero">
 
           <div className="hs-wrap">
-            {/* NAV */}
-            <nav className="hs-nav">
-              <a className="hs-logo" href="#">
-                <svg viewBox="0 0 24 24">
-                  <path d="M12 2 1 11h3v10h6v-6h4v6h6V11h3z" />
-                </svg>
-                HomeSpace
-              </a>
-
-              <div className="hs-menu">
-                {NAV_LINKS.map((l) => (
-                  <a key={l} href="#">{l}</a>
-                ))}
-              </div>
-
-              <div className="hs-nav-r">
-                <IconPin />
-                <a className="hs-btn-list" href="#">List Property</a>
-                <div className="hs-user">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img className="hs-avatar" src="" alt="User avatar" />
-                  <span style={{ fontSize: 11 }}>⌄</span>
-                </div>
-              </div>
-            </nav>
 
             {/* HERO COPY */}
             {/* <div className="hs-hero-top">
@@ -773,6 +732,7 @@ export default function HomeSpace() {
           
         {/* ── STATS ────────────────────────────────────────────────────── */}
         <StatsBanner />
+        <ImageMarquee />
         </div>
       </div>
     </>

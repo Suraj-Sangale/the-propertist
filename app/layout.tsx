@@ -18,6 +18,8 @@ export const metadata: Metadata = {
     "Discover a better way to find home. Explore verified luxury properties, modern villas, apartments, compare prices, and connect with RERA certified agents.",
 };
 
+import Header from "@/components/Header";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -28,7 +30,10 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-white text-slate-900">{children}</body>
+      <body className="min-h-full flex flex-col bg-white text-slate-900">
+        <Header />
+        {children}
+      </body>
     </html>
   );
 }
