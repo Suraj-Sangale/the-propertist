@@ -60,7 +60,7 @@ export default function PropertyDetailsClient({ property }: { property: any }) {
   }, []);
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-[#f3f4f6] font-sans text-[#1a1a2e] selection:bg-[#c8a84b] selection:text-white">
+    <div ref={containerRef} className="min-h-screen bg-[#f3f4f6] text-[#1a1a2e] selection:bg-[#c8a84b] selection:text-white">
       {/* 1. TOP NAVIGATION */}
       <Header />
 
@@ -145,7 +145,7 @@ export default function PropertyDetailsClient({ property }: { property: any }) {
 
       {/* LIGHTBOX GALLERY MODAL */}
       {isGalleryOpen && (
-        <FullscreenGallery onClose={() => setIsGalleryOpen(false)} />
+        <FullscreenGallery property={property} onClose={() => setIsGalleryOpen(false)} />
       )}
     </div>
   );
@@ -384,9 +384,9 @@ function WhyChooseCard({ property }: { property: any }) {
             </li>
           ))}
         </ul>
-        <div className="absolute bottom-6 right-6 w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white shadow-lg border border-white/30 group-hover:bg-[#c8a84b] group-hover:text-white transition-all">
+        {/* <div className="absolute bottom-6 right-6 w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white shadow-lg border border-white/30 group-hover:bg-[#c8a84b] group-hover:text-white transition-all">
           <PlayCircle className="w-6 h-6 ml-0.5" />
-        </div>
+        </div> */}
       </div>
     </div>
   );
@@ -485,54 +485,166 @@ function AmenitiesSection() {
 }
 
 function FloorPlanSection({ property }: { property: any }) {
-  return (
-    <section className="animate-up scroll-mt-32" id="price">
-      <h2 className="text-2xl font-bold text-[#1a1a2e] mb-6">Floor Plan</h2>
-      
-      <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-[0_4px_25px_rgba(20,35,70,0.03)]">
-        <div className="flex gap-2 mb-6">
-          {['2 BHK', '3 BHK', 'All'].map((tab, i) => (
-            <button key={tab} className={`px-5 py-2 text-sm font-bold rounded-full transition-colors ${i===0 ? 'bg-[#1a1a2e] text-[#c8a84b]' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>
-              {tab}
-            </button>
-          ))}
-        </div>
+  // Build tabs from property config keys
+  const configKeys: string[] = property?.config_keys || [];
+  const bhkLabels = configKeys
+    .map((k: string) => {
+      const match = k.match(/^(\d(?:_\d)*)_bhk$/);
+      if (!match) return null;
+      const nums = match[1].split('_');
+      return nums.map(n => `${n} BHK`);
+    })
+    .flat()
+    .filter(Boolean);
 
-        <div className="flex flex-col sm:flex-row gap-8 items-center bg-[#f3f4f6] rounded-2xl p-6">
-          <div className="w-full sm:w-[40%] bg-white rounded-xl p-4 shadow-sm border border-slate-100 relative group cursor-pointer">
-            <div className="aspect-[4/3] relative">
-              <Image src="/images/projects/Untitled-design-21.webp" alt="Floor Plan" fill className="object-contain opacity-50 group-hover:opacity-80 transition-opacity" />
-            </div>
-            <div className="absolute inset-0 flex items-center justify-center">
-               <div className="bg-[#1a1a2e] px-4 py-2 rounded-full shadow-lg text-[#c8a84b] font-bold text-xs flex items-center gap-2 group-hover:scale-105 transition-transform">
-                 <Maximize2 className="w-3.5 h-3.5" /> Enlarge
-               </div>
-            </div>
+  // Deduplicate and keep insertion order
+  const tabs: string[] = bhkLabels.length
+    ? Array.from(new Set(bhkLabels as string[]))
+    : ['All'];
+
+  const [activeTab, setActiveTab] = useState(tabs[0]);
+  const [floorPlanOpen, setFloorPlanOpen] = useState(false);
+
+  // Derive per-tab details from property data (approximate from area string)
+  const areaString: string = property?.area || '1000 – 2000 sq.ft';
+  const areaParts = areaString.replace(/sq\.ft/gi, '').trim().split('–').map((s: string) => s.trim());
+  const minArea = parseInt(areaParts[0]) || 1000;
+  const maxArea = parseInt(areaParts[1] || areaParts[0]) || 2000;
+  const totalTabs = tabs.length;
+
+  function getTabDetails(tab: string, idx: number) {
+    const step = totalTabs > 1 ? (maxArea - minArea) / (totalTabs - 1) : 0;
+    const superArea = Math.round(minArea + step * idx);
+    const carpetArea = Math.round(superArea * 0.76);
+    return {
+      label: `${tab} - Type A`,
+      superArea: `${superArea} sq.ft`,
+      carpetArea: `${carpetArea} sq.ft`,
+      price: property?.priceFrom || 'On Request',
+    };
+  }
+
+  const activeIdx = tabs.indexOf(activeTab);
+  const details = getTabDetails(activeTab, activeIdx);
+  const floorPlanImage = property?.floorPlans?.[activeIdx]?.image || '/images/projects/floor_plan-2.jpg';
+
+  // Lock scroll + Escape key when modal open
+  useEffect(() => {
+    if (!floorPlanOpen) return;
+    document.body.style.overflow = 'hidden';
+    const handleKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setFloorPlanOpen(false); };
+    window.addEventListener('keydown', handleKey);
+    return () => {
+      document.body.style.overflow = 'auto';
+      window.removeEventListener('keydown', handleKey);
+    };
+  }, [floorPlanOpen]);
+
+  return (
+    <>
+      <section className="animate-up scroll-mt-32" id="price">
+        <h2 className="text-2xl font-bold text-[#1a1a2e] mb-6">Floor Plan</h2>
+        
+        <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-[0_4px_25px_rgba(20,35,70,0.03)]">
+          {/* Tab toggle */}
+          <div className="flex gap-2 mb-6 flex-wrap">
+            {tabs.map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-5 py-2 text-sm font-bold rounded-full transition-colors ${
+                  activeTab === tab
+                    ? 'bg-[#1a1a2e] text-[#c8a84b]'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                {tab}
+              </button>
+            ))}
           </div>
-          
-          <div className="w-full sm:w-[60%] flex flex-col gap-5">
-            <h3 className="text-xl font-bold text-[#1a1a2e]">2 BHK - Type A</h3>
-            <div className="flex gap-8">
-              <div className="flex flex-col">
-                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Super Built-up Area</span>
-                <span className="text-base font-bold text-[#1a1a2e]">1075 sq.ft</span>
+
+          <div className="flex flex-col sm:flex-row gap-8 items-center bg-[#f3f4f6] rounded-2xl p-6">
+            {/* Thumbnail — click to enlarge */}
+            <div
+              className="w-full sm:w-[40%] bg-white rounded-xl p-4 shadow-sm border border-slate-100 relative group cursor-pointer"
+              onClick={() => setFloorPlanOpen(true)}
+            >
+              <div className="aspect-[4/3] relative">
+                <Image
+                  src={floorPlanImage}
+                  alt="Floor Plan"
+                  fill
+                  className="object-contain opacity-50 group-hover:opacity-80 transition-opacity"
+                />
               </div>
-              <div className="flex flex-col">
-                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Carpet Area</span>
-                <span className="text-base font-bold text-[#1a1a2e]">820 sq.ft</span>
+              <div className="absolute inset-0 flex items-center justify-center">
+                 <div className="bg-[#1a1a2e] px-4 py-2 rounded-full shadow-lg text-[#c8a84b] font-bold text-xs flex items-center gap-2 group-hover:scale-105 transition-transform">
+                   <Maximize2 className="w-3.5 h-3.5" /> Enlarge
+                 </div>
               </div>
             </div>
-            <div className="flex flex-col pt-2">
-               <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Price</span>
-               <span className="text-2xl font-black text-[#1a1a2e]">₹ 2.3 Cr* <span className="text-sm font-medium text-slate-500 ml-1">Onwards</span></span>
+            
+            <div className="w-full sm:w-[60%] flex flex-col gap-5">
+              <h3 className="text-xl font-bold text-[#1a1a2e]">{details.label}</h3>
+              <div className="flex gap-8">
+                <div className="flex flex-col">
+                  <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Super Built-up Area</span>
+                  <span className="text-base font-bold text-[#1a1a2e]">{details.superArea}</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Carpet Area</span>
+                  <span className="text-base font-bold text-[#1a1a2e]">{details.carpetArea}</span>
+                </div>
+              </div>
+              <div className="flex flex-col pt-2">
+                 <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Price</span>
+                 <span className="text-2xl font-black text-[#1a1a2e]">{details.price} <span className="text-sm font-medium text-slate-500 ml-1">Onwards</span></span>
+              </div>
+              <button
+                onClick={() => setFloorPlanOpen(true)}
+                className="w-fit mt-2 border border-[#1a1a2e] text-[#1a1a2e] hover:bg-[#1a1a2e] hover:text-[#c8a84b] transition-colors font-bold text-sm px-6 py-2.5 rounded-full flex items-center gap-2"
+              >
+                View Floor Plan <ChevronRight className="w-4 h-4" />
+              </button>
             </div>
-            <button className="w-fit mt-2 border border-[#1a1a2e] text-[#1a1a2e] hover:bg-[#1a1a2e] hover:text-[#c8a84b] transition-colors font-bold text-sm px-6 py-2.5 rounded-full flex items-center gap-2">
-              View Floor Plan <ChevronRight className="w-4 h-4" />
-            </button>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      {/* Floor Plan Lightbox */}
+      {floorPlanOpen && (
+        <div
+          className="fixed inset-0 z-[300] bg-black/90 backdrop-blur-xl flex items-center justify-center p-6"
+          onClick={() => setFloorPlanOpen(false)}
+        >
+          <div
+            className="relative w-full max-w-3xl bg-white rounded-2xl overflow-hidden shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal header */}
+            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+              <span className="font-bold text-[#1a1a2e] text-sm">{details.label} — Floor Plan</span>
+              <button
+                onClick={() => setFloorPlanOpen(false)}
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-700 transition-colors"
+                aria-label="Close"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            {/* Full floor plan image */}
+            <div className="relative w-full aspect-[4/3]">
+              <Image
+                src={floorPlanImage}
+                alt={`${details.label} Floor Plan`}
+                fill
+                className="object-contain p-4"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
@@ -778,39 +890,99 @@ function Footer() {
   );
 }
 
-function FullscreenGallery({ onClose }: { onClose: () => void }) {
-  // Lock scroll
+function FullscreenGallery({ property, onClose }: { property: any; onClose: () => void }) {
+  const gallery: string[] = property?.gallery || [];
+  const imageCount = gallery.length;
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const prev = () => setActiveIndex((i) => (i - 1 + imageCount) % imageCount);
+  const next = () => setActiveIndex((i) => (i + 1) % imageCount);
+
+  // Lock scroll + keyboard navigation + hide headers
   useEffect(() => {
     document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = 'auto'; };
-  }, []);
+
+    // Hide ALL headers (local + global layout header)
+    const headers = Array.from(document.querySelectorAll<HTMLElement>('header'));
+    headers.forEach(h => { h.style.visibility = 'hidden'; });
+
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') prev();
+      if (e.key === 'ArrowRight') next();
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => {
+      document.body.style.overflow = 'auto';
+      headers.forEach(h => { h.style.visibility = ''; });
+      window.removeEventListener('keydown', handleKey);
+    };
+  }, [imageCount]);
 
   return (
-    <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex flex-col">
-      <div className="h-20 px-6 flex items-center justify-between border-b border-white/10">
-        <div className="text-white font-bold tracking-wide">Gallery (1/16)</div>
-        <button onClick={onClose} className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-white hover:text-black transition-colors">
-          <X className="w-5 h-5" />
-        </button>
+    <div className="fixed inset-0 z-[200] bg-black/97 backdrop-blur-xl flex flex-col">
+      {/* Close button — top right, no full header */}
+      <button
+        onClick={onClose}
+        className="absolute top-4 right-4 w-10 h-10 bg-white/10 hover:bg-white hover:text-black rounded-full flex items-center justify-center text-white transition-colors z-10 shadow-lg"
+        aria-label="Close gallery"
+      >
+        <X className="w-5 h-5" />
+      </button>
+
+      {/* Counter */}
+      <div className="absolute top-5 left-5 text-white/70 text-sm font-semibold z-10">
+        {activeIndex + 1} / {imageCount || 1}
       </div>
-      <div className="flex-1 relative flex items-center justify-center p-8">
-        <button className="absolute left-8 w-12 h-12 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-white hover:text-black transition-colors z-10">
-          <ChevronLeft className="w-6 h-6" />
-        </button>
-        <div className="relative w-full max-w-5xl aspect-video rounded-xl overflow-hidden shadow-2xl">
-           <Image src="/images/projects/Untitled-design-20.webp" alt="Main" fill className="object-contain" />
+
+      {/* Main image */}
+      <div className="flex-1 relative flex items-center justify-center px-20 py-8">
+        {imageCount > 1 && (
+          <button
+            onClick={prev}
+            className="absolute left-4 w-12 h-12 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-white hover:text-black transition-colors z-10 shadow-lg"
+            aria-label="Previous image"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+        )}
+
+        <div className="relative w-full max-w-5xl h-full rounded-xl overflow-hidden shadow-2xl">
+          <Image
+            src={gallery[activeIndex] || property?.image || ''}
+            alt={`${property?.projectName} – Photo ${activeIndex + 1}`}
+            fill
+            className="object-contain"
+          />
         </div>
-        <button className="absolute right-8 w-12 h-12 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-white hover:text-black transition-colors z-10">
-          <ChevronRight className="w-6 h-6" />
-        </button>
+
+        {imageCount > 1 && (
+          <button
+            onClick={next}
+            className="absolute right-4 w-12 h-12 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-white hover:text-black transition-colors z-10 shadow-lg"
+            aria-label="Next image"
+          >
+            <ChevronRight className="w-6 h-6" />
+          </button>
+        )}
       </div>
-      <div className="h-32 px-6 pb-6 flex items-center justify-center gap-3 overflow-x-auto no-scrollbar">
-        {[18,19,20,21].map((img, i) => (
-          <div key={i} className={`relative h-full aspect-video rounded-lg overflow-hidden cursor-pointer border-2 transition-all ${i===2 ? 'border-white opacity-100' : 'border-transparent opacity-50 hover:opacity-100'}`}>
-            <Image src={`/images/projects/Untitled-design-${img}.webp`} alt="thumb" fill className="object-cover" />
-          </div>
-        ))}
-      </div>
+
+      {/* Thumbnail strip */}
+      {imageCount > 1 && (
+        <div className="h-28 px-6 pb-5 flex items-center justify-center gap-3 overflow-x-auto no-scrollbar flex-shrink-0">
+          {gallery.map((src, i) => (
+            <button
+              key={i}
+              onClick={() => setActiveIndex(i)}
+              className={`relative h-full aspect-video rounded-lg overflow-hidden border-2 transition-all flex-shrink-0 ${
+                i === activeIndex ? 'border-white opacity-100 scale-105' : 'border-transparent opacity-50 hover:opacity-80'
+              }`}
+            >
+              <Image src={src} alt={`Thumb ${i + 1}`} fill className="object-cover" />
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
