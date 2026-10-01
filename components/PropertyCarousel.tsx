@@ -197,8 +197,8 @@ export default function PropertyCarousel({
             },
           }}
         >
-          {properties.map((p) => (
-            <SwiperSlide key={p.price + p.loc + p.imgLink} style={{ height: "auto" }}>
+          {properties.map((p,i ) => (
+            <SwiperSlide key={i} style={{ height: "auto" }}>
               <article className="pc-card">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={p.imgLink} alt={p.type} />

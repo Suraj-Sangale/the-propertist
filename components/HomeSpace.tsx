@@ -444,7 +444,7 @@ export default function HomeSpace() {
         /* HERO */
         .hs-hero {
           position: relative;
-          min-height: 680px;
+          min-height: 720px;
           padding-top: 100px;
           background-image: url('/images/heroBg.png');
           background-attachment: fixed;
@@ -462,7 +462,7 @@ export default function HomeSpace() {
           clip-path: path("M0 60 C 250 20 500 90 800 70 S 1300 130 1600 160 L1600 200 L0 200 Z");
           width: 100%;
         }
-        .hs-hero .hs-wrap { z-index: 3; }
+        .hs-hero .hs-wrap { z-index: 3; position: relative; min-height: 600px; }
 
         /* HERO CONTENT */
         .hs-pill {
@@ -480,7 +480,7 @@ export default function HomeSpace() {
         .hs-lead { font-size: 14px; line-height: 1.65; color: #222; max-width: 470px; }
 
         /* SEARCH */
-        .hs-search-area { position: absolute; left: 24px; top: 375px; width: 1015px; }
+        .hs-search-area { position: absolute; left: 24px; top: 270px; width: 1015px; z-index: 5; }
         .hs-tabs { display: inline-flex; gap: 8px; background: #fff; padding: 12px 14px 10px; border-radius: 26px 26px 0 0; }
         .hs-tabs button {
           border: 0; font: 500 12px 'Inter'; padding: 12px 26px;
@@ -490,45 +490,120 @@ export default function HomeSpace() {
         .hs-tabs button.on { background: #2f3cf0; color: #fff; }
         .hs-bar {
           background: #fff; border-radius: 0 26px 26px 26px;
-          padding: 14px; display: flex; gap: 14px; align-items: center;
+          padding: 12px 14px; display: flex; gap: 10px; align-items: center;
           box-shadow: 0 20px 50px rgba(20,30,80,.12);
         }
         .hs-field {
-          display: flex; align-items: center; gap: 12px;
+          display: flex; align-items: center; gap: 10px;
           background: #f3f5f9; border-radius: 14px;
-          height: 48px; padding: 0 16px;
-          font-size: 12.5px; color: #666;
+          height: 48px; padding: 0 14px;
+          font-size: 12px; color: #666;
+          white-space: nowrap;
         }
-        .hs-field.grow { flex: 1; }
-        .hs-field.sel { width: 190px; justify-content: space-between; }
-        .hs-field small { display: block; font-size: 11px; color: #666; }
-        .hs-field b { display: block; font-size: 12.5px; color: #111; font-weight: 600; }
+        .hs-field.grow { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+        .hs-field.sel { width: 155px; justify-content: space-between; }
+        .hs-field small { display: block; font-size: 10px; color: #666; }
+        .hs-field b { display: block; font-size: 12px; color: #111; font-weight: 600; }
         .hs-go {
           background: #2f3cf0; color: #fff; border: 0;
-          border-radius: 12px; height: 48px; width: 150px;
-          font: 600 14px 'Inter'; cursor: pointer; transition: background .15s;
+          border-radius: 12px; height: 48px; width: 110px;
+          font: 600 13.5px 'Inter'; cursor: pointer; transition: background .15s;
+          flex-shrink: 0;
         }
         .hs-go:hover { background: #2531d6; }
-        .hs-popular { display: flex; align-items: center; gap: 12px; margin-top: 16px; color: #fff; font-size: 13px; font-weight: 500; flex-wrap: wrap; }
+        .hs-popular { display: flex; align-items: center; gap: 10px; margin-top: 16px; color: #fff; font-size: 12.5px; font-weight: 500; flex-wrap: wrap; }
         .hs-popular a {
           border: 1px solid rgba(255,255,255,.55);
           background: rgba(20,30,50,.3); backdrop-filter: blur(6px);
-          padding: 8px 17px; border-radius: 999px; font-size: 12px;
+          padding: 7px 15px; border-radius: 999px; font-size: 11.5px;
           transition: background .15s;
         }
         .hs-popular a:hover { background: rgba(20,30,50,.5); }
 
-        /* CATEGORY CARDS */
-        .hs-cats { position: absolute; right: 20px; top: 560px; display: flex; gap: 26px; z-index: 4; transform: rotate(-4deg); }
-        .hs-cat {
-          width: 130px; height: 225px; background: #fff;
-          border-radius: 18px; padding: 8px 8px 0;
-          box-shadow: 0 20px 40px rgba(30,40,90,.2);
-          transform: perspective(600px) rotateY(-25deg);
+        /* CATEGORY CARDS (3D Extruded Slabs) */
+        .hs-cats {
+          position: absolute;
+          right: 40px;
+          top: 440px;
+          display: flex;
+          gap: 28px;
+          z-index: 4;
+          perspective: 1300px;
+          perspective-origin: 30% 50%;
+          transform-style: preserve-3d;
         }
-        .hs-cat img { width: 100%; height: 148px; border-radius: 12px; }
-        .hs-cat b { display: block; font-size: 12px; margin-top: 10px; transform: rotate(2deg); transform-origin: left; }
-        .hs-cat small { font-size: 11px; color: #666; display: block; transform: rotate(2deg); transform-origin: left; margin-top: 2px; }
+        .hs-cat {
+          position: relative;
+          width: 130px;
+          height: 225px;
+          background: #ffffff;
+          border-radius: 15px;
+          padding: 4px 8px 12px;
+          transform-style: preserve-3d;
+          transform: perspective(1000px) rotateY(-28deg) rotateX(12deg) rotateZ(-3deg);
+          /* 3D solid edge extrusion (depth/thickness) + realistic ambient drop shadow */
+          box-shadow:
+            1px 1px 0 #cdd9e6,
+            2px 1px 0 #cdd9e6,
+            3px 2px 0 #cdd9e6,
+            4px 2px 0 #cdd9e6,
+            5px 3px 0 #cdd9e6,
+            6px 3px 0 #cdd9e6,
+            7px 4px 0 #cdd9e6,
+            8px 4px 0 #cdd9e6,
+            9px 5px 0 #cdd9e6,
+            18px 24px 34px rgba(15, 23, 42, 0.18),
+            28px 40px 65px rgba(15, 23, 42, 0.24),
+            0 2px 6px rgba(0, 0, 0, 0.04);
+          border: 1px solid rgba(255, 255, 255, 0.5);
+          display: flex;
+          flex-direction: column;
+          cursor: pointer;
+          user-select: none;
+          transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+     
+          .hs-cat:hover {
+  transform: perspective(1000px)
+    translateY(-12px)
+    translateZ(15px)
+    rotateY(-12deg)
+    rotateX(5deg)
+    rotateZ(-1deg);
+
+  box-shadow:
+    2px 3px 0 #d5e0eb,
+    4px 5px 0 #d5e0eb,
+    12px 20px 35px rgba(15, 23, 42, 0.16),
+    25px 40px 65px rgba(15, 23, 42, 0.20);
+}
+        .hs-cat img {
+          width: 100%;
+          height: 156px;
+          border-radius: 12px;
+          object-fit: cover;
+          display: block;
+        }
+        .hs-cat-body {
+          padding: 11px 8px 4px;
+          display: flex;
+          flex-direction: column;
+        }
+        .hs-cat b {
+          display: block;
+          font-size: 14.5px;
+          font-weight: 700;
+          color: #0f172a;
+          line-height: 1.25;
+          letter-spacing: -0.2px;
+        }
+        .hs-cat small {
+          font-size: 12.5px;
+          font-weight: 500;
+          color: #64748b;
+          display: block;
+          margin-top: 3px;
+        }
 
         /* FEATURES */
         .hs-features { display: flex; gap: 44px; margin-top: -4px; position: relative; z-index: 3; }
@@ -612,9 +687,14 @@ export default function HomeSpace() {
           .hs-menu { display: none; }
           .hs-h1 { font-size: 44px; }
           .hs-bar { flex-wrap: wrap; }
-          .hs-cats { flex-wrap: wrap; transform: none; }
+          .hs-cats { flex-wrap: wrap; transform: none; perspective: none; justify-content: center; }
+          .hs-cat { transform: none; width: calc(33.333% - 16px); min-width: 140px; }
+          .hs-cat:hover { transform: translateY(-6px); }
         }
-        @media (max-width: 600px) { .hs-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 600px) {
+          .hs-grid { grid-template-columns: 1fr; }
+          .hs-cat { width: 100%; max-width: 260px; }
+        }
       `}</style>
 
       <div className="hs-root">
@@ -690,20 +770,22 @@ export default function HomeSpace() {
 
               <div className="hs-popular">
                 Popular Searches:
-                {POPULAR_SEARCHES.map((s) => (
-                  <a key={s.label} href={s.href}>{s.label}</a>
+                {POPULAR_SEARCHES.map((s,i) => (
+                  <a key={s.label+i} href={s.href}>{s.label}</a>
                 ))}
               </div>
             </div>
 
             {/* CATEGORY TILT CARDS */}
             <div className="hs-cats">
-              {CATEGORY_CARDS.map((c) => (
-                <div className="hs-cat" key={c.title}>
+              {CATEGORY_CARDS.map((c, i) => (
+                <div className="hs-cat" key={c.title+i}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={c.src} alt={c.title} />
-                  <b>{c.title}</b>
-                  <small>{c.sub}</small>
+                  <div className="hs-cat-body">
+                    <b>{c.title}</b>
+                    <small>{c.sub}</small>
+                  </div>
                 </div>
               ))}
             </div>
@@ -717,8 +799,8 @@ export default function HomeSpace() {
         <div className="hs-wrap hs-features-section">
           {/* FEATURES */}
           <div className="hs-features">
-            {FEATURES.map((f) => (
-              <div className="hs-feat" key={f.title}>
+            {FEATURES.map((f, i) => (
+              <div className="hs-feat" key={i}>
                 <div className="hs-ic" style={{ background: f.bg }}>{f.icon}</div>
                 <div>
                   <b>{f.title}</b>
