@@ -1,49 +1,53 @@
 "use client";
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { useCallback, useState, useTransition } from "react";
+import { Fragment, useCallback, useState, useTransition } from "react";
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
-const LOCALITIES = [
-  "All Localities",
-  "Kandivali East",
-  "Jokhandwala",
-  "Andheri West",
-  "Bandra West",
-  "Powai",
-  "Malad West",
-  "Borivali West",
-  "Goregaon West",
+// ─── Filter option type ─────────────────────────────────────────────────────
+type FilterOption = { key: string; label: string };
+
+// key: "" = "show all" (removes param from URL)
+const LOCALITIES: FilterOption[] = [
+  { key: "",               label: "All Localities" },
+  { key: "kandivali_east", label: "Kandivali East" },
+  { key: "jokhandwala",    label: "Jokhandwala" },
+  { key: "andheri_west",   label: "Andheri West" },
+  { key: "bandra_west",    label: "Bandra West" },
+  { key: "powai",          label: "Powai" },
+  { key: "malad_west",     label: "Malad West" },
+  { key: "borivali_west",  label: "Borivali West" },
+  { key: "goregaon_west",  label: "Goregaon West" },
 ];
 
-const CONFIGURATIONS = [
-  "All BHK",
-  "1 BHK",
-  "2 BHK",
-  "2 & 3 BHK",
-  "3 BHK",
-  "3 & 4 BHK",
-  "4 BHK",
-  "4 & 5 BHK",
-  "5 BHK",
+const CONFIGURATIONS: FilterOption[] = [
+  { key: "",        label: "All BHK" },
+  { key: "1_bhk",   label: "1 BHK" },
+  { key: "2_bhk",   label: "2 BHK" },
+  { key: "2_3_bhk", label: "2 & 3 BHK" },
+  { key: "3_bhk",   label: "3 BHK" },
+  { key: "3_4_bhk", label: "3 & 4 BHK" },
+  { key: "4_bhk",   label: "4 BHK" },
+  { key: "4_5_bhk", label: "4 & 5 BHK" },
+  { key: "5_bhk",   label: "5 BHK" },
 ];
 
-const STATUS_OPTIONS = [
-  "Any Status",
-  "Ready to Move",
-  "Under Construction",
-  "New Launch",
-  "Upcoming",
+const STATUS_OPTIONS: FilterOption[] = [
+  { key: "",                  label: "Any Status" },
+  { key: "ready_to_move",     label: "Ready to Move" },
+  { key: "under_construction",label: "Under Construction" },
+  { key: "new_launch",        label: "New Launch" },
+  { key: "upcoming",          label: "Upcoming" },
 ];
 
-const DEVELOPERS = [
-  "All Developers",
-  "Kalpataru",
-  "Godrej Properties",
-  "Lodha Group",
-  "Oberoi Realty",
-  "Rustomjee",
+const DEVELOPERS: FilterOption[] = [
+  { key: "",          label: "All Developers" },
+  { key: "kalpataru", label: "Kalpataru" },
+  { key: "godrej",    label: "Godrej Properties" },
+  { key: "lodha",     label: "Lodha Group" },
+  { key: "oberoi",    label: "Oberoi Realty" },
+  { key: "rustomjee", label: "Rustomjee" },
 ];
 
 const ALL_PROPERTIES = [
@@ -53,25 +57,23 @@ const ALL_PROPERTIES = [
     projectName: "Kalpataru Vian",
     developer: "KALPATARU LIMITED",
     locality: "Jokhandwala",
+    locality_key: "jokhandwala",
     locality_label: "JOKHANDWALA",
     config: "3, 4 & 4.5 BHK",
+    config_keys: ["3_bhk", "4_bhk", "3_4_bhk"],
     config_label: "3, 4 & 4.5 BHK in KALPATARU VIAN",
     area: "1116 – 2688 sq.ft",
     beds: "3, 4 & 4.5 BHK",
     priceFrom: "₹ 4.95 Cr.+++",
     priceLabel: "From ₹4.95 Cr.*",
     status: "Under Construction",
+    status_key: "under_construction",
+    developer_key: "kalpataru",
     mode: "buy",
-    verified: true,
-    rera: true,
+    verified: true, rera: true,
     badge: null as string | null,
     image: "/images/projects/Untitled-design-18.webp",
-    features: [
-      "Expansive Open Views",
-      "Premium Lifestyle Amenities",
-      "Excellent Connectivity",
-      "2, 3, 4 & 5 BHK Lavish Residences",
-    ],
+    features: ["Expansive Open Views","Premium Lifestyle Amenities","Excellent Connectivity","2, 3, 4 & 5 BHK Lavish Residences"],
   },
   {
     id: 2,
@@ -79,25 +81,23 @@ const ALL_PROPERTIES = [
     projectName: "Kalpataru Vienta",
     developer: "KALPATARU LIMITED",
     locality: "Kandivali East",
+    locality_key: "kandivali_east",
     locality_label: "KANDIVALI EAST",
     config: "2, 3 & 4.5 BHK",
+    config_keys: ["2_bhk", "3_bhk", "2_3_bhk"],
     config_label: "2, 3 & 4.5 BHK Duplex in KALPATARU VIENTA",
     area: "1075 – 1689 sq.ft",
     beds: "2, 3 & 4.5 BHK Duplex",
     priceFrom: "₹ 3.82 Cr.++",
     priceLabel: "From ₹3.82 Cr.++",
     status: "Under Construction",
+    status_key: "under_construction",
+    developer_key: "kalpataru",
     mode: "buy",
-    verified: true,
-    rera: true,
+    verified: true, rera: true,
     badge: null as string | null,
     image: "/images/projects/Untitled-design-19.webp",
-    features: [
-      "Expansive Open Views",
-      "Premium Lifestyle Amenities",
-      "Excellent Connectivity",
-      "2, 3 & 4.5 BHK Duplex Residences",
-    ],
+    features: ["Expansive Open Views","Premium Lifestyle Amenities","Excellent Connectivity","2, 3 & 4.5 BHK Duplex Residences"],
   },
   {
     id: 3,
@@ -105,25 +105,23 @@ const ALL_PROPERTIES = [
     projectName: "Godrej Reserve",
     developer: "GODREJ PROPERTIES",
     locality: "Kandivali East",
+    locality_key: "kandivali_east",
     locality_label: "KANDIVALI EAST",
     config: "3 & 4 BHK",
+    config_keys: ["3_bhk", "4_bhk", "3_4_bhk"],
     config_label: "3 & 4 BHK in GODREJ RESERVE",
     area: "1470 – 2030 sq.ft",
     beds: "3 & 4 BHK",
     priceFrom: "₹ 5.90 Cr.*",
     priceLabel: "From ₹5.90 Cr.* All Incl.",
     status: "New Launch",
+    status_key: "new_launch",
+    developer_key: "godrej",
     mode: "buy",
-    verified: true,
-    rera: true,
+    verified: true, rera: true,
     badge: "A NEW BENCHMARK IN WESTERN SUBURBS" as string | null,
     image: "/images/projects/Untitled-design-20.webp",
-    features: [
-      "Expansive Open Views",
-      "Premium Lifestyle Amenities",
-      "Excellent Connectivity",
-      "3 & 4 BHK Luxury Residences",
-    ],
+    features: ["Expansive Open Views","Premium Lifestyle Amenities","Excellent Connectivity","3 & 4 BHK Luxury Residences"],
   },
   {
     id: 4,
@@ -131,25 +129,23 @@ const ALL_PROPERTIES = [
     projectName: "Oberoi Sky Heights",
     developer: "OBEROI REALTY",
     locality: "Goregaon West",
+    locality_key: "goregaon_west",
     locality_label: "GOREGAON WEST",
     config: "3 & 4 BHK",
+    config_keys: ["3_bhk", "4_bhk", "3_4_bhk"],
     config_label: "3 & 4 BHK in OBEROI SKY",
     area: "1350 – 2450 sq.ft",
     beds: "3 & 4 BHK",
     priceFrom: "₹ 6.20 Cr.*",
     priceLabel: "From ₹6.20 Cr.*",
     status: "Under Construction",
+    status_key: "under_construction",
+    developer_key: "oberoi",
     mode: "buy",
-    verified: true,
-    rera: true,
+    verified: true, rera: true,
     badge: null as string | null,
     image: "/images/projects/Untitled-design-21.webp",
-    features: [
-      "Panoramic City Views",
-      "World-Class Amenities",
-      "Metro Connectivity",
-      "3 & 4 BHK Premium Homes",
-    ],
+    features: ["Panoramic City Views","World-Class Amenities","Metro Connectivity","3 & 4 BHK Premium Homes"],
   },
   {
     id: 5,
@@ -157,25 +153,23 @@ const ALL_PROPERTIES = [
     projectName: "Lodha Bellavista",
     developer: "LODHA GROUP",
     locality: "Powai",
+    locality_key: "powai",
     locality_label: "POWAI",
     config: "2 & 3 BHK",
+    config_keys: ["2_bhk", "3_bhk", "2_3_bhk"],
     config_label: "2 & 3 BHK in LODHA BELLAVISTA",
     area: "890 – 1680 sq.ft",
     beds: "2 & 3 BHK",
     priceFrom: "₹ 2.85 Cr.*",
     priceLabel: "From ₹2.85 Cr.*",
     status: "Ready to Move",
+    status_key: "ready_to_move",
+    developer_key: "lodha",
     mode: "buy",
-    verified: true,
-    rera: true,
+    verified: true, rera: true,
     badge: null as string | null,
     image: "/images/projects/Untitled-design-18.webp",
-    features: [
-      "Lakeside Living",
-      "Premium Club Amenities",
-      "Strategic Location",
-      "2 & 3 BHK Spacious Homes",
-    ],
+    features: ["Lakeside Living","Premium Club Amenities","Strategic Location","2 & 3 BHK Spacious Homes"],
   },
   {
     id: 6,
@@ -183,25 +177,23 @@ const ALL_PROPERTIES = [
     projectName: "Rustomjee Elanza",
     developer: "RUSTOMJEE",
     locality: "Malad West",
+    locality_key: "malad_west",
     locality_label: "MALAD WEST",
     config: "2 BHK",
+    config_keys: ["2_bhk"],
     config_label: "2 BHK in RUSTOMJEE ELANZA",
     area: "780 – 1250 sq.ft",
     beds: "2 BHK",
     priceFrom: "₹ 1.95 Cr.*",
     priceLabel: "From ₹1.95 Cr.*",
     status: "New Launch",
+    status_key: "new_launch",
+    developer_key: "rustomjee",
     mode: "buy",
-    verified: true,
-    rera: true,
+    verified: true, rera: true,
     badge: "EARLY BIRD OFFER" as string | null,
     image: "/images/projects/Untitled-design-19.webp",
-    features: [
-      "Modern Architecture",
-      "Green Spaces",
-      "Premium Fittings",
-      "2 BHK Smart Homes",
-    ],
+    features: ["Modern Architecture","Green Spaces","Premium Fittings","2 BHK Smart Homes"],
   },
   {
     id: 7,
@@ -209,25 +201,23 @@ const ALL_PROPERTIES = [
     projectName: "Godrej Prime",
     developer: "GODREJ PROPERTIES",
     locality: "Bandra West",
+    locality_key: "bandra_west",
     locality_label: "BANDRA WEST",
     config: "3 BHK",
+    config_keys: ["3_bhk"],
     config_label: "3 BHK in GODREJ PRIME",
     area: "1200 – 1800 sq.ft",
     beds: "3 BHK",
     priceFrom: "₹ 4.50 Cr.*",
     priceLabel: "From ₹4.50 Cr.*",
     status: "Under Construction",
+    status_key: "under_construction",
+    developer_key: "godrej",
     mode: "rent",
-    verified: true,
-    rera: true,
+    verified: true, rera: true,
     badge: null as string | null,
     image: "/images/projects/Untitled-design-20.webp",
-    features: [
-      "Sea-facing Views",
-      "Luxury Club House",
-      "Vaastu Compliant",
-      "3 BHK Spacious Flats",
-    ],
+    features: ["Sea-facing Views","Luxury Club House","Vaastu Compliant","3 BHK Spacious Flats"],
   },
   {
     id: 8,
@@ -235,35 +225,1271 @@ const ALL_PROPERTIES = [
     projectName: "Kalpataru Aura",
     developer: "KALPATARU LIMITED",
     locality: "Andheri West",
+    locality_key: "andheri_west",
     locality_label: "ANDHERI WEST",
     config: "1 BHK",
+    config_keys: ["1_bhk"],
     config_label: "1 BHK in KALPATARU AURA",
     area: "540 – 750 sq.ft",
     beds: "1 BHK",
     priceFrom: "₹ 1.20 Cr.*",
     priceLabel: "From ₹1.20 Cr.*",
     status: "Ready to Move",
+    status_key: "ready_to_move",
+    developer_key: "kalpataru",
     mode: "rent",
-    verified: true,
-    rera: true,
+    verified: true, rera: true,
     badge: null as string | null,
     image: "/images/projects/Untitled-design-21.webp",
-    features: [
-      "Compact & Smart Design",
-      "Excellent Connectivity",
-      "Premium Interiors",
-      "1 BHK Ready Homes",
-    ],
+    features: ["Compact & Smart Design","Excellent Connectivity","Premium Interiors","1 BHK Ready Homes"],
+  },
+  {
+    id: 9,
+    name: "LODHA ALTAMOUNT",
+    projectName: "Lodha Altamount",
+    developer: "LODHA GROUP",
+    locality: "Bandra West",
+    locality_key: "bandra_west",
+    locality_label: "BANDRA WEST",
+    config: "3 & 4 BHK",
+    config_keys: ["3_bhk", "4_bhk", "3_4_bhk"],
+    config_label: "3 & 4 BHK in LODHA ALTAMOUNT",
+    area: "1560 – 2450 sq.ft",
+    beds: "3 & 4 BHK",
+    priceFrom: "₹ 5.75 Cr.*",
+    priceLabel: "From ₹5.75 Cr.*",
+    status: "Ready to Move",
+    status_key: "ready_to_move",
+    developer_key: "lodha",
+    mode: "buy",
+    verified: true, rera: true,
+    badge: null as string | null,
+    image: "/images/projects/Untitled-design-18.webp",
+    features: ["Premium Location","Luxury Amenities","Excellent Connectivity","3 & 4 BHK Luxury Residences"],
+  },
+  {
+    id: 10,
+    name: "OBEROI GARDENS",
+    projectName: "Oberoi Gardens",
+    developer: "OBEROI REALTY",
+    locality: "Kandivali East",
+    locality_key: "kandivali_east",
+    locality_label: "KANDIVALI EAST",
+    config: "2 & 3 BHK",
+    config_keys: ["2_bhk", "3_bhk", "2_3_bhk"],
+    config_label: "2 & 3 BHK in OBEROI GARDENS",
+    area: "980 – 1580 sq.ft",
+    beds: "2 & 3 BHK",
+    priceFrom: "₹ 2.95 Cr.*",
+    priceLabel: "From ₹2.95 Cr.*",
+    status: "Ready to Move",
+    status_key: "ready_to_move",
+    developer_key: "oberoi",
+    mode: "buy",
+    verified: true, rera: true,
+    badge: "LIMITED INVENTORY" as string | null,
+    image: "/images/projects/Untitled-design-19.webp",
+    features: ["Landscaped Gardens","Clubhouse","Modern Interiors","2 & 3 BHK Premium Homes"],
+  },
+  {
+    id: 11,
+    name: "KALPATARU GRANDEUR",
+    projectName: "Kalpataru Grandeur",
+    developer: "KALPATARU LIMITED",
+    locality: "Goregaon West",
+    locality_key: "goregaon_west",
+    locality_label: "GOREGAON WEST",
+    config: "2 & 3 BHK",
+    config_keys: ["2_bhk", "3_bhk", "2_3_bhk"],
+    config_label: "2 & 3 BHK in KALPATARU GRANDEUR",
+    area: "895 – 1540 sq.ft",
+    beds: "2 & 3 BHK",
+    priceFrom: "₹ 2.48 Cr.*",
+    priceLabel: "From ₹2.48 Cr.*",
+    status: "Under Construction",
+    status_key: "under_construction",
+    developer_key: "kalpataru",
+    mode: "buy",
+    verified: true, rera: true,
+    badge: null as string | null,
+    image: "/images/projects/Untitled-design-20.webp",
+    features: ["Spacious Layouts","Fitness Centre","Rooftop Amenities","2 & 3 BHK Residences"],
+  },
+  {
+    id: 12,
+    name: "GODREJ URBAN PARK",
+    projectName: "Godrej Urban Park",
+    developer: "GODREJ PROPERTIES",
+    locality: "Malad West",
+    locality_key: "malad_west",
+    locality_label: "MALAD WEST",
+    config: "1 & 2 BHK",
+    config_keys: ["1_bhk", "2_bhk", "2_3_bhk"],
+    config_label: "1 & 2 BHK in GODREJ URBAN PARK",
+    area: "520 – 980 sq.ft",
+    beds: "1 & 2 BHK",
+    priceFrom: "₹ 1.45 Cr.*",
+    priceLabel: "From ₹1.45 Cr.*",
+    status: "New Launch",
+    status_key: "new_launch",
+    developer_key: "godrej",
+    mode: "buy",
+    verified: true, rera: true,
+    badge: "NEW LAUNCH" as string | null,
+    image: "/images/projects/Untitled-design-21.webp",
+    features: ["Green Open Spaces","Modern Clubhouse","Metro Connectivity","1 & 2 BHK Smart Homes"],
+  },
+  {
+    id: 13,
+    name: "RUSTOMJEE PARAMOUNT",
+    projectName: "Rustomjee Paramount",
+    developer: "RUSTOMJEE",
+    locality: "Bandra West",
+    locality_key: "bandra_west",
+    locality_label: "BANDRA WEST",
+    config: "3 & 4 BHK",
+    config_keys: ["3_bhk", "4_bhk", "3_4_bhk"],
+    config_label: "3 & 4 BHK in RUSTOMJEE PARAMOUNT",
+    area: "1450 – 2200 sq.ft",
+    beds: "3 & 4 BHK",
+    priceFrom: "₹ 5.25 Cr.*",
+    priceLabel: "From ₹5.25 Cr.*",
+    status: "Under Construction",
+    status_key: "under_construction",
+    developer_key: "rustomjee",
+    mode: "buy",
+    verified: true, rera: true,
+    badge: null as string | null,
+    image: "/images/projects/Untitled-design-18.webp",
+    features: ["Sea Views","Infinity Pool","Premium Clubhouse","3 & 4 BHK Luxury Homes"],
+  },
+  {
+    id: 14,
+    name: "LODHA BELMONDO",
+    projectName: "Lodha Belmondo",
+    developer: "LODHA GROUP",
+    locality: "Powai",
+    locality_key: "powai",
+    locality_label: "POWAI",
+    config: "2 & 3 BHK",
+    config_keys: ["2_bhk", "3_bhk", "2_3_bhk"],
+    config_label: "2 & 3 BHK in LODHA BELMONDO",
+    area: "920 – 1450 sq.ft",
+    beds: "2 & 3 BHK",
+    priceFrom: "₹ 2.65 Cr.*",
+    priceLabel: "From ₹2.65 Cr.*",
+    status: "Ready to Move",
+    status_key: "ready_to_move",
+    developer_key: "lodha",
+    mode: "buy",
+    verified: true, rera: true,
+    badge: null as string | null,
+    image: "/images/projects/Untitled-design-19.webp",
+    features: ["Lakeside Views","Sports Facilities","Luxury Clubhouse","2 & 3 BHK Homes"],
+  },
+  {
+    id: 15,
+    name: "OBEROI PARKVIEW",
+    projectName: "Oberoi Parkview",
+    developer: "OBEROI REALTY",
+    locality: "Borivali West",
+    locality_key: "borivali_west",
+    locality_label: "BORIVALI WEST",
+    config: "2 & 3 BHK",
+    config_keys: ["2_bhk", "3_bhk", "2_3_bhk"],
+    config_label: "2 & 3 BHK in OBEROI PARKVIEW",
+    area: "890 – 1420 sq.ft",
+    beds: "2 & 3 BHK",
+    priceFrom: "₹ 2.35 Cr.*",
+    priceLabel: "From ₹2.35 Cr.*",
+    status: "Upcoming",
+    status_key: "upcoming",
+    developer_key: "oberoi",
+    mode: "buy",
+    verified: true, rera: false,
+    badge: "COMING SOON" as string | null,
+    image: "/images/projects/Untitled-design-20.webp",
+    features: ["Green Views","Modern Amenities","Great Connectivity","2 & 3 BHK Residences"],
+  },
+  {
+    id: 16,
+    name: "KALPATARU AVENUE",
+    projectName: "Kalpataru Avenue",
+    developer: "KALPATARU LIMITED",
+    locality: "Andheri West",
+    locality_key: "andheri_west",
+    locality_label: "ANDHERI WEST",
+    config: "1 & 2 BHK",
+    config_keys: ["1_bhk", "2_bhk", "2_3_bhk"],
+    config_label: "1 & 2 BHK in KALPATARU AVENUE",
+    area: "510 – 930 sq.ft",
+    beds: "1 & 2 BHK",
+    priceFrom: "₹ 1.35 Cr.*",
+    priceLabel: "From ₹1.35 Cr.*",
+    status: "Ready to Move",
+    status_key: "ready_to_move",
+    developer_key: "kalpataru",
+    mode: "rent",
+    verified: true, rera: true,
+    badge: null as string | null,
+    image: "/images/projects/Untitled-design-21.webp",
+    features: ["Prime Location","Smart Homes","Fitness Centre","1 & 2 BHK Apartments"],
+  },
+  {
+    id: 17,
+    name: "GODREJ SKYLINE",
+    projectName: "Godrej Skyline",
+    developer: "GODREJ PROPERTIES",
+    locality: "Powai",
+    locality_key: "powai",
+    locality_label: "POWAI",
+    config: "3 & 4 BHK",
+    config_keys: ["3_bhk", "4_bhk", "3_4_bhk"],
+    config_label: "3 & 4 BHK in GODREJ SKYLINE",
+    area: "1320 – 2180 sq.ft",
+    beds: "3 & 4 BHK",
+    priceFrom: "₹ 4.85 Cr.*",
+    priceLabel: "From ₹4.85 Cr.*",
+    status: "Under Construction",
+    status_key: "under_construction",
+    developer_key: "godrej",
+    mode: "buy",
+    verified: true, rera: true,
+    badge: null as string | null,
+    image: "/images/projects/Untitled-design-18.webp",
+    features: ["Lake Views","Sky Lounge","Premium Amenities","3 & 4 BHK Luxury Homes"],
+  },
+  {
+    id: 18,
+    name: "RUSTOMJEE URBANIA",
+    projectName: "Rustomjee Urbania",
+    developer: "RUSTOMJEE",
+    locality: "Goregaon West",
+    locality_key: "goregaon_west",
+    locality_label: "GOREGAON WEST",
+    config: "2 & 3 BHK",
+    config_keys: ["2_bhk", "3_bhk", "2_3_bhk"],
+    config_label: "2 & 3 BHK in RUSTOMJEE URBANIA",
+    area: "860 – 1380 sq.ft",
+    beds: "2 & 3 BHK",
+    priceFrom: "₹ 2.55 Cr.*",
+    priceLabel: "From ₹2.55 Cr.*",
+    status: "New Launch",
+    status_key: "new_launch",
+    developer_key: "rustomjee",
+    mode: "buy",
+    verified: true, rera: true,
+    badge: "EARLY ACCESS" as string | null,
+    image: "/images/projects/Untitled-design-19.webp",
+    features: ["Urban Lifestyle","Clubhouse","Kids Play Area","2 & 3 BHK Homes"],
+  },
+  {
+    id: 19,
+    name: "LODHA SERENITY",
+    projectName: "Lodha Serenity",
+    developer: "LODHA GROUP",
+    locality: "Malad West",
+    locality_key: "malad_west",
+    locality_label: "MALAD WEST",
+    config: "1 & 2 BHK",
+    config_keys: ["1_bhk", "2_bhk", "2_3_bhk"],
+    config_label: "1 & 2 BHK in LODHA SERENITY",
+    area: "490 – 890 sq.ft",
+    beds: "1 & 2 BHK",
+    priceFrom: "₹ 1.18 Cr.*",
+    priceLabel: "From ₹1.18 Cr.*",
+    status: "Ready to Move",
+    status_key: "ready_to_move",
+    developer_key: "lodha",
+    mode: "rent",
+    verified: true, rera: true,
+    badge: null as string | null,
+    image: "/images/projects/Untitled-design-20.webp",
+    features: ["Peaceful Community","Modern Amenities","Connectivity","1 & 2 BHK Homes"],
+  },
+  {
+    id: 20,
+    name: "OBEROI HILLS",
+    projectName: "Oberoi Hills",
+    developer: "OBEROI REALTY",
+    locality: "Goregaon West",
+    locality_key: "goregaon_west",
+    locality_label: "GOREGAON WEST",
+    config: "3, 4 & 5 BHK",
+    config_keys: ["3_bhk", "4_bhk", "4_5_bhk", "5_bhk"],
+    config_label: "3, 4 & 5 BHK in OBEROI HILLS",
+    area: "1480 – 2850 sq.ft",
+    beds: "3, 4 & 5 BHK",
+    priceFrom: "₹ 6.75 Cr.*",
+    priceLabel: "From ₹6.75 Cr.*",
+    status: "Upcoming",
+    status_key: "upcoming",
+    developer_key: "oberoi",
+    mode: "buy",
+    verified: true, rera: false,
+    badge: "PRE-LAUNCH" as string | null,
+    image: "/images/projects/Untitled-design-21.webp",
+    features: ["Expansive Views","Luxury Amenities","Large Residences","3, 4 & 5 BHK Homes"],
+  },
+
+  {
+    id: 21,
+    name: "KALPATARU HEIGHTS",
+    projectName: "Kalpataru Heights",
+    developer: "KALPATARU LIMITED",
+    locality: "Kandivali East",
+    locality_key: "kandivali_east",
+    locality_label: "KANDIVALI EAST",
+    config: "2 & 3 BHK",
+    config_keys: ["2_bhk", "3_bhk", "2_3_bhk"],
+    config_label: "2 & 3 BHK in KALPATARU HEIGHTS",
+    area: "850 – 1450 sq.ft",
+    beds: "2 & 3 BHK",
+    priceFrom: "₹ 2.28 Cr.*",
+    priceLabel: "From ₹2.28 Cr.*",
+    status: "Under Construction",
+    status_key: "under_construction",
+    developer_key: "kalpataru",
+    mode: "buy",
+    verified: true, rera: true,
+    badge: null as string | null,
+    image: "/images/projects/Untitled-design-18.webp",
+    features: ["City Views","Clubhouse","Fitness Centre","2 & 3 BHK Homes"],
+  },
+  {
+    id: 22,
+    name: "GODREJ CENTRAL",
+    projectName: "Godrej Central",
+    developer: "GODREJ PROPERTIES",
+    locality: "Kandivali East",
+    locality_key: "kandivali_east",
+    locality_label: "KANDIVALI EAST",
+    config: "2 BHK",
+    config_keys: ["2_bhk"],
+    config_label: "2 BHK in GODREJ CENTRAL",
+    area: "760 – 980 sq.ft",
+    beds: "2 BHK",
+    priceFrom: "₹ 1.88 Cr.*",
+    priceLabel: "From ₹1.88 Cr.*",
+    status: "Ready to Move",
+    status_key: "ready_to_move",
+    developer_key: "godrej",
+    mode: "rent",
+    verified: true, rera: true,
+    badge: null as string | null,
+    image: "/images/projects/Untitled-design-19.webp",
+    features: ["Community Living","Swimming Pool","Gymnasium","2 BHK Smart Homes"],
+  },
+  {
+    id: 23,
+    name: "RUSTOMJEE REGALIA",
+    projectName: "Rustomjee Regalia",
+    developer: "RUSTOMJEE",
+    locality: "Borivali West",
+    locality_key: "borivali_west",
+    locality_label: "BORIVALI WEST",
+    config: "2 & 3 BHK",
+    config_keys: ["2_bhk", "3_bhk", "2_3_bhk"],
+    config_label: "2 & 3 BHK in RUSTOMJEE REGALIA",
+    area: "910 – 1510 sq.ft",
+    beds: "2 & 3 BHK",
+    priceFrom: "₹ 2.42 Cr.*",
+    priceLabel: "From ₹2.42 Cr.*",
+    status: "Under Construction",
+    status_key: "under_construction",
+    developer_key: "rustomjee",
+    mode: "buy",
+    verified: true, rera: true,
+    badge: null as string | null,
+    image: "/images/projects/Untitled-design-20.webp",
+    features: ["Premium Finishes","Landscaped Gardens","Clubhouse","2 & 3 BHK Residences"],
+  },
+  {
+    id: 24,
+    name: "LODHA VISTA",
+    projectName: "Lodha Vista",
+    developer: "LODHA GROUP",
+    locality: "Andheri West",
+    locality_key: "andheri_west",
+    locality_label: "ANDHERI WEST",
+    config: "3 & 4 BHK",
+    config_keys: ["3_bhk", "4_bhk", "3_4_bhk"],
+    config_label: "3 & 4 BHK in LODHA VISTA",
+    area: "1380 – 2140 sq.ft",
+    beds: "3 & 4 BHK",
+    priceFrom: "₹ 4.35 Cr.*",
+    priceLabel: "From ₹4.35 Cr.*",
+    status: "New Launch",
+    status_key: "new_launch",
+    developer_key: "lodha",
+    mode: "buy",
+    verified: true, rera: true,
+    badge: "NEW LAUNCH" as string | null,
+    image: "/images/projects/Untitled-design-21.webp",
+    features: ["Elevated Views","Luxury Club","Prime Connectivity","3 & 4 BHK Homes"],
+  },
+  {
+    id: 25,
+    name: "OBEROI GRANDE",
+    projectName: "Oberoi Grande",
+    developer: "OBEROI REALTY",
+    locality: "Andheri West",
+    locality_key: "andheri_west",
+    locality_label: "ANDHERI WEST",
+    config: "4 & 5 BHK",
+    config_keys: ["4_bhk", "5_bhk", "4_5_bhk"],
+    config_label: "4 & 5 BHK in OBEROI GRANDE",
+    area: "1980 – 3250 sq.ft",
+    beds: "4 & 5 BHK",
+    priceFrom: "₹ 7.90 Cr.*",
+    priceLabel: "From ₹7.90 Cr.*",
+    status: "Under Construction",
+    status_key: "under_construction",
+    developer_key: "oberoi",
+    mode: "buy",
+    verified: true, rera: true,
+    badge: "ULTRA LUXURY" as string | null,
+    image: "/images/projects/Untitled-design-18.webp",
+    features: ["Grand Residences","Private Elevators","Premium Club","4 & 5 BHK Residences"],
+  },
+
+  {
+    id: 26,
+    name: "KALPATARU PARK",
+    projectName: "Kalpataru Park",
+    developer: "KALPATARU LIMITED",
+    locality: "Malad West",
+    locality_key: "malad_west",
+    locality_label: "MALAD WEST",
+    config: "1 & 2 BHK",
+    config_keys: ["1_bhk", "2_bhk", "2_3_bhk"],
+    config_label: "1 & 2 BHK in KALPATARU PARK",
+    area: "510 – 910 sq.ft",
+    beds: "1 & 2 BHK",
+    priceFrom: "₹ 1.32 Cr.*",
+    priceLabel: "From ₹1.32 Cr.*",
+    status: "Ready to Move",
+    status_key: "ready_to_move",
+    developer_key: "kalpataru",
+    mode: "rent",
+    verified: true, rera: true,
+    badge: null as string | null,
+    image: "/images/projects/Untitled-design-19.webp",
+    features: ["Green Spaces","Modern Interiors","Fitness Centre","1 & 2 BHK Homes"],
+  },
+  {
+    id: 27,
+    name: "GODREJ GRANDEUR",
+    projectName: "Godrej Grandeur",
+    developer: "GODREJ PROPERTIES",
+    locality: "Bandra West",
+    locality_key: "bandra_west",
+    locality_label: "BANDRA WEST",
+    config: "3 & 4 BHK",
+    config_keys: ["3_bhk", "4_bhk", "3_4_bhk"],
+    config_label: "3 & 4 BHK in GODREJ GRANDEUR",
+    area: "1420 – 2250 sq.ft",
+    beds: "3 & 4 BHK",
+    priceFrom: "₹ 5.45 Cr.*",
+    priceLabel: "From ₹5.45 Cr.*",
+    status: "Upcoming",
+    status_key: "upcoming",
+    developer_key: "godrej",
+    mode: "buy",
+    verified: true, rera: false,
+    badge: "COMING SOON" as string | null,
+    image: "/images/projects/Untitled-design-20.webp",
+    features: ["Premium Address","Sea Views","Luxury Amenities","3 & 4 BHK Homes"],
+  },
+  {
+    id: 28,
+    name: "RUSTOMJEE CROWN",
+    projectName: "Rustomjee Crown",
+    developer: "RUSTOMJEE",
+    locality: "Bandra West",
+    locality_key: "bandra_west",
+    locality_label: "BANDRA WEST",
+    config: "3, 4 & 5 BHK",
+    config_keys: ["3_bhk", "4_bhk", "4_5_bhk", "5_bhk"],
+    config_label: "3, 4 & 5 BHK in RUSTOMJEE CROWN",
+    area: "1550 – 2900 sq.ft",
+    beds: "3, 4 & 5 BHK",
+    priceFrom: "₹ 6.10 Cr.*",
+    priceLabel: "From ₹6.10 Cr.*",
+    status: "Under Construction",
+    status_key: "under_construction",
+    developer_key: "rustomjee",
+    mode: "buy",
+    verified: true, rera: true,
+    badge: null as string | null,
+    image: "/images/projects/Untitled-design-21.webp",
+    features: ["Sea-facing Homes","Infinity Pool","Luxury Clubhouse","3, 4 & 5 BHK Homes"],
+  },
+  {
+    id: 29,
+    name: "LODHA IMPERIAL",
+    projectName: "Lodha Imperial",
+    developer: "LODHA GROUP",
+    locality: "Goregaon West",
+    locality_key: "goregaon_west",
+    locality_label: "GOREGAON WEST",
+    config: "2 & 3 BHK",
+    config_keys: ["2_bhk", "3_bhk", "2_3_bhk"],
+    config_label: "2 & 3 BHK in LODHA IMPERIAL",
+    area: "880 – 1490 sq.ft",
+    beds: "2 & 3 BHK",
+    priceFrom: "₹ 2.62 Cr.*",
+    priceLabel: "From ₹2.62 Cr.*",
+    status: "New Launch",
+    status_key: "new_launch",
+    developer_key: "lodha",
+    mode: "buy",
+    verified: true, rera: true,
+    badge: "EARLY BIRD OFFER" as string | null,
+    image: "/images/projects/Untitled-design-18.webp",
+    features: ["Modern Architecture","Rooftop Amenities","Fitness Centre","2 & 3 BHK Homes"],
+  },
+  {
+    id: 30,
+    name: "OBEROI SIGNATURE",
+    projectName: "Oberoi Signature",
+    developer: "OBEROI REALTY",
+    locality: "Powai",
+    locality_key: "powai",
+    locality_label: "POWAI",
+    config: "3 & 4 BHK",
+    config_keys: ["3_bhk", "4_bhk", "3_4_bhk"],
+    config_label: "3 & 4 BHK in OBEROI SIGNATURE",
+    area: "1280 – 2100 sq.ft",
+    beds: "3 & 4 BHK",
+    priceFrom: "₹ 4.90 Cr.*",
+    priceLabel: "From ₹4.90 Cr.*",
+    status: "Ready to Move",
+    status_key: "ready_to_move",
+    developer_key: "oberoi",
+    mode: "buy",
+    verified: true, rera: true,
+    badge: null as string | null,
+    image: "/images/projects/Untitled-design-19.webp",
+    features: ["Lake View","Luxury Amenities","Clubhouse","3 & 4 BHK Residences"],
+  },
+
+  {
+    id: 31,
+    name: "KALPATARU ELITE",
+    projectName: "Kalpataru Elite",
+    developer: "KALPATARU LIMITED",
+    locality: "Powai",
+    locality_key: "powai",
+    locality_label: "POWAI",
+    config: "2 & 3 BHK",
+    config_keys: ["2_bhk", "3_bhk", "2_3_bhk"],
+    config_label: "2 & 3 BHK in KALPATARU ELITE",
+    area: "900 – 1480 sq.ft",
+    beds: "2 & 3 BHK",
+    priceFrom: "₹ 2.72 Cr.*",
+    priceLabel: "From ₹2.72 Cr.*",
+    status: "Under Construction",
+    status_key: "under_construction",
+    developer_key: "kalpataru",
+    mode: "buy",
+    verified: true, rera: true,
+    badge: null as string | null,
+    image: "/images/projects/Untitled-design-20.webp",
+    features: ["Lake Views","Premium Interiors","Clubhouse","2 & 3 BHK Homes"],
+  },
+  {
+    id: 32,
+    name: "GODREJ AVENUES",
+    projectName: "Godrej Avenues",
+    developer: "GODREJ PROPERTIES",
+    locality: "Andheri West",
+    locality_key: "andheri_west",
+    locality_label: "ANDHERI WEST",
+    config: "2 & 3 BHK",
+    config_keys: ["2_bhk", "3_bhk", "2_3_bhk"],
+    config_label: "2 & 3 BHK in GODREJ AVENUES",
+    area: "820 – 1390 sq.ft",
+    beds: "2 & 3 BHK",
+    priceFrom: "₹ 2.35 Cr.*",
+    priceLabel: "From ₹2.35 Cr.*",
+    status: "Ready to Move",
+    status_key: "ready_to_move",
+    developer_key: "godrej",
+    mode: "rent",
+    verified: true, rera: true,
+    badge: null as string | null,
+    image: "/images/projects/Untitled-design-21.webp",
+    features: ["Metro Connectivity","Smart Amenities","Open Views","2 & 3 BHK Homes"],
+  },
+  {
+    id: 33,
+    name: "RUSTOMJEE RESERVE",
+    projectName: "Rustomjee Reserve",
+    developer: "RUSTOMJEE",
+    locality: "Kandivali East",
+    locality_key: "kandivali_east",
+    locality_label: "KANDIVALI EAST",
+    config: "3 & 4 BHK",
+    config_keys: ["3_bhk", "4_bhk", "3_4_bhk"],
+    config_label: "3 & 4 BHK in RUSTOMJEE RESERVE",
+    area: "1320 – 2020 sq.ft",
+    beds: "3 & 4 BHK",
+    priceFrom: "₹ 3.95 Cr.*",
+    priceLabel: "From ₹3.95 Cr.*",
+    status: "New Launch",
+    status_key: "new_launch",
+    developer_key: "rustomjee",
+    mode: "buy",
+    verified: true, rera: true,
+    badge: "NEW LAUNCH" as string | null,
+    image: "/images/projects/Untitled-design-18.webp",
+    features: ["Private Decks","Luxury Amenities","Green Spaces","3 & 4 BHK Residences"],
+  },
+  {
+    id: 34,
+    name: "LODHA PRIME",
+    projectName: "Lodha Prime",
+    developer: "LODHA GROUP",
+    locality: "Borivali West",
+    locality_key: "borivali_west",
+    locality_label: "BORIVALI WEST",
+    config: "1 & 2 BHK",
+    config_keys: ["1_bhk", "2_bhk", "2_3_bhk"],
+    config_label: "1 & 2 BHK in LODHA PRIME",
+    area: "510 – 920 sq.ft",
+    beds: "1 & 2 BHK",
+    priceFrom: "₹ 1.28 Cr.*",
+    priceLabel: "From ₹1.28 Cr.*",
+    status: "Under Construction",
+    status_key: "under_construction",
+    developer_key: "lodha",
+    mode: "buy",
+    verified: true, rera: true,
+    badge: null as string | null,
+    image: "/images/projects/Untitled-design-19.webp",
+    features: ["Smart Layouts","Clubhouse","Fitness Centre","1 & 2 BHK Homes"],
+  },
+  {
+    id: 35,
+    name: "OBEROI METROPOLIS",
+    projectName: "Oberoi Metropolis",
+    developer: "OBEROI REALTY",
+    locality: "Malad West",
+    locality_key: "malad_west",
+    locality_label: "MALAD WEST",
+    config: "2, 3 & 4 BHK",
+    config_keys: ["2_bhk", "3_bhk", "3_4_bhk", "4_bhk"],
+    config_label: "2, 3 & 4 BHK in OBEROI METROPOLIS",
+    area: "980 – 2280 sq.ft",
+    beds: "2, 3 & 4 BHK",
+    priceFrom: "₹ 3.15 Cr.*",
+    priceLabel: "From ₹3.15 Cr.*",
+    status: "Ready to Move",
+    status_key: "ready_to_move",
+    developer_key: "oberoi",
+    mode: "buy",
+    verified: true, rera: true,
+    badge: null as string | null,
+    image: "/images/projects/Untitled-design-20.webp",
+    features: ["Large Clubhouse","City Views","Premium Interiors","2, 3 & 4 BHK Homes"],
+  },
+
+  {
+    id: 36,
+    name: "KALPATARU ORCHARD",
+    projectName: "Kalpataru Orchard",
+    developer: "KALPATARU LIMITED",
+    locality: "Goregaon West",
+    locality_key: "goregaon_west",
+    locality_label: "GOREGAON WEST",
+    config: "2 & 3 BHK",
+    config_keys: ["2_bhk", "3_bhk", "2_3_bhk"],
+    config_label: "2 & 3 BHK in KALPATARU ORCHARD",
+    area: "840 – 1420 sq.ft",
+    beds: "2 & 3 BHK",
+    priceFrom: "₹ 2.18 Cr.*",
+    priceLabel: "From ₹2.18 Cr.*",
+    status: "Upcoming",
+    status_key: "upcoming",
+    developer_key: "kalpataru",
+    mode: "buy",
+    verified: true, rera: false,
+    badge: "PRE-LAUNCH" as string | null,
+    image: "/images/projects/Untitled-design-21.webp",
+    features: ["Garden Living","Premium Clubhouse","Open Spaces","2 & 3 BHK Residences"],
+  },
+  {
+    id: 37,
+    name: "GODREJ HORIZON",
+    projectName: "Godrej Horizon",
+    developer: "GODREJ PROPERTIES",
+    locality: "Borivali West",
+    locality_key: "borivali_west",
+    locality_label: "BORIVALI WEST",
+    config: "2 & 3 BHK",
+    config_keys: ["2_bhk", "3_bhk", "2_3_bhk"],
+    config_label: "2 & 3 BHK in GODREJ HORIZON",
+    area: "850 – 1500 sq.ft",
+    beds: "2 & 3 BHK",
+    priceFrom: "₹ 2.52 Cr.*",
+    priceLabel: "From ₹2.52 Cr.*",
+    status: "Under Construction",
+    status_key: "under_construction",
+    developer_key: "godrej",
+    mode: "buy",
+    verified: true, rera: true,
+    badge: null as string | null,
+    image: "/images/projects/Untitled-design-18.webp",
+    features: ["Panoramic Views","Sports Facilities","Clubhouse","2 & 3 BHK Homes"],
+  },
+  {
+    id: 38,
+    name: "RUSTOMJEE PALMS",
+    projectName: "Rustomjee Palms",
+    developer: "RUSTOMJEE",
+    locality: "Malad West",
+    locality_key: "malad_west",
+    locality_label: "MALAD WEST",
+    config: "1 & 2 BHK",
+    config_keys: ["1_bhk", "2_bhk", "2_3_bhk"],
+    config_label: "1 & 2 BHK in RUSTOMJEE PALMS",
+    area: "520 – 940 sq.ft",
+    beds: "1 & 2 BHK",
+    priceFrom: "₹ 1.38 Cr.*",
+    priceLabel: "From ₹1.38 Cr.*",
+    status: "Ready to Move",
+    status_key: "ready_to_move",
+    developer_key: "rustomjee",
+    mode: "rent",
+    verified: true, rera: true,
+    badge: null as string | null,
+    image: "/images/projects/Untitled-design-19.webp",
+    features: ["Green Community","Modern Amenities","Prime Location","1 & 2 BHK Homes"],
+  },
+  {
+    id: 39,
+    name: "LODHA GRANDE",
+    projectName: "Lodha Grande",
+    developer: "LODHA GROUP",
+    locality: "Kandivali East",
+    locality_key: "kandivali_east",
+    locality_label: "KANDIVALI EAST",
+    config: "3 & 4 BHK",
+    config_keys: ["3_bhk", "4_bhk", "3_4_bhk"],
+    config_label: "3 & 4 BHK in LODHA GRANDE",
+    area: "1350 – 2150 sq.ft",
+    beds: "3 & 4 BHK",
+    priceFrom: "₹ 4.20 Cr.*",
+    priceLabel: "From ₹4.20 Cr.*",
+    status: "New Launch",
+    status_key: "new_launch",
+    developer_key: "lodha",
+    mode: "buy",
+    verified: true, rera: true,
+    badge: "LIMITED UNITS" as string | null,
+    image: "/images/projects/Untitled-design-20.webp",
+    features: ["Grand Entrance","Luxury Amenities","Sky Lounge","3 & 4 BHK Homes"],
+  },
+  {
+    id: 40,
+    name: "OBEROI URBAN",
+    projectName: "Oberoi Urban",
+    developer: "OBEROI REALTY",
+    locality: "Bandra West",
+    locality_key: "bandra_west",
+    locality_label: "BANDRA WEST",
+    config: "3 & 4 BHK",
+    config_keys: ["3_bhk", "4_bhk", "3_4_bhk"],
+    config_label: "3 & 4 BHK in OBEROI URBAN",
+    area: "1440 – 2300 sq.ft",
+    beds: "3 & 4 BHK",
+    priceFrom: "₹ 5.65 Cr.*",
+    priceLabel: "From ₹5.65 Cr.*",
+    status: "Under Construction",
+    status_key: "under_construction",
+    developer_key: "oberoi",
+    mode: "buy",
+    verified: true, rera: true,
+    badge: null as string | null,
+    image: "/images/projects/Untitled-design-21.webp",
+    features: ["Premium Address","Luxury Club","Sea Views","3 & 4 BHK Residences"],
+  },
+
+  {
+    id: 41,
+    name: "KALPATARU RESERVE",
+    projectName: "Kalpataru Reserve",
+    developer: "KALPATARU LIMITED",
+    locality: "Bandra West",
+    locality_key: "bandra_west",
+    locality_label: "BANDRA WEST",
+    config: "4 & 5 BHK",
+    config_keys: ["4_bhk", "5_bhk", "4_5_bhk"],
+    config_label: "4 & 5 BHK in KALPATARU RESERVE",
+    area: "1880 – 3100 sq.ft",
+    beds: "4 & 5 BHK",
+    priceFrom: "₹ 7.25 Cr.*",
+    priceLabel: "From ₹7.25 Cr.*",
+    status: "Upcoming",
+    status_key: "upcoming",
+    developer_key: "kalpataru",
+    mode: "buy",
+    verified: true, rera: false,
+    badge: "PRE-LAUNCH" as string | null,
+    image: "/images/projects/Untitled-design-18.webp",
+    features: ["Ultra Luxury","Private Lobby","Premium Amenities","4 & 5 BHK Residences"],
+  },
+  {
+    id: 42,
+    name: "GODREJ ELITE",
+    projectName: "Godrej Elite",
+    developer: "GODREJ PROPERTIES",
+    locality: "Goregaon West",
+    locality_key: "goregaon_west",
+    locality_label: "GOREGAON WEST",
+    config: "3 & 4 BHK",
+    config_keys: ["3_bhk", "4_bhk", "3_4_bhk"],
+    config_label: "3 & 4 BHK in GODREJ ELITE",
+    area: "1260 – 2050 sq.ft",
+    beds: "3 & 4 BHK",
+    priceFrom: "₹ 4.15 Cr.*",
+    priceLabel: "From ₹4.15 Cr.*",
+    status: "Ready to Move",
+    status_key: "ready_to_move",
+    developer_key: "godrej",
+    mode: "buy",
+    verified: true, rera: true,
+    badge: null as string | null,
+    image: "/images/projects/Untitled-design-19.webp",
+    features: ["Premium Lifestyle","Gymnasium","Swimming Pool","3 & 4 BHK Homes"],
+  },
+  {
+    id: 43,
+    name: "RUSTOMJEE ROYALE",
+    projectName: "Rustomjee Royale",
+    developer: "RUSTOMJEE",
+    locality: "Andheri West",
+    locality_key: "andheri_west",
+    locality_label: "ANDHERI WEST",
+    config: "2 & 3 BHK",
+    config_keys: ["2_bhk", "3_bhk", "2_3_bhk"],
+    config_label: "2 & 3 BHK in RUSTOMJEE ROYALE",
+    area: "870 – 1460 sq.ft",
+    beds: "2 & 3 BHK",
+    priceFrom: "₹ 2.68 Cr.*",
+    priceLabel: "From ₹2.68 Cr.*",
+    status: "Under Construction",
+    status_key: "under_construction",
+    developer_key: "rustomjee",
+    mode: "buy",
+    verified: true, rera: true,
+    badge: null as string | null,
+    image: "/images/projects/Untitled-design-20.webp",
+    features: ["Modern Design","Clubhouse","Metro Access","2 & 3 BHK Homes"],
+  },
+  {
+    id: 44,
+    name: "LODHA PARKSIDE",
+    projectName: "Lodha Parkside",
+    developer: "LODHA GROUP",
+    locality: "Powai",
+    locality_key: "powai",
+    locality_label: "POWAI",
+    config: "2 & 3 BHK",
+    config_keys: ["2_bhk", "3_bhk", "2_3_bhk"],
+    config_label: "2 & 3 BHK in LODHA PARKSIDE",
+    area: "900 – 1510 sq.ft",
+    beds: "2 & 3 BHK",
+    priceFrom: "₹ 2.78 Cr.*",
+    priceLabel: "From ₹2.78 Cr.*",
+    status: "Ready to Move",
+    status_key: "ready_to_move",
+    developer_key: "lodha",
+    mode: "buy",
+    verified: true, rera: true,
+    badge: null as string | null,
+    image: "/images/projects/Untitled-design-21.webp",
+    features: ["Lakeside Living","Green Spaces","Sports Club","2 & 3 BHK Homes"],
+  },
+  {
+    id: 45,
+    name: "OBEROI ROYALE",
+    projectName: "Oberoi Royale",
+    developer: "OBEROI REALTY",
+    locality: "Kandivali East",
+    locality_key: "kandivali_east",
+    locality_label: "KANDIVALI EAST",
+    config: "3 & 4 BHK",
+    config_keys: ["3_bhk", "4_bhk", "3_4_bhk"],
+    config_label: "3 & 4 BHK in OBEROI ROYALE",
+    area: "1380 – 2250 sq.ft",
+    beds: "3 & 4 BHK",
+    priceFrom: "₹ 4.65 Cr.*",
+    priceLabel: "From ₹4.65 Cr.*",
+    status: "New Launch",
+    status_key: "new_launch",
+    developer_key: "oberoi",
+    mode: "buy",
+    verified: true, rera: true,
+    badge: "NEW LAUNCH" as string | null,
+    image: "/images/projects/Untitled-design-18.webp",
+    features: ["Luxury Residences","Private Amenities","Open Views","3 & 4 BHK Homes"],
+  },
+
+  {
+    id: 46,
+    name: "KALPATARU CENTRAL",
+    projectName: "Kalpataru Central",
+    developer: "KALPATARU LIMITED",
+    locality: "Borivali West",
+    locality_key: "borivali_west",
+    locality_label: "BORIVALI WEST",
+    config: "1 & 2 BHK",
+    config_keys: ["1_bhk", "2_bhk", "2_3_bhk"],
+    config_label: "1 & 2 BHK in KALPATARU CENTRAL",
+    area: "490 – 900 sq.ft",
+    beds: "1 & 2 BHK",
+    priceFrom: "₹ 1.22 Cr.*",
+    priceLabel: "From ₹1.22 Cr.*",
+    status: "Under Construction",
+    status_key: "under_construction",
+    developer_key: "kalpataru",
+    mode: "rent",
+    verified: true, rera: true,
+    badge: null as string | null,
+    image: "/images/projects/Untitled-design-19.webp",
+    features: ["Central Location","Smart Homes","Modern Amenities","1 & 2 BHK Homes"],
+  },
+  {
+    id: 47,
+    name: "GODREJ GRANDE",
+    projectName: "Godrej Grande",
+    developer: "GODREJ PROPERTIES",
+    locality: "Powai",
+    locality_key: "powai",
+    locality_label: "POWAI",
+    config: "3 & 4 BHK",
+    config_keys: ["3_bhk", "4_bhk", "3_4_bhk"],
+    config_label: "3 & 4 BHK in GODREJ GRANDE",
+    area: "1350 – 2190 sq.ft",
+    beds: "3 & 4 BHK",
+    priceFrom: "₹ 4.72 Cr.*",
+    priceLabel: "From ₹4.72 Cr.*",
+    status: "Under Construction",
+    status_key: "under_construction",
+    developer_key: "godrej",
+    mode: "buy",
+    verified: true, rera: true,
+    badge: null as string | null,
+    image: "/images/projects/Untitled-design-20.webp",
+    features: ["Lake Views","Premium Club","Landscaped Gardens","3 & 4 BHK Residences"],
+  },
+  {
+    id: 48,
+    name: "RUSTOMJEE PARK",
+    projectName: "Rustomjee Park",
+    developer: "RUSTOMJEE",
+    locality: "Goregaon West",
+    locality_key: "goregaon_west",
+    locality_label: "GOREGAON WEST",
+    config: "2 & 3 BHK",
+    config_keys: ["2_bhk", "3_bhk", "2_3_bhk"],
+    config_label: "2 & 3 BHK in RUSTOMJEE PARK",
+    area: "820 – 1390 sq.ft",
+    beds: "2 & 3 BHK",
+    priceFrom: "₹ 2.38 Cr.*",
+    priceLabel: "From ₹2.38 Cr.*",
+    status: "Ready to Move",
+    status_key: "ready_to_move",
+    developer_key: "rustomjee",
+    mode: "buy",
+    verified: true, rera: true,
+    badge: null as string | null,
+    image: "/images/projects/Untitled-design-21.webp",
+    features: ["Garden Views","Community Hall","Fitness Centre","2 & 3 BHK Homes"],
+  },
+  {
+    id: 49,
+    name: "LODHA SIGNATURE",
+    projectName: "Lodha Signature",
+    developer: "LODHA GROUP",
+    locality: "Malad West",
+    locality_key: "malad_west",
+    locality_label: "MALAD WEST",
+    config: "2 & 3 BHK",
+    config_keys: ["2_bhk", "3_bhk", "2_3_bhk"],
+    config_label: "2 & 3 BHK in LODHA SIGNATURE",
+    area: "850 – 1480 sq.ft",
+    beds: "2 & 3 BHK",
+    priceFrom: "₹ 2.48 Cr.*",
+    priceLabel: "From ₹2.48 Cr.*",
+    status: "New Launch",
+    status_key: "new_launch",
+    developer_key: "lodha",
+    mode: "buy",
+    verified: true, rera: true,
+    badge: "EARLY ACCESS" as string | null,
+    image: "/images/projects/Untitled-design-18.webp",
+    features: ["Premium Interiors","Rooftop Lounge","Clubhouse","2 & 3 BHK Homes"],
+  },
+  {
+    id: 50,
+    name: "OBEROI RESERVE",
+    projectName: "Oberoi Reserve",
+    developer: "OBEROI REALTY",
+    locality: "Malad West",
+    locality_key: "malad_west",
+    locality_label: "MALAD WEST",
+    config: "4 & 5 BHK",
+    config_keys: ["4_bhk", "5_bhk", "4_5_bhk"],
+    config_label: "4 & 5 BHK in OBEROI RESERVE",
+    area: "1950 – 3200 sq.ft",
+    beds: "4 & 5 BHK",
+    priceFrom: "₹ 7.15 Cr.*",
+    priceLabel: "From ₹7.15 Cr.*",
+    status: "Upcoming",
+    status_key: "upcoming",
+    developer_key: "oberoi",
+    mode: "buy",
+    verified: true, rera: false,
+    badge: "PRE-LAUNCH" as string | null,
+    image: "/images/projects/Untitled-design-19.webp",
+    features: ["Private Residences","Luxury Club","Large Balconies","4 & 5 BHK Homes"],
+  },
+
+  {
+    id: 51,
+    name: "KALPATARU ONE",
+    projectName: "Kalpataru One",
+    developer: "KALPATARU LIMITED",
+    locality: "Andheri West",
+    locality_key: "andheri_west",
+    locality_label: "ANDHERI WEST",
+    config: "2 BHK",
+    config_keys: ["2_bhk"],
+    config_label: "2 BHK in KALPATARU ONE",
+    area: "720 – 980 sq.ft",
+    beds: "2 BHK",
+    priceFrom: "₹ 1.92 Cr.*",
+    priceLabel: "From ₹1.92 Cr.*",
+    status: "Ready to Move",
+    status_key: "ready_to_move",
+    developer_key: "kalpataru",
+    mode: "rent",
+    verified: true, rera: true,
+    badge: null as string | null,
+    image: "/images/projects/Untitled-design-20.webp",
+    features: ["Prime Location","Modern Interiors","Gymnasium","2 BHK Apartments"],
+  },
+  {
+    id: 52,
+    name: "GODREJ LUXE",
+    projectName: "Godrej Luxe",
+    developer: "GODREJ PROPERTIES",
+    locality: "Bandra West",
+    locality_key: "bandra_west",
+    locality_label: "BANDRA WEST",
+    config: "4 & 5 BHK",
+    config_keys: ["4_bhk", "5_bhk", "4_5_bhk"],
+    config_label: "4 & 5 BHK in GODREJ LUXE",
+    area: "1900 – 3050 sq.ft",
+    beds: "4 & 5 BHK",
+    priceFrom: "₹ 7.45 Cr.*",
+    priceLabel: "From ₹7.45 Cr.*",
+    status: "Under Construction",
+    status_key: "under_construction",
+    developer_key: "godrej",
+    mode: "buy",
+    verified: true, rera: true,
+    badge: "ULTRA LUXURY" as string | null,
+    image: "/images/projects/Untitled-design-21.webp",
+    features: ["Sea Views","Private Lobby","Luxury Amenities","4 & 5 BHK Residences"],
+  },
+  {
+    id: 53,
+    name: "RUSTOMJEE VISTA",
+    projectName: "Rustomjee Vista",
+    developer: "RUSTOMJEE",
+    locality: "Powai",
+    locality_key: "powai",
+    locality_label: "POWAI",
+    config: "3 & 4 BHK",
+    config_keys: ["3_bhk", "4_bhk", "3_4_bhk"],
+    config_label: "3 & 4 BHK in RUSTOMJEE VISTA",
+    area: "1300 – 2050 sq.ft",
+    beds: "3 & 4 BHK",
+    priceFrom: "₹ 4.05 Cr.*",
+    priceLabel: "From ₹4.05 Cr.*",
+    status: "New Launch",
+    status_key: "new_launch",
+    developer_key: "rustomjee",
+    mode: "buy",
+    verified: true, rera: true,
+    badge: "NEW LAUNCH" as string | null,
+    image: "/images/projects/Untitled-design-18.webp",
+    features: ["Lake Views","Premium Club","Green Spaces","3 & 4 BHK Homes"],
+  },
+  {
+    id: 54,
+    name: "LODHA GARDEN",
+    projectName: "Lodha Garden",
+    developer: "LODHA GROUP",
+    locality: "Borivali West",
+    locality_key: "borivali_west",
+    locality_label: "BORIVALI WEST",
+    config: "2 & 3 BHK",
+    config_keys: ["2_bhk", "3_bhk", "2_3_bhk"],
+    config_label: "2 & 3 BHK in LODHA GARDEN",
+    area: "830 – 1410 sq.ft",
+    beds: "2 & 3 BHK",
+    priceFrom: "₹ 2.25 Cr.*",
+    priceLabel: "From ₹2.25 Cr.*",
+    status: "Under Construction",
+    status_key: "under_construction",
+    developer_key: "lodha",
+    mode: "buy",
+    verified: true, rera: true,
+    badge: null as string | null,
+    image: "/images/projects/Untitled-design-19.webp",
+    features: ["Garden Views","Clubhouse","Sports Facilities","2 & 3 BHK Homes"],
+  },
+  {
+    id: 55,
+    name: "OBEROI ICON",
+    projectName: "Oberoi Icon",
+    developer: "OBEROI REALTY",
+    locality: "Andheri West",
+    locality_key: "andheri_west",
+    locality_label: "ANDHERI WEST",
+    config: "3 & 4 BHK",
+    config_keys: ["3_bhk", "4_bhk", "3_4_bhk"],
+    config_label: "3 & 4 BHK in OBEROI ICON",
+    area: "1370 – 2190 sq.ft",
+    beds: "3 & 4 BHK",
+    priceFrom: "₹ 4.95 Cr.*",
+    priceLabel: "From ₹4.95 Cr.*",
+    status: "Ready to Move",
+    status_key: "ready_to_move",
+    developer_key: "oberoi",
+    mode: "buy",
+    verified: true, rera: true,
+    badge: null as string | null,
+    image: "/images/projects/Untitled-design-20.webp",
+    features: ["Premium Location","Luxury Amenities","Metro Connectivity","3 & 4 BHK Homes"],
+  },
+
+  {
+    id: 56,
+    name: "KALPATARU GRAND",
+    projectName: "Kalpataru Grand",
+    developer: "KALPATARU LIMITED",
+    locality: "Goregaon West",
+    locality_key: "goregaon_west",
+    locality_label: "GOREGAON WEST",
+    config: "3 & 4 BHK",
+    config_keys: ["3_bhk", "4_bhk", "3_4_bhk"],
+    config_label: "3 & 4 BHK in KALPATARU GRAND",
+    area: "1280 – 2080 sq.ft",
+    beds: "3 & 4 BHK",
+    priceFrom: "₹ 3.88 Cr.*",
+    priceLabel: "From ₹3.88 Cr.*",
+    status: "Under Construction",
+    status_key: "under_construction",
+    developer_key: "kalpataru",
+    mode: "buy",
+    verified: true, rera: true,
+    badge: null as string | null,
+    image: "/images/projects/Untitled-design-21.webp",
+    features: ["Premium Residences","Sky Lounge","Fitness Centre","3 & 4 BHK Homes"],
+  },
+  {
+    id: 57,
+    name: "GODREJ BLOOM",
+    projectName: "Godrej Bloom",
+    developer: "GODREJ PROPERTIES",
+    locality: "Malad West",
+    locality_key: "malad_west",
+    locality_label: "MALAD WEST",
+    config: "1 & 2 BHK",
+    config_keys: ["1_bhk", "2_bhk", "2_3_bhk"],
+    config_label: "1 & 2 BHK in GODREJ BLOOM",
+    area: "510 – 920 sq.ft",
+    beds: "1 & 2 BHK",
+    priceFrom: "₹ 1.35 Cr.*",
+    priceLabel: "From ₹1.35 Cr.*",
+    status: "New Launch",
+    status_key: "new_launch",
+    developer_key: "godrej",
+    mode: "rent",
+    verified: true, rera: true,
+    badge: "EARLY BIRD OFFER" as string | null,
+    image: "/images/projects/Untitled-design-18.webp",
+    features: ["Green Living","Smart Amenities","Modern Homes","1 & 2 BHK Residences"],
+  },
+  {
+    id: 58,
+    name: "RUSTOMJEE GRAND",
+    projectName: "Rustomjee Grand",
+    developer: "RUSTOMJEE",
+    locality: "Kandivali East",
+    locality_key: "kandivali_east",
+    locality_label: "KANDIVALI EAST",
+    config: "3, 4 & 5 BHK",
+    config_keys: ["3_bhk", "4_bhk", "4_5_bhk", "5_bhk"],
+    config_label: "3, 4 & 5 BHK in RUSTOMJEE GRAND",
+    area: "1450 – 2750 sq.ft",
+    beds: "3, 4 & 5 BHK",
+    priceFrom: "₹ 5.25 Cr.*",
+    priceLabel: "From ₹5.25 Cr.*",
+    status: "Upcoming",
+    status_key: "upcoming",
+    developer_key: "rustomjee",
+    mode: "buy",
+    verified: true, rera: false,
+    badge: "PRE-LAUNCH" as string | null,
+    image: "/images/projects/Untitled-design-19.webp",
+    features: ["Grand Residences","Premium Clubhouse","Private Decks","3, 4 & 5 BHK Homes"],
   },
 ];
 
+const OFFERS = [
+  {
+    title: "Unlock Premium Developer Offers",
+    description:
+      "Get exclusive early-bird discounts and zero brokerage on selected luxury properties across Mumbai.",
+    button: "Claim Offers",
+  },
+  {
+    title: "Get Priority Access to New Launches",
+    description:
+      "Be among the first to explore premium residences, special launch pricing and limited inventory.",
+    button: "Explore New Launches",
+  },
+  {
+    title: "Exclusive Homebuyer Benefits",
+    description:
+      "Discover special payment plans, limited-period offers and premium upgrades from leading developers.",
+    button: "View Benefits",
+  },
+  {
+    title: "Find Your Dream Home",
+    description:
+      "Tell us what you're looking for and get personalised property recommendations from our experts.",
+    button: "Get Recommendations",
+  },
+];
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-function matchConfig(propConfig: string, filterConfig: string): boolean {
-  if (filterConfig === "All BHK") return true;
-  const filterBhks = filterConfig.toLowerCase().replace(/\s/g, "").split("&");
-  const prop = propConfig.toLowerCase().replace(/\s/g, "");
-  return filterBhks.some((f) => prop.includes(f));
+// Match a property against the active config key (key="" means no filter)
+function matchConfig(propConfigKeys: string[], filterKey: string): boolean {
+  if (!filterKey) return true;
+  return propConfigKeys.includes(filterKey);
+}
+
+// Get display label for an active filter key
+function getLabel(options: FilterOption[], key: string): string {
+  return options.find((o) => o.key === key)?.label ?? key;
 }
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
@@ -347,16 +1573,27 @@ function ListIcon({ active }: { active: boolean }) {
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
+// Desktop dropdown — emits the selected option's key
 function SelectFilter({ id, label, options, value, onChange }: {
-  id: string; label: string; options: string[];
-  value: string; onChange: (v: string) => void;
+  id: string;
+  label: string;
+  options: FilterOption[];
+  value: string;           // current active key from URL
+  onChange: (key: string) => void;
 }) {
   return (
     <div className="lp-filter-group">
       <label htmlFor={id} className="lp-filter-label">{label}</label>
       <div className="lp-select-wrap">
-        <select id={id} className="lp-select" value={value} onChange={(e) => onChange(e.target.value)}>
-          {options.map((o) => <option key={o} value={o}>{o}</option>)}
+        <select
+          id={id}
+          className="lp-select"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+        >
+          {options.map((o) => (
+            <option key={o.key} value={o.key}>{o.label}</option>
+          ))}
         </select>
         <ChevronIcon />
       </div>
@@ -417,7 +1654,7 @@ function PropertyCard({ property, view }: { property: Property; view: "grid" | "
         </div>
 
         {property.badge && <div className="lp-card-badge-ribbon">{property.badge}</div>}
-        <div className="lp-dev-tag">{property.developer}</div>
+        {/* <div className="lp-dev-tag">{property.developer}</div> */}
       </div>
       {cardBody}
     </article>
@@ -434,18 +1671,14 @@ export default function ListingsPage() {
   const searchParams = useSearchParams();
   const [, startTransition] = useTransition();
 
-  const mode = searchParams.get("mode") ?? "buy";
-  const locality = searchParams.get("locality") ?? "All Localities";
-  const config = searchParams.get("config") ?? "All BHK";
-  const status = searchParams.get("status") ?? "Any Status";
-  const developer = searchParams.get("developer") ?? "All Developers";
-  const sort = searchParams.get("sort") ?? "Relevance";
-  const view = (searchParams.get("view") ?? "grid") as "grid" | "list";
+  const mode      = searchParams.get("mode")     ?? "buy";
+  const locality  = searchParams.get("locality") ?? "";
+  const config    = searchParams.get("config")   ?? "";
+  const status    = searchParams.get("status")   ?? "";
+  const developer = searchParams.get("developer")  ?? "";
+  const sort      = searchParams.get("sort")     ?? "Relevance";
+  const view      = (searchParams.get("view")    ?? "grid") as "grid" | "list";
 
-  const [pendingLocality, setPendingLocality] = useState(locality);
-  const [pendingConfig, setPendingConfig] = useState(config);
-  const [pendingDeveloper, setPendingDeveloper] = useState(developer);
-  const [pendingStatus, setPendingStatus] = useState(status);
   const [search, setSearch] = useState(searchParams.get("q") ?? "");
   const [drawer, setDrawer] = useState<DrawerPanel>(null);
   const [isClosing, setIsClosing] = useState(false);
@@ -453,6 +1686,7 @@ export default function ListingsPage() {
   const updateParams = useCallback(
     (updates: Record<string, string>) => {
       const params = new URLSearchParams(searchParams.toString());
+      // key="" removes the param (= "show all"); any other value sets it
       Object.entries(updates).forEach(([k, v]) => { if (v) params.set(k, v); else params.delete(k); });
       startTransition(() => { router.replace(`${pathname}?${params.toString()}`, { scroll: false }); });
     },
@@ -462,41 +1696,29 @@ export default function ListingsPage() {
   // Trigger close animation then unmount
   const closeDrawer = useCallback(() => {
     setIsClosing(true);
-    setTimeout(() => {
-      setDrawer(null);
-      setIsClosing(false);
-    }, 320);
+    setTimeout(() => { setDrawer(null); setIsClosing(false); }, 320);
   }, []);
 
   const openDrawer = useCallback((panel: DrawerPanel) => {
-    if (drawer === panel) {
-      closeDrawer();
-    } else {
-      setIsClosing(false);
-      setDrawer(panel);
-    }
+    if (drawer === panel) { closeDrawer(); }
+    else { setIsClosing(false); setDrawer(panel); }
   }, [drawer, closeDrawer]);
 
-  const applyFilters = () => {
-    updateParams({ locality: pendingLocality, config: pendingConfig, developer: pendingDeveloper, status: pendingStatus, q: search });
-    closeDrawer();
-  };
+  // Mobile filter Apply just closes the drawer (each chip already updated URL)
+  const applyFilters = () => { closeDrawer(); };
 
-  // count active filters for badge
-  const activeFilterCount = [
-    locality !== "All Localities",
-    config !== "All BHK",
-    developer !== "All Developers",
-    status !== "Any Status",
-  ].filter(Boolean).length;
+  // Count active (non-empty) filter params for the badge
+  const activeFilterCount = [locality, config, developer, status].filter(Boolean).length;
 
   const filtered = ALL_PROPERTIES.filter((p) => {
     if (p.mode !== mode) return false;
-    if (locality !== "All Localities" && p.locality !== locality) return false;
-    if (!matchConfig(p.config, config)) return false;
-    if (status !== "Any Status" && p.status !== status) return false;
-    if (developer !== "All Developers" && !p.developer.toLowerCase().includes(developer.toLowerCase().split(" ")[0])) return false;
-    if (search && !p.name.toLowerCase().includes(search.toLowerCase()) && !p.locality.toLowerCase().includes(search.toLowerCase()) && !p.developer.toLowerCase().includes(search.toLowerCase())) return false;
+    if (locality  && p.locality_key  !== locality)             return false;
+    if (config    && !matchConfig(p.config_keys, config))      return false;
+    if (status    && p.status_key    !== status)               return false;
+    if (developer && p.developer_key !== developer)            return false;
+    if (search && !p.name.toLowerCase().includes(search.toLowerCase())
+               && !p.locality.toLowerCase().includes(search.toLowerCase())
+               && !p.developer.toLowerCase().includes(search.toLowerCase())) return false;
     return true;
   });
 
@@ -557,14 +1779,14 @@ export default function ListingsPage() {
         .lp-sort-row { display: flex; align-items: center; gap: 10px; }
         .lp-sort-label { font-size: 13px; color: #999; }
         .lp-sort-select { appearance: none; -webkit-appearance: none; background: #fff; border: 1.5px solid #eaecf0; border-radius: 8px; height: 36px; padding: 0 14px; font: 500 13px 'Inter'; color: #222; cursor: pointer; outline: none; }
-        .lp-view-toggle { display: flex; gap: 4px; }
+        .lp-view-toggle { display: none; }
         .lp-view-btn-icon { width: 36px; height: 36px; border-radius: 8px; border: 1.5px solid #eaecf0; background: #fff; display: grid; place-items: center; cursor: pointer; transition: border-color .15s, background .15s; }
         .lp-view-btn-icon.active { border-color: #c8a84b; background: #fdf8ec; }
 
         /* PROPERTY GRID */
         .lp-grid-wrap { max-width: 1280px; margin: 0 auto 70px; padding: 0 32px; }
         .lp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
-        .lp-grid--list { grid-template-columns: 1fr; }
+        .lp-grid--list { grid-template-columns: repeat(3, 1fr); }
 
         /* PROPERTY CARD */
         .lp-card { background: #fff; border-radius: 18px; overflow: hidden; box-shadow: 0 2px 14px rgba(0,0,0,0.07); transition: transform .28s cubic-bezier(0.2,0.8,0.2,1), box-shadow .28s; display: flex; flex-direction: column; }
@@ -604,6 +1826,68 @@ export default function ListingsPage() {
         .lp-view-btn { display: flex; align-items: center; gap: 6px; padding: 9px 18px; border-radius: 8px; border: 1.5px solid #1a1a2e; background: #fff; font: 600 12px 'Inter'; color: #1a1a2e; cursor: pointer; transition: background .15s, color .15s; white-space: nowrap; }
         .lp-view-btn:hover { background: #1a1a2e; color: #fff; }
 
+        /* PROMO BANNER */
+        .lp-promo-banner {
+          grid-column: 1 / -1;
+          background: linear-gradient(135deg, #0a0e1e, #1a1a2e);
+          border-radius: 18px;
+          padding: 32px 40px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 24px;
+          margin: 10px 0;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+          position: relative;
+          overflow: hidden;
+        }
+        .lp-promo-banner::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background-image: url('/images/heroBg.png');
+          background-size: cover;
+          background-position: center;
+          opacity: 0.15;
+          z-index: 0;
+        }
+        .lp-promo-content { position: relative; z-index: 1; }
+        .lp-promo-banner h3 { color: #fff; font-size: 24px; font-weight: 800; margin: 0 0 8px; letter-spacing: -0.5px; }
+        .lp-promo-banner p { color: #a0a5b5; font-size: 15px; margin: 0; max-width: 600px; line-height: 1.5; }
+        .lp-promo-btn {
+          position: relative;
+          z-index: 1;
+          background: #c8a84b;
+          color: #1a1a2e;
+          font: 700 15px 'Inter';
+          padding: 14px 28px;
+          border-radius: 8px;
+          border: none;
+          cursor: pointer;
+          white-space: nowrap;
+          transition: transform 0.2s, background 0.2s;
+        }
+        .lp-promo-btn:hover { background: #d4b55b; transform: translateY(-2px); }
+
+        /* DESKTOP & TABLET LIST VIEW STYLES */
+        @media (min-width: 721px) {
+          .lp-card--list .lp-card-body {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            grid-template-rows: auto auto 1fr auto;
+            gap: 6px 30px;
+            padding: 24px 30px;
+          }
+          .lp-card--list .lp-card-title { grid-column: 1; grid-row: 1; font-size: 18px; margin-bottom: 2px; }
+          .lp-card--list .lp-card-loc { grid-column: 1; grid-row: 2; font-size: 14px; margin-bottom: 8px; }
+          .lp-card--list .lp-card-meta { grid-column: 1; grid-row: 3; align-self: start; border: none; padding: 0; margin: 0; }
+          .lp-card--list .lp-card-meta span { font-size: 13.5px; }
+          
+          .lp-card--list .lp-card-price-main { grid-column: 2; grid-row: 1 / span 2; font-size: 24px; text-align: right; margin: 0; align-self: start; }
+          
+          .lp-card--list .lp-card-footer { grid-column: 1 / -1; grid-row: 4; border-top: 1px solid #f0f2f7; padding-top: 18px; margin-top: 12px; }
+        }
+
         /* EMPTY STATE */
         .lp-empty { grid-column: 1 / -1; text-align: center; padding: 80px 24px; }
         .lp-empty-icon { font-size: 52px; margin-bottom: 16px; }
@@ -616,8 +1900,7 @@ export default function ListingsPage() {
         /* RESPONSIVE */
         @media (max-width: 1100px) {
           .lp-grid { grid-template-columns: repeat(2, 1fr); }
-          .lp-card--list { flex-direction: column; }
-          .lp-card-img-wrap--list { width: 100%; height: 235px; }
+          .lp-grid.lp-grid--list { grid-template-columns: 1fr; }
         }
 
         /* ── MOBILE (≤720px) ─────────────────────── */
@@ -629,6 +1912,28 @@ export default function ListingsPage() {
           .lp-trust-item { padding: 0 14px; }
           .lp-trust-row { gap: 8px 0; }
           .lp-grid-wrap { margin-bottom: 100px; }
+
+          /* Mobile Promo Banner */
+          .lp-promo-banner { flex-direction: column; align-items: flex-start; padding: 24px; }
+          .lp-promo-banner h3 { font-size: 20px; }
+          .lp-promo-btn { width: 100%; text-align: center; }
+
+          /* Proper Mobile List View */
+          .lp-card--list { flex-direction: row; min-height: 135px; }
+          .lp-card-img-wrap--list { width: 135px; height: auto; }
+          .lp-card--list .lp-card-overlay,
+          .lp-card--list .lp-dev-tag,
+          .lp-card--list .lp-card-badge-ribbon { display: none; }
+          .lp-card--list .lp-heart { top: 8px; left: 8px; right: auto; width: 28px; height: 28px; }
+          .lp-card--list .lp-card-body { padding: 12px; justify-content: center; gap: 4px; }
+          .lp-card--list .lp-card-title { font-size: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3; }
+          .lp-card--list .lp-card-price-main { font-size: 15px; margin-top: 0; }
+          .lp-card--list .lp-card-loc { font-size: 10px; margin-top: 0; }
+          .lp-card--list .lp-card-meta { margin-top: 4px; padding-top: 8px; gap: 8px; }
+          .lp-card--list .lp-card-meta span { font-size: 10px; }
+          .lp-card--list .lp-badges-row { display: none; }
+          .lp-card--list .lp-card-footer { margin-top: 6px; }
+          .lp-card--list .lp-view-btn { padding: 6px 12px; font-size: 10.5px; }
 
           /* Sticky mobile footer toolbar */
           .lp-mob-toolbar {
@@ -895,10 +2200,27 @@ export default function ListingsPage() {
               />
             </div>
 
-            <SelectFilter id="lp-locality" label="Locality" options={LOCALITIES} value={pendingLocality} onChange={setPendingLocality} />
-            <SelectFilter id="lp-config" label="Configuration" options={CONFIGURATIONS} value={pendingConfig} onChange={setPendingConfig} />
-            <SelectFilter id="lp-developer" label="Developer" options={DEVELOPERS} value={pendingDeveloper} onChange={setPendingDeveloper} />
-            <SelectFilter id="lp-status" label="Status" options={STATUS_OPTIONS} value={pendingStatus} onChange={setPendingStatus} />
+            {/* Desktop dropdowns: each change updates ONLY that one URL param */}
+            <SelectFilter
+              id="lp-locality" label="Locality"
+              options={LOCALITIES} value={locality}
+              onChange={(key) => updateParams({ locality: key })}
+            />
+            <SelectFilter
+              id="lp-config" label="Configuration"
+              options={CONFIGURATIONS} value={config}
+              onChange={(key) => updateParams({ config: key })}
+            />
+            <SelectFilter
+              id="lp-developer" label="Developer"
+              options={DEVELOPERS} value={developer}
+              onChange={(key) => updateParams({ developer: key })}
+            />
+            <SelectFilter
+              id="lp-status" label="Status"
+              options={STATUS_OPTIONS} value={status}
+              onChange={(key) => updateParams({ status: key })}
+            />
           </div>
         </div>
 
@@ -940,7 +2262,29 @@ export default function ListingsPage() {
                 <p>Try adjusting your filters or switch between Buy / Rent.</p>
               </div>
             ) : (
-              filtered.map((p) => <PropertyCard key={p.id} property={p} view={view} />)
+              filtered.map((p, index) => (
+  <Fragment key={p.id}>
+    <PropertyCard property={p} view={view} />
+
+    {(index + 1) % 6 === 0 && index !== filtered.length - 1 && (() => {
+      const offerIndex = (index + 1) / 6 - 1;
+      const offer = OFFERS[offerIndex % OFFERS.length];
+
+      return (
+        <div className="lp-promo-banner">
+          <div className="lp-promo-content">
+            <h3>{offer.title}</h3>
+            <p>{offer.description}</p>
+          </div>
+
+          <button className="lp-promo-btn">
+            {offer.button}
+          </button>
+        </div>
+      );
+    })()}
+  </Fragment>
+))
             )}
           </div>
         </main>
@@ -1043,7 +2387,7 @@ export default function ListingsPage() {
                 </div>
               )}
 
-              {/* FILTER PANEL */}
+              {/* FILTER PANEL — each chip immediately updates its own URL param */}
               {drawer === "filter" && (
                 <div>
                   <div className="lp-drawer-group">
@@ -1051,10 +2395,10 @@ export default function ListingsPage() {
                     <div className="lp-drawer-chips">
                       {LOCALITIES.map((loc) => (
                         <button
-                          key={loc}
-                          className={`lp-drawer-chip${pendingLocality === loc ? " selected" : ""}`}
-                          onClick={() => setPendingLocality(loc)}
-                        >{loc}</button>
+                          key={loc.key}
+                          className={`lp-drawer-chip${locality === loc.key ? " selected" : ""}`}
+                          onClick={() => updateParams({ locality: loc.key })}
+                        >{loc.label}</button>
                       ))}
                     </div>
                   </div>
@@ -1063,10 +2407,10 @@ export default function ListingsPage() {
                     <div className="lp-drawer-chips">
                       {CONFIGURATIONS.map((cfg) => (
                         <button
-                          key={cfg}
-                          className={`lp-drawer-chip${pendingConfig === cfg ? " selected" : ""}`}
-                          onClick={() => setPendingConfig(cfg)}
-                        >{cfg}</button>
+                          key={cfg.key}
+                          className={`lp-drawer-chip${config === cfg.key ? " selected" : ""}`}
+                          onClick={() => updateParams({ config: cfg.key })}
+                        >{cfg.label}</button>
                       ))}
                     </div>
                   </div>
@@ -1075,10 +2419,10 @@ export default function ListingsPage() {
                     <div className="lp-drawer-chips">
                       {STATUS_OPTIONS.map((st) => (
                         <button
-                          key={st}
-                          className={`lp-drawer-chip${pendingStatus === st ? " selected" : ""}`}
-                          onClick={() => setPendingStatus(st)}
-                        >{st}</button>
+                          key={st.key}
+                          className={`lp-drawer-chip${status === st.key ? " selected" : ""}`}
+                          onClick={() => updateParams({ status: st.key })}
+                        >{st.label}</button>
                       ))}
                     </div>
                   </div>
@@ -1088,13 +2432,11 @@ export default function ListingsPage() {
 
             {drawer === "filter" && (
               <div className="lp-drawer-foot">
+                {/* Reset: clears all four filter params from URL */}
                 <button className="lp-drawer-reset" onClick={() => {
-                  setPendingLocality("All Localities");
-                  setPendingConfig("All BHK");
-                  setPendingStatus("Any Status");
-                  setPendingDeveloper("All Developers");
+                  updateParams({ locality: "", config: "", status: "", developer: "" });
                 }}>Reset</button>
-                <button className="lp-drawer-apply" onClick={applyFilters}>Apply Filters</button>
+                <button className="lp-drawer-apply" onClick={applyFilters}>Done</button>
               </div>
             )}
           </div>
