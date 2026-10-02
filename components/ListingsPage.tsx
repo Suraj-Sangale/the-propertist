@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { Fragment, useCallback, useEffect, useRef, useState, useTransition } from "react";
+import { Fragment, memo, useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { ALL_PROPERTIES } from "@/utilities/masterData";
 
@@ -453,11 +453,115 @@ function MultiSelectFilter({
   );
 }
 
+// Fast typing Search Field with debounced parent emission
+const SearchField = memo(function SearchField({
+  value,
+  onSearch,
+  onClear,
+}: {
+  value: string;
+  onSearch: (query: string) => void;
+  onClear: () => void;
+}) {
+  const [localText, setLocalText] = useState(value);
+  const [isDebouncing, setIsDebouncing] = useState(false);
+  const lastEmittedRef = useRef(value);
+  const onSearchRef = useRef(onSearch);
+  const onClearRef = useRef(onClear);
+
+  useEffect(() => {
+    onSearchRef.current = onSearch;
+    onClearRef.current = onClear;
+  });
+
+  // Sync when parent value changes externally (e.g. Back/Forward, Clear All, HomeSpace)
+  useEffect(() => {
+    if (value !== lastEmittedRef.current) {
+      setLocalText(value);
+      lastEmittedRef.current = value;
+      setIsDebouncing(false);
+    }
+  }, [value]);
+
+  // Debounced search
+  useEffect(() => {
+    if (localText.trim() === lastEmittedRef.current.trim()) {
+      setIsDebouncing(false);
+      return;
+    }
+
+    setIsDebouncing(true);
+    const timer = setTimeout(() => {
+      const trimmed = localText.trim();
+      lastEmittedRef.current = trimmed;
+      setIsDebouncing(false);
+      onSearchRef.current(trimmed);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [localText]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLocalText(e.target.value);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      const trimmed = localText.trim();
+      lastEmittedRef.current = trimmed;
+      setIsDebouncing(false);
+      onSearchRef.current(trimmed);
+    }
+  };
+
+  const handleClear = () => {
+    setLocalText("");
+    lastEmittedRef.current = "";
+    setIsDebouncing(false);
+    onClearRef.current();
+  };
+
+  return (
+    <div className="lp-search-field">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+        <circle cx="11" cy="11" r="7" />
+        <path d="m20 20-4-4" />
+      </svg>
+      <input
+        id="lp-search"
+        type="text"
+        placeholder="Search all properties..."
+        value={localText}
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
+        autoComplete="off"
+        spellCheck="false"
+      />
+      {isDebouncing && (
+        <span
+          className="lp-search-spinner"
+          title="Searching all records..."
+        />
+      )}
+      {localText && (
+        <button
+          type="button"
+          onClick={handleClear}
+          aria-label="Clear search"
+          className="lp-search-clear"
+        >
+          ✕
+        </button>
+      )}
+    </div>
+  );
+});
+
 // ─── Property Card ────────────────────────────────────────────────────────────
 
 type Property = typeof ALL_PROPERTIES[0];
 
-function PropertyCard({ property, view }: { property: Property; view: "grid" | "list" }) {
+const PropertyCard = memo(function PropertyCard({ property, view }: { property: Property; view: "grid" | "list" }) {
   const [hearted, setHearted] = useState(false);
 
   const cardBody = (
@@ -511,7 +615,7 @@ function PropertyCard({ property, view }: { property: Property; view: "grid" | "
       {cardBody}
     </Link>
   );
-}
+});
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
@@ -538,10 +642,11 @@ export default function ListingsPage() {
   const selectedBudgets    = parseMultiKeys(budget);
   const selectedStatuses   = parseMultiKeys(status);
 
+  const urlQ = searchParams.get("q") ?? "";
+  const lastSyncedQRef = useRef(urlQ);
+
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  const [search, setSearch] = useState(searchParams.get("q") ?? "");
-  const [debouncedSearch, setDebouncedSearch] = useState(searchParams.get("q") ?? "");
-  const [isSearchingDebounce, setIsSearchingDebounce] = useState(false);
+  const [debouncedSearch, setDebouncedSearch] = useState(urlQ);
   const [drawer, setDrawer] = useState<DrawerPanel>(null);
   const [isClosing, setIsClosing] = useState(false);
 
@@ -555,53 +660,30 @@ export default function ListingsPage() {
     [searchParams, pathname, router]
   );
 
-  // Debounced search: update debouncedSearch state and URL search param `q` 300ms after user pauses typing
-  useEffect(() => {
-    if (search === debouncedSearch) {
-      setIsSearchingDebounce(false);
-      return;
-    }
-
-    setIsSearchingDebounce(true);
-    const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-      setIsSearchingDebounce(false);
-      const currentQ = searchParams.get("q") ?? "";
-      if (search.trim() !== currentQ) {
-        updateParams({ q: search.trim() });
-      }
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [search, debouncedSearch, searchParams, updateParams]);
-
-  // Keep search state in sync when URL changes (e.g. navigation from HomeSpace, back/forward)
+  // Keep search state in sync ONLY when URL changes from external navigation (e.g. back/forward, HomeSpace)
   useEffect(() => {
     const currentQ = searchParams.get("q") ?? "";
-    if (currentQ !== search) {
-      setSearch(currentQ);
+    if (currentQ !== lastSyncedQRef.current) {
+      lastSyncedQRef.current = currentQ;
       setDebouncedSearch(currentQ);
-      setIsSearchingDebounce(false);
     }
-  }, [searchParams, search]);
+  }, [searchParams]);
 
-  const handleSearchSubmit = () => {
-    setDebouncedSearch(search);
-    setIsSearchingDebounce(false);
-    updateParams({ q: search.trim() });
-  };
+  const handleSearchCommit = useCallback((query: string) => {
+    lastSyncedQRef.current = query;
+    setDebouncedSearch(query);
+    updateParams({ q: query });
+  }, [updateParams]);
 
-  const handleClearSearch = () => {
-    setSearch("");
+  const handleClearSearch = useCallback(() => {
+    lastSyncedQRef.current = "";
     setDebouncedSearch("");
-    setIsSearchingDebounce(false);
     updateParams({ q: "" });
-  };
+  }, [updateParams]);
 
-  const handleClearAllFilters = () => {
-    setSearch("");
+  const handleClearAllFilters = useCallback(() => {
+    lastSyncedQRef.current = "";
     setDebouncedSearch("");
-    setIsSearchingDebounce(false);
     updateParams({
       locality: "",
       config: "",
@@ -611,7 +693,7 @@ export default function ListingsPage() {
       q: "",
       mode: "buy",
     });
-  };
+  }, [updateParams]);
 
   const appliedFilters: { key: string; category: string; label: string; onRemove: () => void }[] = [];
   if (debouncedSearch.trim()) {
@@ -701,37 +783,49 @@ export default function ListingsPage() {
   const hasSearch = Boolean(debouncedSearch.trim());
 
   // Search from ALL records across the entire database when searching, not just existing filtered results
-  const filtered = ALL_PROPERTIES.filter((p) => {
-    if (hasSearch) {
-      return matchesSearch(p, debouncedSearch);
-    }
+  const filtered = useMemo(() => {
+    return ALL_PROPERTIES.filter((p) => {
+      if (hasSearch) {
+        return matchesSearch(p, debouncedSearch);
+      }
 
-    if (p.mode !== mode) return false;
-    if (selectedLocalities.length > 0 && !selectedLocalities.includes(p.locality_key)) return false;
-    if (selectedConfigs.length > 0 && !matchMultiConfig(p.config_keys, selectedConfigs)) return false;
-    if (selectedStatuses.length > 0 && !selectedStatuses.includes(p.status_key)) return false;
-    if (selectedDevelopers.length > 0 && !selectedDevelopers.includes(p.developer_key)) return false;
-    if (selectedBudgets.length > 0 && !matchMultiBudget(p, selectedBudgets)) return false;
-    return true;
-  }).sort((a, b) => {
-    if (sort === "Price: Low to High") {
-      return parsePropertyPrice(a) - parsePropertyPrice(b);
-    }
-    if (sort === "Price: High to Low") {
-      return parsePropertyPrice(b) - parsePropertyPrice(a);
-    }
-    if (sort === "Newest First") {
-      return (Number(b.id) || 0) - (Number(a.id) || 0);
-    }
-    if (debouncedSearch) {
-      const q = debouncedSearch.toLowerCase();
-      const aStarts = (a.name || "").toLowerCase().startsWith(q) || (a.projectName || "").toLowerCase().startsWith(q);
-      const bStarts = (b.name || "").toLowerCase().startsWith(q) || (b.projectName || "").toLowerCase().startsWith(q);
-      if (aStarts && !bStarts) return -1;
-      if (!aStarts && bStarts) return 1;
-    }
-    return 0;
-  });
+      if (p.mode !== mode) return false;
+      if (selectedLocalities.length > 0 && !selectedLocalities.includes(p.locality_key)) return false;
+      if (selectedConfigs.length > 0 && !matchMultiConfig(p.config_keys, selectedConfigs)) return false;
+      if (selectedStatuses.length > 0 && !selectedStatuses.includes(p.status_key)) return false;
+      if (selectedDevelopers.length > 0 && !selectedDevelopers.includes(p.developer_key)) return false;
+      if (selectedBudgets.length > 0 && !matchMultiBudget(p, selectedBudgets)) return false;
+      return true;
+    }).sort((a, b) => {
+      if (sort === "Price: Low to High") {
+        return parsePropertyPrice(a) - parsePropertyPrice(b);
+      }
+      if (sort === "Price: High to Low") {
+        return parsePropertyPrice(b) - parsePropertyPrice(a);
+      }
+      if (sort === "Newest First") {
+        return (Number(b.id) || 0) - (Number(a.id) || 0);
+      }
+      if (debouncedSearch) {
+        const q = debouncedSearch.toLowerCase();
+        const aStarts = (a.name || "").toLowerCase().startsWith(q) || (a.projectName || "").toLowerCase().startsWith(q);
+        const bStarts = (b.name || "").toLowerCase().startsWith(q) || (b.projectName || "").toLowerCase().startsWith(q);
+        if (aStarts && !bStarts) return -1;
+        if (!aStarts && bStarts) return 1;
+      }
+      return 0;
+    });
+  }, [
+    hasSearch,
+    debouncedSearch,
+    mode,
+    selectedLocalities,
+    selectedConfigs,
+    selectedStatuses,
+    selectedDevelopers,
+    selectedBudgets,
+    sort,
+  ]);
 
   return (
     <>
@@ -787,7 +881,6 @@ export default function ListingsPage() {
           color: #999;
           cursor: pointer;
           font-size: 14px;
-          padding: 4px 6px;
           line-height: 1;
           display: flex;
           align-items: center;
@@ -1501,39 +1594,11 @@ export default function ListingsPage() {
               ))}
             </div>
 
-            <div className="lp-search-field">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" />
-              </svg>
-              <input
-                id="lp-search"
-                type="text"
-                placeholder="Search all properties..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    handleSearchSubmit();
-                  }
-                }}
-              />
-              {isSearchingDebounce && (
-                <span
-                  className="lp-search-spinner"
-                  title="Searching all records..."
-                />
-              )}
-              {search && (
-                <button
-                  type="button"
-                  onClick={handleClearSearch}
-                  aria-label="Clear search"
-                  className="lp-search-clear"
-                >
-                  ✕
-                </button>
-              )}
-            </div>
+            <SearchField
+              value={debouncedSearch}
+              onSearch={handleSearchCommit}
+              onClear={handleClearSearch}
+            />
 
             {/* Desktop custom luxury multi-select dropdowns */}
             <MultiSelectFilter
@@ -1964,7 +2029,7 @@ export default function ListingsPage() {
               <div className="lp-drawer-foot">
                 {/* Reset: clears all filter and search params from URL */}
                 <button className="lp-drawer-reset" onClick={() => {
-                  setSearch("");
+                  // setSearch("");
                   updateParams({ locality: "", config: "", status: "", developer: "", budget: "", q: "" });
                 }}>Reset</button>
                 <button className="lp-drawer-apply" onClick={applyFilters}>Done</button>
