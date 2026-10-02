@@ -25,7 +25,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "",
-    "image": "/images/projects/Untitled-design-18.webp",
     "features": [
       "Expansive Open Views",
       "Premium Lifestyle Amenities",
@@ -45,7 +44,7 @@ export const ALL_PROPERTIES = [
       "Indoor Games"
     ],
     "gallery": [
-      "/images/projects/Untitled-design-18.webp",
+      "/images/projects/building-2.jpg",
       "/images/projects/images-1.jfif",
       "/images/projects/inner-1.jpg",
       "/images/projects/Untitled-design-21.webp"
@@ -91,7 +90,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "",
-    "image": "/images/projects/building-1.jpg",
     "features": [
       "Expansive Open Views",
       "Premium Lifestyle Amenities",
@@ -157,7 +155,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "A NEW BENCHMARK IN WESTERN SUBURBS",
-    "image": "/images/projects/building-2.jpg",
     "features": [
       "Expansive Open Views",
       "Premium Lifestyle Amenities",
@@ -177,7 +174,7 @@ export const ALL_PROPERTIES = [
       "Indoor Games"
     ],
     "gallery": [
-      "/images/projects/building-2.jpg",
+      "/images/projects/building-3.jpg",
       "/images/projects/inner-3.jpg",
       "/images/projects/Untitled-design-20.webp",
       "/images/projects/Untitled-design-21.webp"
@@ -223,7 +220,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "",
-    "image": "/images/projects/Untitled-design-21.webp",
     "features": [
       "Panoramic City Views",
       "World-Class Amenities",
@@ -243,7 +239,7 @@ export const ALL_PROPERTIES = [
       "Indoor Games"
     ],
     "gallery": [
-      "/images/projects/Untitled-design-18.webp",
+      "/images/projects/building-4.jpg",
       "/images/projects/inner-4.jpg",
       "/images/projects/Untitled-design-20.webp",
       "/images/projects/Untitled-design-21.webp"
@@ -289,7 +285,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "",
-    "image": "/images/projects/Untitled-design-18.webp",
     "features": [
       "Lakeside Living",
       "Premium Club Amenities",
@@ -309,7 +304,7 @@ export const ALL_PROPERTIES = [
       "Indoor Games"
     ],
     "gallery": [
-      "/images/projects/Untitled-design-18.webp",
+      "/images/projects/building-5.jpg",
       "/images/projects/inner-5.jpg",
       "/images/projects/Untitled-design-20.webp",
       "/images/projects/Untitled-design-21.webp"
@@ -353,7 +348,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "EARLY BIRD OFFER",
-    "image": "/images/projects/Untitled-design-19.webp",
     "features": [
       "Modern Architecture",
       "Green Spaces",
@@ -373,7 +367,7 @@ export const ALL_PROPERTIES = [
       "Indoor Games"
     ],
     "gallery": [
-      "/images/projects/Untitled-design-18.webp",
+      "/images/projects/building-6.jpg",
       "/images/projects/inner-6.jpg",
       "/images/projects/Untitled-design-20.webp",
       "/images/projects/Untitled-design-21.webp"
@@ -417,7 +411,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "",
-    "image": "/images/projects/Untitled-design-20.webp",
     "features": [
       "Sea-facing Views",
       "Luxury Club House",
@@ -437,7 +430,7 @@ export const ALL_PROPERTIES = [
       "Indoor Games"
     ],
     "gallery": [
-      "/images/projects/Untitled-design-18.webp",
+      "/images/projects/building-7.jpg",
       "/images/projects/inner-7.jpg",
       "/images/projects/Untitled-design-20.webp",
       "/images/projects/Untitled-design-21.webp"
@@ -481,7 +474,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "",
-    "image": "/images/projects/Untitled-design-21.webp",
     "features": [
       "Compact & Smart Design",
       "Excellent Connectivity",
@@ -547,7 +539,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "",
-    "image": "/images/projects/Untitled-design-18.webp",
     "features": [
       "Premium Location",
       "Luxury Amenities",
@@ -613,7 +604,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "LIMITED INVENTORY",
-    "image": "/images/projects/Untitled-design-19.webp",
     "features": [
       "Landscaped Gardens",
       "Clubhouse",
@@ -679,7 +669,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "",
-    "image": "/images/projects/Untitled-design-20.webp",
     "features": [
       "Spacious Layouts",
       "Fitness Centre",
@@ -745,7 +734,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "NEW LAUNCH",
-    "image": "/images/projects/Untitled-design-21.webp",
     "features": [
       "Green Open Spaces",
       "Modern Clubhouse",
@@ -811,7 +799,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "",
-    "image": "/images/projects/Untitled-design-18.webp",
     "features": [
       "Sea Views",
       "Infinity Pool",
@@ -877,7 +864,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "",
-    "image": "/images/projects/Untitled-design-19.webp",
     "features": [
       "Lakeside Views",
       "Sports Facilities",
@@ -943,7 +929,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": false,
     "badge": "COMING SOON",
-    "image": "/images/projects/Untitled-design-20.webp",
     "features": [
       "Green Views",
       "Modern Amenities",
@@ -1009,7 +994,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "",
-    "image": "/images/projects/Untitled-design-21.webp",
     "features": [
       "Prime Location",
       "Smart Homes",
@@ -1075,7 +1059,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "",
-    "image": "/images/projects/Untitled-design-18.webp",
     "features": [
       "Lake Views",
       "Sky Lounge",
@@ -1141,7 +1124,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "EARLY ACCESS",
-    "image": "/images/projects/Untitled-design-19.webp",
     "features": [
       "Urban Lifestyle",
       "Clubhouse",
@@ -1207,7 +1189,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "",
-    "image": "/images/projects/Untitled-design-20.webp",
     "features": [
       "Peaceful Community",
       "Modern Amenities",
@@ -1274,7 +1255,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": false,
     "badge": "PRE-LAUNCH",
-    "image": "/images/projects/Untitled-design-21.webp",
     "features": [
       "Expansive Views",
       "Luxury Amenities",
@@ -1340,7 +1320,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "",
-    "image": "/images/projects/Untitled-design-18.webp",
     "features": [
       "City Views",
       "Clubhouse",
@@ -1404,7 +1383,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "",
-    "image": "/images/projects/Untitled-design-19.webp",
     "features": [
       "Community Living",
       "Swimming Pool",
@@ -1470,7 +1448,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "",
-    "image": "/images/projects/Untitled-design-20.webp",
     "features": [
       "Premium Finishes",
       "Landscaped Gardens",
@@ -1536,7 +1513,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "NEW LAUNCH",
-    "image": "/images/projects/Untitled-design-21.webp",
     "features": [
       "Elevated Views",
       "Luxury Club",
@@ -1602,7 +1578,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "ULTRA LUXURY",
-    "image": "/images/projects/Untitled-design-18.webp",
     "features": [
       "Grand Residences",
       "Private Elevators",
@@ -1668,7 +1643,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "",
-    "image": "/images/projects/Untitled-design-19.webp",
     "features": [
       "Green Spaces",
       "Modern Interiors",
@@ -1734,7 +1708,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": false,
     "badge": "COMING SOON",
-    "image": "/images/projects/Untitled-design-20.webp",
     "features": [
       "Premium Address",
       "Sea Views",
@@ -1801,7 +1774,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "",
-    "image": "/images/projects/Untitled-design-21.webp",
     "features": [
       "Sea-facing Homes",
       "Infinity Pool",
@@ -1867,7 +1839,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "EARLY BIRD OFFER",
-    "image": "/images/projects/Untitled-design-18.webp",
     "features": [
       "Modern Architecture",
       "Rooftop Amenities",
@@ -1933,7 +1904,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "",
-    "image": "/images/projects/Untitled-design-19.webp",
     "features": [
       "Lake View",
       "Luxury Amenities",
@@ -1999,7 +1969,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "",
-    "image": "/images/projects/Untitled-design-20.webp",
     "features": [
       "Lake Views",
       "Premium Interiors",
@@ -2065,7 +2034,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "",
-    "image": "/images/projects/Untitled-design-21.webp",
     "features": [
       "Metro Connectivity",
       "Smart Amenities",
@@ -2131,7 +2099,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "NEW LAUNCH",
-    "image": "/images/projects/Untitled-design-18.webp",
     "features": [
       "Private Decks",
       "Luxury Amenities",
@@ -2197,7 +2164,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "",
-    "image": "/images/projects/Untitled-design-19.webp",
     "features": [
       "Smart Layouts",
       "Clubhouse",
@@ -2264,7 +2230,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "",
-    "image": "/images/projects/Untitled-design-20.webp",
     "features": [
       "Large Clubhouse",
       "City Views",
@@ -2330,7 +2295,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": false,
     "badge": "PRE-LAUNCH",
-    "image": "/images/projects/Untitled-design-21.webp",
     "features": [
       "Garden Living",
       "Premium Clubhouse",
@@ -2396,7 +2360,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "",
-    "image": "/images/projects/Untitled-design-18.webp",
     "features": [
       "Panoramic Views",
       "Sports Facilities",
@@ -2462,7 +2425,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "",
-    "image": "/images/projects/Untitled-design-19.webp",
     "features": [
       "Green Community",
       "Modern Amenities",
@@ -2528,7 +2490,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "LIMITED UNITS",
-    "image": "/images/projects/Untitled-design-20.webp",
     "features": [
       "Grand Entrance",
       "Luxury Amenities",
@@ -2594,7 +2555,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "",
-    "image": "/images/projects/Untitled-design-21.webp",
     "features": [
       "Premium Address",
       "Luxury Club",
@@ -2660,7 +2620,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": false,
     "badge": "PRE-LAUNCH",
-    "image": "/images/projects/Untitled-design-18.webp",
     "features": [
       "Ultra Luxury",
       "Private Lobby",
@@ -2726,7 +2685,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "",
-    "image": "/images/projects/Untitled-design-19.webp",
     "features": [
       "Premium Lifestyle",
       "Gymnasium",
@@ -2792,7 +2750,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "",
-    "image": "/images/projects/Untitled-design-20.webp",
     "features": [
       "Modern Design",
       "Clubhouse",
@@ -2858,7 +2815,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "",
-    "image": "/images/projects/Untitled-design-21.webp",
     "features": [
       "Lakeside Living",
       "Green Spaces",
@@ -2924,7 +2880,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "NEW LAUNCH",
-    "image": "/images/projects/Untitled-design-18.webp",
     "features": [
       "Luxury Residences",
       "Private Amenities",
@@ -2990,7 +2945,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "",
-    "image": "/images/projects/Untitled-design-19.webp",
     "features": [
       "Central Location",
       "Smart Homes",
@@ -3056,7 +3010,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "",
-    "image": "/images/projects/Untitled-design-20.webp",
     "features": [
       "Lake Views",
       "Premium Club",
@@ -3122,7 +3075,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "",
-    "image": "/images/projects/Untitled-design-21.webp",
     "features": [
       "Garden Views",
       "Community Hall",
@@ -3188,7 +3140,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "EARLY ACCESS",
-    "image": "/images/projects/Untitled-design-18.webp",
     "features": [
       "Premium Interiors",
       "Rooftop Lounge",
@@ -3254,7 +3205,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": false,
     "badge": "PRE-LAUNCH",
-    "image": "/images/projects/Untitled-design-19.webp",
     "features": [
       "Private Residences",
       "Luxury Club",
@@ -3318,7 +3268,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "",
-    "image": "/images/projects/Untitled-design-20.webp",
     "features": [
       "Prime Location",
       "Modern Interiors",
@@ -3384,7 +3333,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "ULTRA LUXURY",
-    "image": "/images/projects/Untitled-design-21.webp",
     "features": [
       "Sea Views",
       "Private Lobby",
@@ -3450,7 +3398,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "NEW LAUNCH",
-    "image": "/images/projects/Untitled-design-18.webp",
     "features": [
       "Lake Views",
       "Premium Club",
@@ -3516,7 +3463,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "",
-    "image": "/images/projects/Untitled-design-19.webp",
     "features": [
       "Garden Views",
       "Clubhouse",
@@ -3582,7 +3528,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "",
-    "image": "/images/projects/Untitled-design-20.webp",
     "features": [
       "Premium Location",
       "Luxury Amenities",
@@ -3648,7 +3593,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "",
-    "image": "/images/projects/Untitled-design-21.webp",
     "features": [
       "Premium Residences",
       "Sky Lounge",
@@ -3714,7 +3658,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": true,
     "badge": "EARLY BIRD OFFER",
-    "image": "/images/projects/Untitled-design-18.webp",
     "features": [
       "Green Living",
       "Smart Amenities",
@@ -3781,7 +3724,6 @@ export const ALL_PROPERTIES = [
     "verified": true,
     "rera": false,
     "badge": "PRE-LAUNCH",
-    "image": "/images/projects/Untitled-design-19.webp",
     "features": [
       "Grand Residences",
       "Premium Clubhouse",

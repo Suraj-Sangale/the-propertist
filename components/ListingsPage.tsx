@@ -231,7 +231,7 @@ function PropertyCard({ property, view }: { property: Property; view: "grid" | "
     <Link href={`/property/${property.slug}`} className={`lp-card${view === "list" ? " lp-card--list" : ""}`}>
       <div className={`lp-card-img-wrap${view === "list" ? " lp-card-img-wrap--list" : ""}`}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={property.image} alt={property.name} className="lp-card-img" />
+        <img src={property?.gallery[0]} alt={property.name} className="lp-card-img" />
         <button className="lp-heart" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setHearted((h) => !h); }} aria-label="Save property">
           <HeartIcon filled={hearted} />
         </button>
