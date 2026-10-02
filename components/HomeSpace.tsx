@@ -551,7 +551,28 @@ export default function HomeSpace() {
 
         /* RESPONSIVE */
         @media (max-width: 1100px) {
-          .hs-search-area, .hs-cats { position: static; width: auto; margin: 20px 0; }
+          .hs-search-area { position: static; width: auto; margin: 20px 0; }
+          .hs-cats {
+            position: static;
+            width: 100%;
+            max-width: 580px;
+            margin: 24px auto 0;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            transform: none;
+            perspective: none;
+            justify-content: center;
+          }
+          .hs-cat {
+            transform: none;
+            width: 100%;
+            height: 100%;
+            min-width: 0;
+            padding: 4px;
+          }
+          .hs-cat:hover { transform: translateY(-4px); box-shadow: none; }
+          .hs-cat img { height: 200px; }
           .hs-hero { height: auto; padding-bottom: 40px; }
           .hs-hero-curve { display: none; }
           .hs-grid { grid-template-columns: repeat(2,1fr); }
@@ -560,13 +581,46 @@ export default function HomeSpace() {
           .hs-menu { display: none; }
           .hs-h1 { font-size: 44px; }
           .hs-bar { flex-wrap: wrap; }
-          .hs-cats { flex-wrap: wrap; transform: none; perspective: none; justify-content: center; }
-          .hs-cat { transform: none; width: calc(33.333% - 16px); min-width: 140px; }
-          .hs-cat:hover { transform: translateY(-6px); }
         }
         @media (max-width: 600px) {
           .hs-grid { grid-template-columns: 1fr; }
-          .hs-cat { width: 100%; max-width: 260px; }
+          .hs-h1 { font-size: 32px; }
+          .hs-cats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            width: 100%;
+            max-width: 100%;
+            margin: 18px 0 0;
+          }
+          .hs-cat {
+            width: 100%;
+            max-width: none;
+            padding: 4px 5px 8px;
+            border-radius: 12px;
+          }
+          .hs-cat img {
+            height: 200px;
+            border-radius: 8px;
+          }
+          .hs-cat-body {
+            padding: 6px 2px 0;
+          }
+          .hs-cat b {
+            font-size: 11px;
+            line-height: 1.2;
+            word-break: break-word;
+          }
+          .hs-cat small {
+            font-size: 9.5px;
+          }
+        }
+        @media (max-width: 380px) {
+          .hs-cats { gap: 6px; }
+          .hs-cat { padding: 3px 4px 6px; }
+          .hs-cat img { height: 200px; }
+          .hs-cat b { font-size: 10px; }
+          .hs-cat small { font-size: 8.5px; }
         }
       `}</style>
 

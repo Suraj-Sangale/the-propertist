@@ -458,10 +458,12 @@ const SearchField = memo(function SearchField({
   value,
   onSearch,
   onClear,
+  isLoading,
 }: {
   value: string;
   onSearch: (query: string) => void;
   onClear: () => void;
+  isLoading?: boolean;
 }) {
   const [localText, setLocalText] = useState(value);
   const [isDebouncing, setIsDebouncing] = useState(false);
@@ -537,7 +539,7 @@ const SearchField = memo(function SearchField({
         autoComplete="off"
         spellCheck="false"
       />
-      {isDebouncing && (
+      {(isDebouncing || isLoading) && (
         <span
           className="lp-search-spinner"
           title="Searching all records..."
@@ -567,7 +569,9 @@ const PropertyCard = memo(function PropertyCard({ property, view }: { property: 
   const cardBody = (
     <div className="lp-card-body">
       <div className="lp-card-title">{property.config_label}</div>
-      <div className="lp-card-price-main">{property.priceFrom} Onwards</div>
+      <div className="lp-card-price-main">
+        {property.mode === "rent" ? property.priceFrom : `${property.priceFrom} Onwards`}
+      </div>
       <div className="lp-card-loc"><PinIcon />{property.projectName}</div>
       <div className="lp-card-meta">
         <span><AreaIcon />{property.area}</span>
@@ -617,6 +621,51 @@ const PropertyCard = memo(function PropertyCard({ property, view }: { property: 
   );
 });
 
+// ─── Property Card Skeleton ───────────────────────────────────────────────────
+
+const PropertyCardSkeleton = memo(function PropertyCardSkeleton({ view }: { view: "grid" | "list" }) {
+  return (
+    <div className={`lp-card lp-card--skeleton${view === "list" ? " lp-card--list" : ""}`} aria-hidden="true">
+      <div className={`lp-card-img-wrap${view === "list" ? " lp-card-img-wrap--list" : ""}`}>
+        <div className="lp-skel-img lp-skel-shimmer" />
+        <div className="lp-skel-heart" />
+        <div className="lp-card-overlay">
+          <div className="lp-card-features">
+            <div className="lp-skel-line lp-skel-line--xs lp-skel-shimmer" style={{ width: "85px" }} />
+            <div className="lp-skel-line lp-skel-line--xs lp-skel-shimmer" style={{ width: "105px" }} />
+            <div className="lp-skel-line lp-skel-line--xs lp-skel-shimmer" style={{ width: "70px" }} />
+          </div>
+          <div className="lp-card-name-area">
+            <div className="lp-skel-line lp-skel-line--lg lp-skel-shimmer" style={{ width: "120px" }} />
+            <div className="lp-skel-line lp-skel-line--xs lp-skel-shimmer" style={{ width: "75px", marginTop: "4px" }} />
+          </div>
+        </div>
+      </div>
+      <div className="lp-card-body">
+        <div className="lp-card-title">
+          <div className="lp-skel-line lp-skel-line--md lp-skel-shimmer" style={{ width: "70%" }} />
+        </div>
+        <div className="lp-card-price-main">
+          <div className="lp-skel-line lp-skel-line--lg lp-skel-shimmer" style={{ width: "130px" }} />
+        </div>
+        <div className="lp-card-loc">
+          <div className="lp-skel-line lp-skel-line--sm lp-skel-shimmer" style={{ width: "55%" }} />
+        </div>
+        <div className="lp-card-meta">
+          <div className="lp-skel-line lp-skel-line--sm lp-skel-shimmer" style={{ width: "80px" }} />
+          <div className="lp-skel-line lp-skel-line--sm lp-skel-shimmer" style={{ width: "65px" }} />
+        </div>
+        <div className="lp-card-footer">
+          <div className="lp-badges-row">
+            <div className="lp-skel-badge lp-skel-shimmer" style={{ width: "95px", height: "24px" }} />
+            <div className="lp-skel-badge lp-skel-shimmer" style={{ width: "85px", height: "24px" }} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+});
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 type DrawerPanel = "view" | "sort" | "filter" | null;
@@ -647,8 +696,28 @@ export default function ListingsPage() {
 
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [debouncedSearch, setDebouncedSearch] = useState(urlQ);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isSearchLoading, setIsSearchLoading] = useState(false);
+  const searchLoadingTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [drawer, setDrawer] = useState<DrawerPanel>(null);
   const [isClosing, setIsClosing] = useState(false);
+
+  // Default initial loading skeleton on mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsInitialLoading(false);
+    }, 800);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Cleanup search timer on unmount
+  useEffect(() => {
+    return () => {
+      if (searchLoadingTimerRef.current) {
+        clearTimeout(searchLoadingTimerRef.current);
+      }
+    };
+  }, []);
 
   const updateParams = useCallback(
     (updates: Record<string, string>) => {
@@ -666,6 +735,15 @@ export default function ListingsPage() {
     if (currentQ !== lastSyncedQRef.current) {
       lastSyncedQRef.current = currentQ;
       setDebouncedSearch(currentQ);
+      if (currentQ.trim()) {
+        if (searchLoadingTimerRef.current) {
+          clearTimeout(searchLoadingTimerRef.current);
+        }
+        setIsSearchLoading(true);
+        searchLoadingTimerRef.current = setTimeout(() => {
+          setIsSearchLoading(false);
+        }, 1500);
+      }
     }
   }, [searchParams]);
 
@@ -673,9 +751,22 @@ export default function ListingsPage() {
     lastSyncedQRef.current = query;
     setDebouncedSearch(query);
     updateParams({ q: query });
+
+    // Custom 1.5s loading on search
+    if (searchLoadingTimerRef.current) {
+      clearTimeout(searchLoadingTimerRef.current);
+    }
+    setIsSearchLoading(true);
+    searchLoadingTimerRef.current = setTimeout(() => {
+      setIsSearchLoading(false);
+    }, 1500);
   }, [updateParams]);
 
   const handleClearSearch = useCallback(() => {
+    if (searchLoadingTimerRef.current) {
+      clearTimeout(searchLoadingTimerRef.current);
+    }
+    setIsSearchLoading(false);
     lastSyncedQRef.current = "";
     setDebouncedSearch("");
     updateParams({ q: "" });
@@ -889,6 +980,75 @@ export default function ListingsPage() {
         }
         .lp-search-clear:hover {
           color: #1a1a2e;
+        }
+
+        /* SKELETON SHIMMER & STYLES */
+        @keyframes lp-shimmer {
+          0% { background-position: -200% 0; }
+          100% { background-position: 200% 0; }
+        }
+        .lp-skel-shimmer {
+          background: linear-gradient(
+            90deg,
+            #eef1f6 0%,
+            #f6f8fb 25%,
+            #e2e7f0 50%,
+            #f6f8fb 75%,
+            #eef1f6 100%
+          );
+          background-size: 200% 100%;
+          animation: lp-shimmer 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+        .lp-card--skeleton {
+          pointer-events: none;
+          user-select: none;
+          border: 1px solid #eaecf0;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+        .lp-card--skeleton:hover {
+          transform: none;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+        .lp-skel-img {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+        }
+        .lp-skel-heart {
+          position: absolute;
+          top: 12px;
+          right: 12px;
+          width: 34px;
+          height: 34px;
+          border-radius: 50%;
+          background: rgba(255,255,255,0.7);
+          z-index: 3;
+        }
+        .lp-skel-line {
+          border-radius: 5px;
+          display: block;
+        }
+        .lp-skel-line--xs { height: 9px; }
+        .lp-skel-line--sm { height: 12px; }
+        .lp-skel-line--md { height: 16px; }
+        .lp-skel-line--lg { height: 22px; }
+        .lp-skel-badge {
+          border-radius: 6px;
+          display: inline-block;
+        }
+        .lp-searching-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 13px;
+          color: #b8963c;
+          background: #fdf8ec;
+          border: 1px solid #ebd9a2;
+          border-radius: 20px;
+          padding: 4px 14px;
+          font-weight: 600;
+          box-shadow: 0 2px 8px rgba(200,168,75,0.12);
         }
         .lp-filter-group { display: flex; flex-direction: column; gap: 4px; }
         .lp-filter-label { font-size: 9.5px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: #aaa; padding-left: 2px; }
@@ -1208,7 +1368,7 @@ export default function ListingsPage() {
         .lp-heart:hover { transform: scale(1.12); }
 
         /* Card image overlay */
-        .lp-card-overlay { position: absolute; inset: 0; z-index: 2; display: flex; align-items: stretch; padding: 14px; background: linear-gradient(to right, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.4) 45%, transparent 70%); }
+        .lp-card-overlay { position: absolute; inset: 0; z-index: 2; display: flex; align-items: stretch; padding: 14px; background: linear-gradient(to right, rgb(175 175 175 / 75%) 0%, rgb(231 231 231 / 40%) 45%, transparent 70%); }
         .lp-card-features { display: flex; flex-direction: column; gap: 5px; flex: 1; padding-top: 2px; }
         .lp-feat-item { display: flex; align-items: flex-start; gap: 6px; font-size: 10px; color: rgba(255,255,255,0.9); line-height: 1.35; }
         .lp-feat-dot { width: 5px; height: 5px; border-radius: 50%; background: #4ade80; flex-shrink: 0; margin-top: 3px; }
@@ -1598,6 +1758,7 @@ export default function ListingsPage() {
               value={debouncedSearch}
               onSearch={handleSearchCommit}
               onClear={handleClearSearch}
+              isLoading={isSearchLoading}
             />
 
             {/* Desktop custom luxury multi-select dropdowns */}
@@ -1689,29 +1850,44 @@ export default function ListingsPage() {
         {/* ── RESULTS HEADER ─────────────────────── */}
         <div className="lp-results-header">
           <p className="lp-count">
-            <strong>{filtered.length}</strong> {filtered.length === 1 ? "property" : "properties"} found
-            {debouncedSearch && (
-              <span style={{ color: "#475569" }}>
-                {" "}for &ldquo;<strong>{debouncedSearch}</strong>&rdquo;
-                <span style={{ marginLeft: 8, fontSize: 11, background: "#fdf8ec", color: "#b8963c", border: "1px solid #ebd9a2", padding: "2px 8px", borderRadius: 4, fontWeight: 600 }}>
-                  All Records
-                </span>
-                <button
-                  type="button"
-                  onClick={handleClearSearch}
-                  style={{
-                    marginLeft: 8,
-                    background: "none",
-                    border: "none",
-                    color: "#999",
-                    fontSize: 12,
-                    textDecoration: "underline",
-                    cursor: "pointer",
-                  }}
-                >
-                  Clear
-                </button>
+            {isInitialLoading || isSearchLoading ? (
+              <span className="lp-searching-pill">
+                <span className="lp-search-spinner" style={{ width: 13, height: 13 }} />
+                {isSearchLoading ? (
+                  <span>
+                    Searching Mumbai properties for &ldquo;<strong>{debouncedSearch || "all records"}</strong>&rdquo;...
+                  </span>
+                ) : (
+                  <span>Loading verified properties...</span>
+                )}
               </span>
+            ) : (
+              <>
+                <strong>{filtered.length}</strong> {filtered.length === 1 ? "property" : "properties"} found
+                {debouncedSearch && (
+                  <span style={{ color: "#475569" }}>
+                    {" "}for &ldquo;<strong>{debouncedSearch}</strong>&rdquo;
+                    <span style={{ marginLeft: 8, fontSize: 11, background: "#fdf8ec", color: "#b8963c", border: "1px solid #ebd9a2", padding: "2px 8px", borderRadius: 4, fontWeight: 600 }}>
+                      All Records
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleClearSearch}
+                      style={{
+                        marginLeft: 8,
+                        background: "none",
+                        border: "none",
+                        color: "#999",
+                        fontSize: 12,
+                        textDecoration: "underline",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Clear
+                    </button>
+                  </span>
+                )}
+              </>
             )}
           </p>
           <div className="lp-sort-row">
@@ -1772,7 +1948,11 @@ export default function ListingsPage() {
         {/* ── PROPERTY GRID ──────────────────────── */}
         <main className="lp-grid-wrap">
           <div className={`lp-grid${view === "list" ? " lp-grid--list" : ""}`}>
-            {filtered.length === 0 ? (
+            {isInitialLoading || isSearchLoading ? (
+              Array.from({ length: 6 }).map((_, i) => (
+                <PropertyCardSkeleton key={`skeleton-${i}`} view={view} />
+              ))
+            ) : filtered.length === 0 ? (
               <div className="lp-empty">
                 <div className="lp-empty-icon">{debouncedSearch ? "🔍" : "🏡"}</div>
                 {/* <h3>{debouncedSearch ? `No properties found for "${debouncedSearch}"` : "No properties found"}</h3> */}
