@@ -352,7 +352,7 @@ export default function SavedPropertiesPage() {
             {savedProperties.map((property) => {
               const id = property.id;
               const title = property.projectName || property.name || property.config_label;
-              const imgSrc = property.gallery?.[0] || property.image || "/images/projects/building-1.jpg";
+              const imgSrc = property.gallery?.[0] || (property as any).image || "/images/projects/building-1.jpg";
               const price = property.mode === "rent" ? property.priceFrom : `${property.priceFrom} Onwards`;
 
               return (

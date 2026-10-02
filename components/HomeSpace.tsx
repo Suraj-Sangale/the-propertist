@@ -55,20 +55,10 @@ const CATEGORY_CARDS = [
 ];
 
 const FEATURES = [
-  // {
-  //   bg: "#e8edff",
-  //   icon: (
-  //     <svg viewBox="0 0 24 24" fill="#2f3cf0" style={{ width: 22, height: 22 }}>
-  //       <path d="M12 3 2 12h3v9h5v-6h4v6h5v-9h3z" />
-  //     </svg>
-  //   ),
-  //   title: "Verified Listings",
-  //   sub: "100% authentic properties",
-  // },
   {
-    bg: "#dcf5e5",
+    bg: "#fdf8ec",
     icon: (
-      <svg viewBox="0 0 24 24" fill="#26a75a" style={{ width: 22, height: 22 }}>
+      <svg viewBox="0 0 24 24" fill="#c8a84b" style={{ width: 22, height: 22 }}>
         <path d="M12 2 4 5v6c0 5 3.4 9.3 8 11 4.6-1.7 8-6 8-11V5z" />
         <path d="m8.5 12 2.5 2.5 4.5-5" stroke="#fff" strokeWidth="2" fill="none" />
       </svg>
@@ -77,9 +67,9 @@ const FEATURES = [
     sub: "RERA approved professionals",
   },
   {
-    bg: "#fdebd9",
+    bg: "#fdf8ec",
     icon: (
-      <svg viewBox="0 0 24 24" fill="#f7931e" style={{ width: 22, height: 22 }}>
+      <svg viewBox="0 0 24 24" fill="#c8a84b" style={{ width: 22, height: 22 }}>
         <path d="m12 2 3 6.5 7 .8-5.2 4.8 1.5 7-6.3-3.6L5.7 21l1.5-7L2 9.3l7-.8z" />
       </svg>
     ),
@@ -87,9 +77,9 @@ const FEATURES = [
     sub: "Compare & save more",
   },
   {
-    bg: "#ece3fb",
+    bg: "#fdf8ec",
     icon: (
-      <svg viewBox="0 0 24 24" fill="#7b3fe4" style={{ width: 22, height: 22 }}>
+      <svg viewBox="0 0 24 24" fill="#c8a84b" style={{ width: 22, height: 22 }}>
         <path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z" />
       </svg>
     ),
@@ -104,27 +94,27 @@ const PROPERTIES = ALL_PROPERTIES.slice(0,8)
 // ─── SVG helpers ─────────────────────────────────────────────────────────────
 
 const IconSearch = () => (
-  <svg viewBox="0 0 24 24" style={{ width: 20, height: 20, stroke: "#222", fill: "none", strokeWidth: 2 }}>
+  <svg viewBox="0 0 24 24" style={{ width: 20, height: 20, stroke: "#1a1a2e", fill: "none", strokeWidth: 2 }}>
     <circle cx="11" cy="11" r="7" />
     <path d="m20 20-4-4" />
   </svg>
 );
 
 const IconHome = () => (
-  <svg viewBox="0 0 24 24" style={{ width: 16, height: 16, stroke: "#2f3cf0", fill: "none", strokeWidth: 2 }}>
+  <svg viewBox="0 0 24 24" style={{ width: 16, height: 16, stroke: "#c8a84b", fill: "none", strokeWidth: 2 }}>
     <path d="M3 11 12 3l9 8v10H3z" />
   </svg>
 );
 
 const IconBudget = () => (
-  <svg viewBox="0 0 24 24" style={{ width: 16, height: 16, stroke: "#2f3cf0", fill: "none", strokeWidth: 2 }}>
+  <svg viewBox="0 0 24 24" style={{ width: 16, height: 16, stroke: "#c8a84b", fill: "none", strokeWidth: 2 }}>
     <ellipse cx="12" cy="6" rx="8" ry="3" />
     <path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6" />
   </svg>
 );
 
 const IconPin = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="#2f3cf0" strokeWidth="2" style={{ width: 18, height: 18 }}>
+  <svg viewBox="0 0 24 24" fill="none" stroke="#c8a84b" strokeWidth="2" style={{ width: 18, height: 18 }}>
     <path d="M12 21s-8-5.5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.5-8 11-8 11z" />
   </svg>
 );
@@ -347,19 +337,22 @@ export default function HomeSpace() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@1,700&display=swap');
 
         .hs-root * { box-sizing: border-box; }
         .hs-root {
           font-family: 'Inter', system-ui, sans-serif;
-          color: #0d0d12;
+          color: #1a1a2e;
           background: #fff;
           overflow-x: hidden;
-          --blue: #2f3cf0;
-          --blue-d: #2531d6;
-          --ink: #0d0d12;
-          --muted: #5b6172;
-          --navy: #3a4a6b;
+          --gold: #c8a84b;
+          --gold-dark: #b8963c;
+          --gold-light: #fdf8ec;
+          --gold-border: #ebd9a2;
+          --navy: #1a1a2e;
+          --navy-dark: #0a0e1e;
+          --ink: #1a1a2e;
+          --muted: #64748b;
         }
         .hs-root img { display: block; object-fit: cover; background: linear-gradient(135deg,#dfe6f3,#c4d0e6); }
         .hs-root a { color: inherit; text-decoration: none; }
@@ -375,7 +368,7 @@ export default function HomeSpace() {
         }
 
         .hs-wrap { max-width: 1320px; margin: 0rem auto; padding: 0 24px; position: relative; }
-.hs-features-section { margin-top: 4rem; }
+        .hs-features-section { margin-top: 4rem; }
         /* HERO */
         .hs-hero {
           position: relative;
@@ -389,7 +382,7 @@ export default function HomeSpace() {
         .hs-hero::after {
           content: "";
           position: absolute; inset: 0; z-index: 1;
-          background: linear-gradient(90deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,.15) 45%, transparent 65%);
+          background: linear-gradient(90deg, rgba(255,255,255,.65) 0%, rgba(255,255,255,.2) 45%, transparent 65%);
         }
         .hs-hero-curve {
           position: absolute; left: 0; right: 0; bottom: -1px; height: 130px;
@@ -400,43 +393,91 @@ export default function HomeSpace() {
         .hs-hero .hs-wrap { z-index: 3; position: relative; min-height: 600px; }
 
         /* HERO CONTENT */
+        .hs-hero-eyebrow {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 12px;
+        }
+        .hs-hero-eyebrow-line {
+          width: 44px;
+          height: 1px;
+          background: linear-gradient(90deg, transparent, #c8a84b);
+        }
+        .hs-hero-eyebrow-line:last-child {
+          background: linear-gradient(90deg, #c8a84b, transparent);
+        }
+        .hs-hero-eyebrow-text {
+          font-size: 11px;
+          font-weight: 700;
+          letter-spacing: 2.8px;
+          color: #b8963c;
+          text-transform: uppercase;
+        }
         .hs-pill {
           display: inline-block;
-          background: rgba(232,236,255,.85); color: #22308f;
-          font-size: 13px; font-weight: 500;
-          padding: 9px 16px; border-radius: 999px;
-          border: 1px solid #cfd6f5;
+          background: #fdf8ec; color: #927228;
+          font-size: 13px; font-weight: 600;
+          padding: 8px 16px; border-radius: 999px;
+          border: 1px solid #ebd9a2;
         }
         .hs-trust { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; color: #444; margin-left: 18px; }
-        .hs-trust-dot { width: 8px; height: 8px; border-radius: 50%; background: #f7931e; display: inline-block; }
+        .hs-trust-dot { width: 8px; height: 8px; border-radius: 50%; background: #c8a84b; display: inline-block; }
         .hs-hero-top { margin-top: 16px; }
-        .hs-h1 { font-size: 54px; line-height: 1.05; font-weight: 800; letter-spacing: -1.5px; margin: 10px 0 22px; }
-        .hs-h1 span { color: #2f3cf0; }
-        .hs-lead { font-size: 14px; line-height: 1.65; color: #222; max-width: 470px; }
+        .hs-h1 { font-size: 54px; line-height: 1.05; font-weight: 800; letter-spacing: -1.5px; margin: 10px 0 22px; color: #0a0e1e; }
+        .hs-h1 span, .hs-h1 em { font-family: 'Playfair Display', serif; font-style: italic; color: #c8a84b; }
+        .hs-lead { font-size: 14.5px; line-height: 1.65; color: #475569; max-width: 470px; }
 
         /* SEARCH */
         .hs-search-area { position: absolute; left: 24px; top: 270px; width: 1015px; z-index: 5; }
-        .hs-tabs { display: inline-flex; gap: 8px; background: #fff; padding: 12px 14px 10px; border-radius: 26px 26px 0 0; }
+        .hs-tabs { display: inline-flex; gap: 6px; background: #fff; padding: 10px 12px 8px; border-radius: 24px 24px 0 0; box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.04); }
         .hs-tabs button {
-          border: 0; font: 500 12px 'Inter'; padding: 12px 26px;
-          border-radius: 999px; background: #f1f3f8; cursor: pointer;
-          transition: background .15s, color .15s;
+          border: 0; font: 600 12.5px 'Inter', sans-serif; padding: 10px 24px;
+          border-radius: 999px; background: #f8fafc; color: #64748b; cursor: pointer;
+          transition: all .18s ease;
         }
-        .hs-tabs button.on { background: #2f3cf0; color: #fff; }
+        .hs-tabs button:hover:not(.on) {
+          background: #fdf8ec;
+          color: #927228;
+        }
+        .hs-tabs button.on {
+          background: #1a1a2e;
+          color: #ffffff;
+          box-shadow: 0 4px 14px rgba(26, 26, 46, 0.25);
+        }
         .hs-bar {
-          background: #fff; border-radius: 0 26px 26px 26px;
+          background: #fff; border-radius: 0 24px 24px 24px;
           padding: 12px 14px; display: flex; gap: 10px; align-items: center;
-          box-shadow: 0 20px 50px rgba(20,30,80,.12);
+          box-shadow: 0 20px 50px rgba(10, 14, 30, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04);
           position: relative;
         }
         .hs-field {
           display: flex; align-items: center; gap: 10px;
-          background: #f3f5f9; border-radius: 14px;
+          background: #f8f9fb; border-radius: 12px;
           height: 48px; padding: 0 14px;
-          font-size: 12px; color: #666;
+          font-size: 13px; color: #666;
+          border: 1.5px solid #eaecf0;
           white-space: nowrap;
           position: relative;
+          transition: border-color .15s, background .15s, box-shadow .15s;
         }
+        .hs-field:focus-within {
+          border-color: #c8a84b;
+          background: #ffffff;
+          box-shadow: 0 0 0 3px rgba(200, 168, 75, 0.12);
+        }
+        .hs-search-input {
+          border: 0; outline: none; background: transparent;
+          font-family: inherit; font-size: 13px; color: #1a1a2e;
+          width: 100%;
+        }
+        .hs-clear-btn {
+          border: none; background: transparent; color: #94a3b8;
+          cursor: pointer; font-size: 13px; padding: 0 4px;
+          transition: color .15s;
+        }
+        .hs-clear-btn:hover { color: #1a1a2e; }
+
         /* SEARCH DROPDOWNS */
         .hs-dropdowns-group {
           display: flex;
@@ -451,9 +492,9 @@ export default function HomeSpace() {
         .hs-dropdown-btn {
           width: 100%;
           height: 48px;
-          border-radius: 14px;
-          background: #f3f5f9;
-          border: 1.5px solid transparent;
+          border-radius: 12px;
+          background: #f8f9fb;
+          border: 1.5px solid #eaecf0;
           display: flex;
           align-items: center;
           justify-content: space-between;
@@ -464,17 +505,17 @@ export default function HomeSpace() {
           text-align: left;
         }
         .hs-dropdown-btn:hover {
-          background: #eef2f8;
+          background: #f1f5f9;
           border-color: #cbd5e1;
         }
         .hs-dropdown-btn.open {
-          background: #ffffff;
-          border-color: #2f3cf0;
-          box-shadow: 0 0 0 3px rgba(47, 60, 240, 0.14);
+          background: #fdfbf7;
+          border-color: #c8a84b;
+          box-shadow: 0 0 0 3px rgba(200, 168, 75, 0.15);
         }
         .hs-dropdown-btn.has-value {
-          background: #f8faff;
-          border-color: #c7d2fe;
+          background: #fdfbf7;
+          border-color: #ebd9a2;
         }
         .hs-dropdown-btn-left {
           display: flex;
@@ -492,7 +533,7 @@ export default function HomeSpace() {
           place-items: center;
           flex-shrink: 0;
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-          color: #2f3cf0;
+          color: #c8a84b;
         }
         .hs-dropdown-labels {
           display: flex;
@@ -505,14 +546,14 @@ export default function HomeSpace() {
           font-weight: 700;
           text-transform: uppercase;
           letter-spacing: 0.6px;
-          color: #64748b;
+          color: #94a3b8;
           line-height: 1;
           margin-bottom: 2px;
         }
         .hs-dropdown-val {
           font-size: 12px;
           font-weight: 700;
-          color: #0f172a;
+          color: #1a1a2e;
           line-height: 1.2;
           white-space: nowrap;
           overflow: hidden;
@@ -536,7 +577,7 @@ export default function HomeSpace() {
         }
         .hs-dropdown-chevron.rotate {
           transform: rotate(180deg);
-          color: #2f3cf0;
+          color: #c8a84b;
         }
 
         /* FLOATING DROPDOWN MENU */
@@ -557,8 +598,8 @@ export default function HomeSpace() {
           min-width: 220px;
           background: #ffffff;
           border-radius: 16px;
-          border: 1.5px solid #e2e8f0;
-          box-shadow: 0 18px 40px -6px rgba(15, 23, 42, 0.18), 0 4px 12px rgba(15, 23, 42, 0.08);
+          border: 1.5px solid #ebd9a2;
+          box-shadow: 0 18px 40px -6px rgba(15, 23, 42, 0.15), 0 4px 12px rgba(200, 168, 75, 0.08);
           padding: 6px;
           z-index: 60;
           animation: hs-drop-fade 0.16s cubic-bezier(0.16, 1, 0.3, 1);
@@ -572,7 +613,7 @@ export default function HomeSpace() {
           margin-bottom: 4px;
           font-size: 11px;
           font-weight: 700;
-          color: #64748b;
+          color: #94a3b8;
           letter-spacing: 0.5px;
           text-transform: uppercase;
         }
@@ -609,16 +650,16 @@ export default function HomeSpace() {
           width: 100%;
           text-align: left;
           transition: background 0.12s, color 0.12s;
-          color: #334155;
+          color: #1a1a2e;
         }
         .hs-dropdown-item:hover {
-          background: #f1f5f9;
-          color: #0f172a;
+          background: #fdf8ec;
+          color: #927228;
         }
         .hs-dropdown-item.selected {
-          background: #eef2ff;
-          color: #1e1b4b;
-          font-weight: 600;
+          background: #fdf8ec;
+          color: #927228;
+          font-weight: 700;
         }
         .hs-dropdown-check {
           width: 18px;
@@ -632,8 +673,8 @@ export default function HomeSpace() {
           transition: all 0.15s;
         }
         .hs-dropdown-item.selected .hs-dropdown-check {
-          background: #2f3cf0;
-          border-color: #2f3cf0;
+          background: #c8a84b;
+          border-color: #c8a84b;
           color: #ffffff;
         }
         .hs-dropdown-check svg {
@@ -647,52 +688,63 @@ export default function HomeSpace() {
           font-family: inherit;
         }
         .hs-go {
-          background: #2f3cf0; color: #fff; border: 0;
+          background: linear-gradient(135deg, #c8a84b 0%, #b8963c 100%);
+          color: #fff; border: 0;
           border-radius: 12px; height: 48px; width: 110px;
-          font: 600 13.5px 'Inter'; cursor: pointer; transition: background .15s, transform .1s, box-shadow .15s;
-          flex-shrink: 0; box-shadow: 0 4px 14px rgba(47,60,240,.3);
+          font: 700 14px 'Inter', sans-serif; cursor: pointer; transition: all .2s cubic-bezier(0.16, 1, 0.3, 1);
+          flex-shrink: 0; box-shadow: 0 4px 14px rgba(200, 168, 75, 0.35);
         }
-        .hs-go:hover { background: #2531d6; transform: translateY(-1px); box-shadow: 0 6px 18px rgba(47,60,240,.4); }
+        .hs-go:hover {
+          background: #1a1a2e;
+          transform: translateY(-1px);
+          box-shadow: 0 6px 18px rgba(26, 26, 46, 0.25);
+        }
         .hs-go:active { transform: translateY(0); }
 
         /* LIVE SUGGESTIONS POPUP */
         .hs-sugg-box {
           position: absolute; top: calc(100% + 8px); left: 0; right: 0;
           background: #ffffff; border-radius: 16px;
-          box-shadow: 0 18px 40px rgba(15, 23, 42, 0.16), 0 2px 8px rgba(15, 23, 42, 0.08);
-          border: 1px solid #e2e8f0; padding: 8px 0; z-index: 50; overflow: hidden;
+          box-shadow: 0 18px 40px rgba(15, 23, 42, 0.14), 0 2px 8px rgba(200, 168, 75, 0.08);
+          border: 1.5px solid #ebd9a2; padding: 8px 0; z-index: 50; overflow: hidden;
         }
         .hs-sugg-item {
           display: flex; align-items: center; justify-content: space-between;
           padding: 10px 16px; cursor: pointer; transition: background 0.12s ease;
           text-decoration: none; color: inherit;
         }
-        .hs-sugg-item:hover { background: #f8fafc; }
+        .hs-sugg-item:hover { background: #fdf8ec; }
         .hs-sugg-title {
-          font-size: 13px; font-weight: 600; color: #0f172a;
+          font-size: 13px; font-weight: 600; color: #1a1a2e;
           white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
         .hs-sugg-sub { font-size: 11.5px; color: #64748b; margin-top: 2px; }
         .hs-sugg-price {
-          font-size: 12px; font-weight: 700; color: #2563eb;
+          font-size: 12.5px; font-weight: 800; color: #c8a84b;
           white-space: nowrap; margin-left: 12px;
         }
         .hs-sugg-footer {
-          display: block; padding: 10px 16px; text-align: center;
-          font-size: 12px; font-weight: 600; color: #2f3cf0;
-          border-top: 1px solid #f1f5f9; background: #fafbfd;
+          display: block; padding: 11px 16px; text-align: center;
+          font-size: 12.5px; font-weight: 700; color: #b8963c;
+          border-top: 1px solid #f1f5f9; background: #fdfbf7;
           cursor: pointer; border: 0; width: 100%; transition: background .12s;
         }
-        .hs-sugg-footer:hover { background: #f1f5f9; }
+        .hs-sugg-footer:hover { background: #fdf8ec; }
 
-        .hs-popular { display: flex; align-items: center; gap: 10px; margin-top: 16px; color: #fff; font-size: 12.5px; font-weight: 500; flex-wrap: wrap; }
+        .hs-popular { display: flex; align-items: center; gap: 10px; margin-top: 16px; color: #1a1a2e; font-size: 12.5px; font-weight: 600; flex-wrap: wrap; }
         .hs-popular a {
-          border: 1px solid rgba(255,255,255,.55);
-          background: rgba(20,30,50,.3); backdrop-filter: blur(6px);
-          padding: 7px 15px; border-radius: 999px; font-size: 11.5px;
-          transition: background .15s;
+          border: 1px solid #ebd9a2;
+          background: rgba(255,255,255,.9); backdrop-filter: blur(6px);
+          padding: 6px 14px; border-radius: 999px; font-size: 11.5px;
+          color: #1a1a2e;
+          transition: all .15s ease;
         }
-        .hs-popular a:hover { background: rgba(20,30,50,.5); }
+        .hs-popular a:hover {
+          background: #fdf8ec;
+          border-color: #c8a84b;
+          color: #927228;
+          transform: translateY(-1px);
+        }
 
         /* CATEGORY CARDS (3D Extruded Slabs) */
         .hs-cats {
@@ -753,7 +805,7 @@ export default function HomeSpace() {
 }
         .hs-cat img {
           width: 100%;
-          height: 156px;
+          height: 140px;
           border-radius: 12px;
           object-fit: cover;
           display: block;
@@ -811,7 +863,8 @@ export default function HomeSpace() {
         /* SECTION PILL */
         .hs-sec-pill {
           display: inline-block;
-          background: #eef4d4; color: #3f5a10;
+          background: #fdf8ec; color: #927228;
+          border: 1px solid #ebd9a2;
           font-size: 11.5px; font-weight: 600;
           padding: 5px 13px; border-radius: 999px;
           margin-bottom: 8px;
@@ -1005,8 +1058,14 @@ export default function HomeSpace() {
             </div> */}
 
             <div className="hs-hero-text-fog">
+              <div className="hs-hero-eyebrow">
+                <span className="hs-hero-eyebrow-line" />
+                <span className="hs-hero-eyebrow-text">VERIFIED LUXURY PORTFOLIO</span>
+                <span className="hs-hero-eyebrow-line" />
+              </div>
+
               <h1 className="hs-h1">
-                Discover a Better<br />Way to Find <span>Home</span>
+                Discover a Better<br />Way to Find <em>Home</em>
               </h1>
 
               <p className="hs-lead">

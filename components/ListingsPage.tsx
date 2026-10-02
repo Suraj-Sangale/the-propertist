@@ -932,9 +932,9 @@ export default function ListingsPage() {
         .lp-root * { box-sizing: border-box; }
 
         /* HERO */
-        .lp-hero { background: #0a0e1e; position: relative; overflow: hidden; padding: 56px 0 0; }
+        .lp-hero { background: #0a0e1e; position: relative; overflow: hidden; padding: 100px 0 0; }
         .lp-hero-bg { position: absolute; inset: 0; background-image: url('/images/heroBg.png'); background-size: cover; background-position: center top; opacity: 0.18; }
-        .lp-hero-overlay { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(8,12,28,0.97) 0%, rgba(10,18,38,0.82) 55%, rgba(0,0,0,0.55) 100%); }
+        .lp-hero-overlay { position: absolute; inset: 0; background: linear-gradient(135deg, rgb(90 122 250 / 0%) 0%, rgb(20 28 47 / 82%) 55%, rgba(0, 0, 0, 0.55) 100%); }
         .lp-hero-inner { position: relative; z-index: 2; max-width: 1280px; margin: 0 auto; padding: 0 32px 44px; text-align: center; }
         .lp-hero-eyebrow { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 22px; }
         .lp-hero-eyebrow-line { width: 52px; height: 1px; background: linear-gradient(90deg, transparent, #c8a84b); }
@@ -1478,6 +1478,7 @@ export default function ListingsPage() {
 
         /* ── MOBILE (≤720px) ─────────────────────── */
         @media (max-width: 720px) {
+          .lp-hero { padding-top: 86px; }
           .lp-grid { grid-template-columns: 1fr; }
           .lp-hero-inner, .lp-results-header, .lp-grid-wrap { padding-left: 16px; padding-right: 16px; }
           .lp-filter-bar-wrap { display: none; }

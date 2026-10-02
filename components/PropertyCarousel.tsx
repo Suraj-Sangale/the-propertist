@@ -577,9 +577,9 @@ export default function PropertyCarousel({
                             </span>
                           )}
                         </div>
-                        <span className="pc-view-link">
+                        {/* <span className="pc-view-link">
                           Details <span className="pc-view-arrow">→</span>
-                        </span>
+                        </span> */}
                       </div>
                     </div>
                   </Link>

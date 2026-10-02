@@ -169,7 +169,7 @@ export default function ImageMarquee() {
           font-weight: 600;
           letter-spacing: 0.22em;
           text-transform: uppercase;
-          color: #3ec8e4;
+          color: #040ea1;
           margin: 0 0 8px;
         }
         .imq-heading {
