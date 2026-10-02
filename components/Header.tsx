@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useWishlist } from "@/utilities/wishlist";
 import {
   Building2,
   Home,
@@ -209,6 +210,7 @@ const QUICK_TOOLS = [
 ];
 
 export default function Header() {
+  const { count: wishlistCount, isLoaded: isWishlistLoaded } = useWishlist();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -546,6 +548,46 @@ export default function Header() {
           border-radius: 999px;
           text-transform: uppercase;
           letter-spacing: 0.03em;
+        }
+
+        /* ─── Wishlist Header Button ────────────────── */
+        .hs-wishlist-btn {
+          position: relative;
+          width: 42px;
+          height: 42px;
+          border-radius: 14px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-decoration: none;
+          color: #f43f5e;
+          transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .hs-wishlist-btn:hover {
+          background: #ffffff;
+          border-color: #fca5a5;
+          transform: translateY(-2px);
+          box-shadow: 0 8px 20px rgba(244, 63, 94, 0.16);
+          color: #e11d48;
+        }
+        .hs-wishlist-badge {
+          position: absolute;
+          top: -1px;
+          right: -1px;
+          background: #f43f5e;
+          color: #ffffff;
+          font-size: 10px;
+          font-weight: 800;
+          min-width: 18px;
+          height: 18px;
+          border-radius: 999px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0 4px;
+          box-shadow: 0 2px 6px rgba(244, 63, 94, 0.5);
+          border: 2px solid #ffffff;
+          line-height: 1;
         }
 
         /* ─── Mobile / Sidebar Menu Trigger ─────────── */
@@ -1296,6 +1338,19 @@ export default function Header() {
 
           {/* RIGHT: Actions */}
           <div className="hs-hdr-actions">
+            {/* Wishlist Link */}
+            <Link href="/saved" className="hs-wishlist-btn" title="Saved Properties">
+              <Heart 
+                size={18} 
+                color="#f43f5e" 
+                fill={isWishlistLoaded && wishlistCount > 0 ? "#f43f5e" : "none"} 
+                strokeWidth={2} 
+              />
+              {isWishlistLoaded && wishlistCount > 0 && (
+                <span className="hs-wishlist-badge">{wishlistCount}</span>
+              )}
+            </Link>
+
             <Link href="/list-property" className="hs-btn-list-prop">
               <Plus size={16} strokeWidth={2.6} />
               <span>List Property</span>
@@ -1368,7 +1423,12 @@ export default function Header() {
             <div className="hs-user-quick-stats">
               <Link href="/saved" className="hs-quick-stat-item" onClick={() => setMobileMenuOpen(false)}>
                 <span className="hs-stat-num">
-                  <Heart size={14} color="#f43f5e" /> 12
+                  <Heart 
+                    size={14} 
+                    color="#f43f5e" 
+                    fill={isWishlistLoaded && wishlistCount > 0 ? "#f43f5e" : "none"} 
+                  />{" "}
+                  {isWishlistLoaded ? wishlistCount : 0}
                 </span>
                 <span className="hs-stat-lbl">Saved Homes</span>
               </Link>

@@ -111,13 +111,13 @@ const IconSearch = () => (
 );
 
 const IconHome = () => (
-  <svg viewBox="0 0 24 24" style={{ width: 20, height: 20, fill: "#222", stroke: "none" }}>
+  <svg viewBox="0 0 24 24" style={{ width: 16, height: 16, stroke: "#2f3cf0", fill: "none", strokeWidth: 2 }}>
     <path d="M3 11 12 3l9 8v10H3z" />
   </svg>
 );
 
 const IconBudget = () => (
-  <svg viewBox="0 0 24 24" style={{ width: 20, height: 20, stroke: "#222", fill: "none", strokeWidth: 2 }}>
+  <svg viewBox="0 0 24 24" style={{ width: 16, height: 16, stroke: "#2f3cf0", fill: "none", strokeWidth: 2 }}>
     <ellipse cx="12" cy="6" rx="8" ry="3" />
     <path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6" />
   </svg>
@@ -153,6 +153,107 @@ const IconBath = () => (
   </svg>
 );
 
+function SearchDropdown({
+  id,
+  icon,
+  label,
+  value,
+  options,
+  isOpen,
+  onToggle,
+  onSelect,
+}: {
+  id: string;
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  options: { value: string; label: string }[];
+  isOpen: boolean;
+  onToggle: () => void;
+  onSelect: (val: string) => void;
+}) {
+  const selectedOption = options.find((o) => o.value === value) || options[0];
+  const hasValue = Boolean(value);
+
+  return (
+    <div className="hs-dropdown-wrap" id={`wrap-${id}`}>
+      <button
+        type="button"
+        id={id}
+        className={`hs-dropdown-btn${isOpen ? " open" : ""}${hasValue ? " has-value" : ""}`}
+        onClick={(e) => {
+          e.stopPropagation();
+          onToggle();
+        }}
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+      >
+        <div className="hs-dropdown-btn-left">
+          <div className="hs-dropdown-icon">{icon}</div>
+          <div className="hs-dropdown-labels">
+            <span className="hs-dropdown-tag">{label}</span>
+            <span className="hs-dropdown-val" title={selectedOption.label}>
+              {selectedOption.label}
+            </span>
+          </div>
+        </div>
+        <span className={`hs-dropdown-chevron${isOpen ? " rotate" : ""}`}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4}>
+            <path d="m6 9 6 6 6-6" />
+          </svg>
+        </span>
+      </button>
+
+      {isOpen && (
+        <div className="hs-dropdown-popover" role="listbox">
+          <div className="hs-dropdown-header">
+            <span>Select {label}</span>
+            {hasValue && (
+              <button
+                type="button"
+                className="hs-dropdown-reset"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSelect("");
+                }}
+              >
+                Reset
+              </button>
+            )}
+          </div>
+          <div className="hs-dropdown-options">
+            {options.map((opt) => {
+              const isSelected = opt.value === value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  role="option"
+                  aria-selected={isSelected}
+                  className={`hs-dropdown-item${isSelected ? " selected" : ""}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onSelect(opt.value);
+                  }}
+                >
+                  <span className="hs-dropdown-check">
+                    {isSelected && (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3}>
+                        <path d="M20 6 9 17l-5-5" />
+                      </svg>
+                    )}
+                  </span>
+                  <span className="hs-dropdown-item-label">{opt.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function HomeSpace() {
@@ -162,6 +263,7 @@ export default function HomeSpace() {
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [propertyType, setPropertyType] = useState("");
   const [budget, setBudget] = useState("");
+  const [openDropdown, setOpenDropdown] = useState<"type" | "budget" | null>(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const searchWrapRef = useRef<HTMLDivElement>(null);
 
@@ -173,15 +275,26 @@ export default function HomeSpace() {
     return () => clearTimeout(timer);
   }, [query]);
 
-  // Close suggestions dropdown on click outside
+  // Close suggestions and custom dropdowns on click outside or escape key
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (searchWrapRef.current && !searchWrapRef.current.contains(e.target as Node)) {
         setShowSuggestions(false);
+        setOpenDropdown(null);
+      }
+    }
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setShowSuggestions(false);
+        setOpenDropdown(null);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
   }, []);
 
   const handleSearch = (overrideQuery?: string) => {
@@ -324,26 +437,214 @@ export default function HomeSpace() {
           white-space: nowrap;
           position: relative;
         }
-        .hs-field.grow { flex: 1; min-width: 220px; }
-        .hs-field.sel { width: 175px; justify-content: space-between; cursor: pointer; }
-        .hs-field small { display: block; font-size: 10px; color: #666; }
-        .hs-field b { display: block; font-size: 12px; color: #111; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px; }
-        .hs-search-input {
-          flex: 1; border: 0; outline: none; background: transparent;
-          font: 500 13px 'Inter', sans-serif; color: #111; width: 100%;
+        /* SEARCH DROPDOWNS */
+        .hs-dropdowns-group {
+          display: flex;
+          align-items: center;
+          gap: 10px;
         }
-        .hs-search-input::placeholder { color: #71717a; }
-        .hs-clear-btn {
-          border: 0; background: transparent; color: #94a3b8;
-          cursor: pointer; font-size: 13px; padding: 2px 6px; line-height: 1;
-          border-radius: 50%;
+        .hs-dropdown-wrap {
+          position: relative;
+          width: 175px;
+          flex-shrink: 0;
         }
-        .hs-clear-btn:hover { color: #1e293b; }
-        .hs-sel-chevron { font-size: 11px; color: #8892a4; pointer-events: none; }
-        .hs-select-overlay {
-          position: absolute; inset: 0; width: 100%; height: 100%;
-          opacity: 0; cursor: pointer; appearance: none; -webkit-appearance: none;
-          z-index: 2;
+        .hs-dropdown-btn {
+          width: 100%;
+          height: 48px;
+          border-radius: 14px;
+          background: #f3f5f9;
+          border: 1.5px solid transparent;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0 12px;
+          cursor: pointer;
+          transition: all 0.15s ease;
+          outline: none;
+          text-align: left;
+        }
+        .hs-dropdown-btn:hover {
+          background: #eef2f8;
+          border-color: #cbd5e1;
+        }
+        .hs-dropdown-btn.open {
+          background: #ffffff;
+          border-color: #2f3cf0;
+          box-shadow: 0 0 0 3px rgba(47, 60, 240, 0.14);
+        }
+        .hs-dropdown-btn.has-value {
+          background: #f8faff;
+          border-color: #c7d2fe;
+        }
+        .hs-dropdown-btn-left {
+          display: flex;
+          align-items: center;
+          gap: 9px;
+          min-width: 0;
+          overflow: hidden;
+        }
+        .hs-dropdown-icon {
+          width: 28px;
+          height: 28px;
+          border-radius: 8px;
+          background: #ffffff;
+          display: grid;
+          place-items: center;
+          flex-shrink: 0;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+          color: #2f3cf0;
+        }
+        .hs-dropdown-labels {
+          display: flex;
+          flex-direction: column;
+          min-width: 0;
+          overflow: hidden;
+        }
+        .hs-dropdown-tag {
+          font-size: 9.5px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.6px;
+          color: #64748b;
+          line-height: 1;
+          margin-bottom: 2px;
+        }
+        .hs-dropdown-val {
+          font-size: 12px;
+          font-weight: 700;
+          color: #0f172a;
+          line-height: 1.2;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .hs-dropdown-chevron {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 16px;
+          height: 16px;
+          color: #94a3b8;
+          flex-shrink: 0;
+          margin-left: 4px;
+          transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), color 0.15s;
+        }
+        .hs-dropdown-chevron svg {
+          width: 14px;
+          height: 14px;
+          display: block;
+        }
+        .hs-dropdown-chevron.rotate {
+          transform: rotate(180deg);
+          color: #2f3cf0;
+        }
+
+        /* FLOATING DROPDOWN MENU */
+        @keyframes hs-drop-fade {
+          from {
+            opacity: 0;
+            transform: translateY(-6px) scale(0.98);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+        .hs-dropdown-popover {
+          position: absolute;
+          top: calc(100% + 8px);
+          left: 0;
+          min-width: 220px;
+          background: #ffffff;
+          border-radius: 16px;
+          border: 1.5px solid #e2e8f0;
+          box-shadow: 0 18px 40px -6px rgba(15, 23, 42, 0.18), 0 4px 12px rgba(15, 23, 42, 0.08);
+          padding: 6px;
+          z-index: 60;
+          animation: hs-drop-fade 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .hs-dropdown-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 8px 10px 8px;
+          border-bottom: 1px solid #f1f5f9;
+          margin-bottom: 4px;
+          font-size: 11px;
+          font-weight: 700;
+          color: #64748b;
+          letter-spacing: 0.5px;
+          text-transform: uppercase;
+        }
+        .hs-dropdown-reset {
+          background: none;
+          border: none;
+          color: #ef4444;
+          font-size: 11px;
+          font-weight: 600;
+          cursor: pointer;
+          padding: 2px 6px;
+          border-radius: 4px;
+          transition: background 0.12s;
+        }
+        .hs-dropdown-reset:hover {
+          background: #fee2e2;
+        }
+        .hs-dropdown-options {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+          max-height: 260px;
+          overflow-y: auto;
+        }
+        .hs-dropdown-item {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 9px 12px;
+          border-radius: 10px;
+          border: 0;
+          background: transparent;
+          cursor: pointer;
+          width: 100%;
+          text-align: left;
+          transition: background 0.12s, color 0.12s;
+          color: #334155;
+        }
+        .hs-dropdown-item:hover {
+          background: #f1f5f9;
+          color: #0f172a;
+        }
+        .hs-dropdown-item.selected {
+          background: #eef2ff;
+          color: #1e1b4b;
+          font-weight: 600;
+        }
+        .hs-dropdown-check {
+          width: 18px;
+          height: 18px;
+          border-radius: 5px;
+          border: 1.5px solid #cbd5e1;
+          display: grid;
+          place-items: center;
+          flex-shrink: 0;
+          background: #ffffff;
+          transition: all 0.15s;
+        }
+        .hs-dropdown-item.selected .hs-dropdown-check {
+          background: #2f3cf0;
+          border-color: #2f3cf0;
+          color: #ffffff;
+        }
+        .hs-dropdown-check svg {
+          width: 11px;
+          height: 11px;
+          stroke: #ffffff;
+          display: block;
+        }
+        .hs-dropdown-item-label {
+          font-size: 13px;
+          font-family: inherit;
         }
         .hs-go {
           background: #2f3cf0; color: #fff; border: 0;
@@ -576,15 +877,79 @@ export default function HomeSpace() {
           .hs-hero { height: auto; padding-bottom: 40px; }
           .hs-hero-curve { display: none; }
           .hs-grid { grid-template-columns: repeat(2,1fr); }
-          .hs-features { flex-wrap: wrap; }
           .hs-sec-r { margin-right: 0; }
           .hs-menu { display: none; }
           .hs-h1 { font-size: 44px; }
           .hs-bar { flex-wrap: wrap; }
         }
+        @media (max-width: 900px) {
+          .hs-bar {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+            padding: 14px;
+            border-radius: 0 20px 20px 20px;
+          }
+          .hs-field.grow {
+            width: 100%;
+            min-width: 0;
+          }
+          .hs-dropdowns-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            width: 100%;
+          }
+          .hs-dropdown-wrap {
+            width: 100%;
+            flex: 1;
+          }
+          .hs-dropdown-popover {
+            min-width: 180px;
+          }
+          .hs-go {
+            width: 100%;
+            height: 48px;
+            font-size: 14px;
+            border-radius: 12px;
+          }
+        }
         @media (max-width: 600px) {
           .hs-grid { grid-template-columns: 1fr; }
           .hs-h1 { font-size: 32px; }
+          .hs-search-area {
+            position: static;
+            width: 100%;
+            max-width: 100%;
+            margin: 16px 0 0;
+          }
+          .hs-bar {
+            border-radius: 0 16px 16px 16px;
+            padding: 10px;
+          }
+          .hs-dropdown-btn {
+            padding: 0 8px;
+            height: 46px;
+          }
+          .hs-dropdown-icon {
+            width: 24px;
+            height: 24px;
+          }
+          .hs-dropdown-tag {
+            font-size: 8.5px;
+          }
+          .hs-dropdown-val {
+            font-size: 11px;
+          }
+          .hs-dropdown-popover {
+            left: 0;
+            right: auto;
+            max-width: 90vw;
+          }
+          #wrap-hs-dropdown-budget .hs-dropdown-popover {
+            left: auto;
+            right: 0;
+          }
           .hs-cats {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -696,46 +1061,34 @@ export default function HomeSpace() {
                   )}
                 </div>
 
-                <div className="hs-field sel">
-                  <span style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                    <IconHome />
-                    <span>
-                      <small>Property Type</small>
-                      <b>{PROPERTY_TYPE_OPTIONS.find((o) => o.value === propertyType)?.label || "Any"}</b>
-                    </span>
-                  </span>
-                  <span className="hs-sel-chevron">⌄</span>
-                  <select
-                    className="hs-select-overlay"
+                <div className="hs-dropdowns-group">
+                  <SearchDropdown
+                    id="hs-dropdown-type"
+                    icon={<IconHome />}
+                    label="Property Type"
                     value={propertyType}
-                    onChange={(e) => setPropertyType(e.target.value)}
-                    aria-label="Select Property Type"
-                  >
-                    {PROPERTY_TYPE_OPTIONS.map((o) => (
-                      <option key={o.value} value={o.value}>{o.label}</option>
-                    ))}
-                  </select>
-                </div>
+                    options={PROPERTY_TYPE_OPTIONS}
+                    isOpen={openDropdown === "type"}
+                    onToggle={() => setOpenDropdown((prev) => (prev === "type" ? null : "type"))}
+                    onSelect={(val) => {
+                      setPropertyType(val);
+                      setOpenDropdown(null);
+                    }}
+                  />
 
-                <div className="hs-field sel">
-                  <span style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                    <IconBudget />
-                    <span>
-                      <small>Budget</small>
-                      <b>{BUDGET_OPTIONS.find((o) => o.value === budget)?.label || "Any"}</b>
-                    </span>
-                  </span>
-                  <span className="hs-sel-chevron">⌄</span>
-                  <select
-                    className="hs-select-overlay"
+                  <SearchDropdown
+                    id="hs-dropdown-budget"
+                    icon={<IconBudget />}
+                    label="Budget"
                     value={budget}
-                    onChange={(e) => setBudget(e.target.value)}
-                    aria-label="Select Budget"
-                  >
-                    {BUDGET_OPTIONS.map((o) => (
-                      <option key={o.value} value={o.value}>{o.label}</option>
-                    ))}
-                  </select>
+                    options={BUDGET_OPTIONS}
+                    isOpen={openDropdown === "budget"}
+                    onToggle={() => setOpenDropdown((prev) => (prev === "budget" ? null : "budget"))}
+                    onSelect={(val) => {
+                      setBudget(val);
+                      setOpenDropdown(null);
+                    }}
+                  />
                 </div>
 
                 <button type="button" className="hs-go" onClick={() => handleSearch()}>Search</button>
@@ -804,7 +1157,7 @@ export default function HomeSpace() {
                 <div className="hs-ic" style={{ background: f.bg }}>{f.icon}</div>
                 <div>
                   <b>{f.title}</b>
-                  <small>{f.sub}</small>
+                  {/* <small>{f.sub}</small> */}
                 </div>
               </div>
             ))}

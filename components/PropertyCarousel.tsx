@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import type { Swiper as SwiperType } from "swiper";
 import CommonSwiper, { SwiperSlide } from "./commonSwiper";
 import Link from "next/link";
+import { useWishlist } from "@/utilities/wishlist";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -136,23 +137,24 @@ const CSS = `
   .cs-swiper { overflow: visible !important; }
   .cs-swiper .swiper-slide { height: auto; display: flex; }
 
-  /* Navigation Arrows */
+  /* Navigation Arrows - centered on image (195px height / 2 = 98px) so they never overlap price */
   .pc-arrow {
     position: absolute;
-    top: 50%;
+    top: 40%;
     transform: translateY(-50%);
     z-index: 15;
     width: 44px;
     height: 44px;
     border-radius: 50%;
     border: 1px solid #e2e8f0;
-    background: #ffffff;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(6px);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     color: #1e293b;
-    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.1);
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.12);
     transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
   }
   .pc-arrow:hover {
@@ -160,7 +162,7 @@ const CSS = `
     border-color: #2563eb;
     color: #2563eb;
     transform: translateY(-50%) scale(1.08);
-    box-shadow: 0 6px 22px rgba(37, 99, 235, 0.2);
+    box-shadow: 0 6px 22px rgba(37, 99, 235, 0.22);
   }
   .pc-arrow:active {
     transform: translateY(-50%) scale(0.95);
@@ -168,15 +170,21 @@ const CSS = `
   .pc-arrow-prev { left: -22px; }
   .pc-arrow-next { right: -22px; }
 
+  @media (min-width: 1240px) {
+    .pc-arrow-prev { left: -24px; }
+    .pc-arrow-next { right: -24px; }
+  }
+
   @media (max-width: 900px) {
-    .pc-arrow-prev { left: -10px; }
-    .pc-arrow-next { right: -10px; }
+    .pc-arrow { top: 40%; }
+    .pc-arrow-prev { left: -8px; }
+    .pc-arrow-next { right: -8px; }
   }
 
   @media (max-width: 640px) {
-    .pc-arrow { width: 36px; height: 36px; }
-    .pc-arrow-prev { left: 4px; }
-    .pc-arrow-next { right: 4px; }
+    .pc-arrow { width: 36px; height: 36px; top: 35%; }
+    .pc-arrow-prev { left: 8px; }
+    .pc-arrow-next { right: 8px; }
   }
 
   /* Property Card */
@@ -429,12 +437,12 @@ export default function PropertyCarousel({
   subheading = "Discover the newest properties added to our platform.",
 }: PropertyCarouselProps) {
   const swiperRef = useRef<SwiperType | null>(null);
-  const [savedIds, setSavedIds] = useState<Record<string | number, boolean>>({});
+  const { has: isInWishlist, toggle: toggleWishlist } = useWishlist();
 
   const toggleSave = (e: React.MouseEvent, id: string | number) => {
     e.preventDefault();
     e.stopPropagation();
-    setSavedIds((prev) => ({ ...prev, [id]: !prev[id] }));
+    toggleWishlist(id);
   };
 
   return (
@@ -490,7 +498,7 @@ export default function PropertyCarousel({
               const beds = p.beds || p.config || "";
               const tagStyle = statusTag ? getStatusStyle(statusTag) : null;
               const href = p.slug ? `/property/${p.slug}` : "#";
-              const isSaved = Boolean(savedIds[id]);
+              const isSaved = isInWishlist(id);
 
               return (
                 <SwiperSlide key={id} style={{ height: "auto" }}>

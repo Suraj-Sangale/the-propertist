@@ -12,6 +12,7 @@ import {
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
+import { useWishlist, useWishlistItem } from "@/utilities/wishlist";
 
 
 gsap.registerPlugin(ScrollTrigger);
@@ -156,6 +157,8 @@ export default function PropertyDetailsClient({ property }: { property: any }) {
 // ============================================================================
 
 function Header() {
+  const { count: wishlistCount, isLoaded: isWishlistLoaded } = useWishlist();
+
   return (
     <header className="fixed top-0 inset-x-0 z-50 bg-white/80 backdrop-blur-md shadow-[0_4px_30px_rgba(0,0,0,0.03)] border-b border-slate-100 h-20 flex items-center transition-all duration-300">
       <div className="max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
@@ -188,9 +191,22 @@ function Header() {
               className="w-[280px] h-[42px] bg-slate-50 border border-slate-200 rounded-full pl-10 pr-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#c8a84b]/20 focus:border-[#c8a84b] transition-all placeholder:text-slate-400"
             />
           </div>
-          <button className="w-10 h-10 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-50 hover:text-red-500 transition-colors">
-            <Heart className="w-5 h-5" />
-          </button>
+          <Link 
+            href="/saved" 
+            className="relative w-10 h-10 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-50 hover:text-red-500 transition-colors"
+            title="Saved Properties"
+          >
+            <Heart 
+              className="w-5 h-5" 
+              fill={isWishlistLoaded && wishlistCount > 0 ? "#ef4444" : "none"} 
+              stroke={isWishlistLoaded && wishlistCount > 0 ? "#ef4444" : "currentColor"} 
+            />
+            {isWishlistLoaded && wishlistCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-sm">
+                {wishlistCount}
+              </span>
+            )}
+          </Link>
           <button className="h-[42px] px-6 rounded-full border border-slate-200 text-[#1a1a2e] font-semibold text-sm hover:bg-[#1a1a2e] hover:text-white hover:border-[#1a1a2e] transition-all flex items-center gap-2">
             <User className="w-4 h-4" />
             Login / Sign Up
@@ -206,6 +222,7 @@ function Header() {
 }
 
 function PropertyGallery({ property, onOpenFullscreen }: { property: any, onOpenFullscreen: () => void }) {
+  const { isLiked, toggle } = useWishlistItem(property?.id ?? property?.slug ?? "");
   const gallery = property?.gallery || [];
   const imageCount = gallery.length;
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -243,8 +260,16 @@ function PropertyGallery({ property, onOpenFullscreen }: { property: any, onOpen
           Offers
         </div>
 
-        <button className="absolute top-4 right-4 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-slate-700 hover:text-red-500 hover:scale-110 transition-all shadow-lg z-10" onClick={(e) => { e.stopPropagation(); }}>
-          <Heart className="w-5 h-5" />
+        <button 
+          aria-label={isLiked ? "Remove from wishlist" : "Add to wishlist"}
+          className={`absolute top-4 right-4 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110 transition-all shadow-lg z-10 ${isLiked ? "text-red-500" : "text-slate-700 hover:text-red-500"}`} 
+          onClick={toggle}
+        >
+          <Heart 
+            className="w-5 h-5" 
+            fill={isLiked ? "#ef4444" : "none"} 
+            stroke={isLiked ? "#ef4444" : "currentColor"} 
+          />
         </button>
 
         <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-2">
@@ -274,6 +299,8 @@ function PropertyGallery({ property, onOpenFullscreen }: { property: any, onOpen
 }
 
 function PropertySummary({ property }: { property: any }) {
+  const { isLiked, toggle: toggleSave } = useWishlistItem(property?.id ?? property?.slug ?? "");
+
   return (
     <div className="bg-white rounded-3xl p-6 lg:p-7 shadow-[0_8px_30px_rgba(20,35,70,0.05)] border border-slate-100 flex flex-col h-full justify-between animate-up">
       <div>
@@ -287,9 +314,23 @@ function PropertySummary({ property }: { property: any }) {
               <span className="text-xs font-bold">RERA Approved</span>
             </div>
           </div>
-          <button className="flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-[#c8a84b] transition-colors">
-            <Share2 className="w-4 h-4" /> Share
-          </button>
+          <div className="flex items-center gap-3">
+            <button 
+              type="button"
+              onClick={toggleSave}
+              className={`flex items-center gap-1.5 text-xs sm:text-sm font-semibold transition-all px-3 py-1.5 rounded-full border ${
+                isLiked 
+                  ? "border-red-200 bg-red-50 text-red-600" 
+                  : "border-slate-200 text-slate-600 hover:border-red-200 hover:text-red-500"
+              }`}
+            >
+              <Heart className="w-4 h-4" fill={isLiked ? "#ef4444" : "none"} stroke={isLiked ? "#ef4444" : "currentColor"} />
+              <span>{isLiked ? "Saved" : "Save"}</span>
+            </button>
+            <button className="flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-[#c8a84b] transition-colors">
+              <Share2 className="w-4 h-4" /> Share
+            </button>
+          </div>
         </div>
 
         <h1 className="text-3xl font-extrabold text-[#1a1a2e] tracking-tight mb-2 capitalize">{property.projectName}</h1>

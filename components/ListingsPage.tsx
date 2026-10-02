@@ -4,6 +4,7 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { Fragment, memo, useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { ALL_PROPERTIES } from "@/utilities/masterData";
+import { useWishlistItem } from "@/utilities/wishlist";
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
@@ -564,7 +565,7 @@ const SearchField = memo(function SearchField({
 type Property = typeof ALL_PROPERTIES[0];
 
 const PropertyCard = memo(function PropertyCard({ property, view }: { property: Property; view: "grid" | "list" }) {
-  const [hearted, setHearted] = useState(false);
+  const { isLiked, toggle } = useWishlistItem(property.id);
 
   const cardBody = (
     <div className="lp-card-body">
@@ -592,12 +593,16 @@ const PropertyCard = memo(function PropertyCard({ property, view }: { property: 
       <div className={`lp-card-img-wrap${view === "list" ? " lp-card-img-wrap--list" : ""}`}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={property?.gallery[0]} alt={property.name} className="lp-card-img" />
-        <button className="lp-heart" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setHearted((h) => !h); }} aria-label="Save property">
-          <HeartIcon filled={hearted} />
+        <button
+          className="lp-heart"
+          onClick={toggle}
+          aria-label={isLiked ? "Remove from wishlist" : "Save property"}
+        >
+          <HeartIcon filled={isLiked} />
         </button>
 
         {/* Overlay: features left, name+price right */}
-        <div className="lp-card-overlay">
+        {/* <div className="lp-card-overlay">
           <div className="lp-card-features">
             {property.features.map((f) => (
               <div key={f} className="lp-feat-item">
@@ -611,7 +616,7 @@ const PropertyCard = memo(function PropertyCard({ property, view }: { property: 
             <div className="lp-card-locality">{property.locality_label}</div>
             <div className="lp-card-price-badge">{property.priceLabel}</div>
           </div>
-        </div>
+        </div> */}
 
         {property.badge && <div className="lp-card-badge-ribbon">{property.badge}</div>}
         {/* <div className="lp-dev-tag">{property.developer}</div> */}
