@@ -3762,5 +3762,73 @@ export const ALL_PROPERTIES = [
       }
     ],
     "mapLocation": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d241317.11609823277!2d72.74109995709657!3d19.08219783958221!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7c6306644edc1%3A0x5da4ed8f8d648c69!2sMumbai%2C%20Maharashtra!5e0!3m2!1sen!2sin!4v1689000000000!5m2!1sen!2sin"
+  },
+  {
+    "id": 59,
+    "name": "GODREJ MEADOWS LUXURY PLOTS",
+    "projectName": "Godrej Meadows Plots",
+    "developer": "GODREJ PROPERTIES",
+    "locality": "Pune",
+    "locality_key": "pune",
+    "locality_label": "PUNE",
+    "config": "Plots & Land",
+    "config_keys": [
+      "plot",
+      "plots",
+      "residential_plot"
+    ],
+    "config_label": "Plots & Land in GODREJ MEADOWS",
+    "area": "1,500 – 4,500 sq.ft",
+    "beds": "Plots & Land",
+    "priceFrom": "₹ 85 Lakh*",
+    "priceLabel": "From ₹85 Lakh*",
+    "status": "New Launch",
+    "status_key": "new_launch",
+    "developer_key": "godrej",
+    "mode": "buy",
+    "type": "plot",
+    "propertyType": "plot",
+    "verified": true,
+    "rera": true,
+    "badge": "HOT PLOT",
+    "features": [
+      "Clear Title RERA Approved Plots",
+      "Gated Luxury Villa Community",
+      "Immediate Registry & Demarcation",
+      "100% Vastu Compliant Plots",
+      "Scenic Hills & Nature Views"
+    ],
+    "slug": "residential-plots-in-pune-godrej-meadows",
+    "description": "Premium gated villa plots in Pune surrounded by picturesque hills. Enjoy a world of curated luxury with clear title NA plots, wide internal roads, underground electrical & water lines, grand clubhouse, swimming pool, and round-the-clock multi-tier security. Conveniently located near major business hubs, Hinjewadi IT Park, and the Mumbai-Pune Expressway.",
+    "amenities": [
+      "Grand Clubhouse",
+      "Landscaped Gardens",
+      "Swimming Pool",
+      "24/7 Security & CCTV",
+      "Underground Cabling & Water Supply",
+      "Jogging Track",
+      "Kids Play Area",
+      "Open Amphitheatre"
+    ],
+    "gallery": [
+      "/images/cat/plot.jpg",
+      "/images/projects/Untitled-design-20.webp",
+      "/images/projects/Untitled-design-19.webp",
+      "/images/projects/Untitled-design-21.webp"
+    ],
+    "address": "Hinjewadi - Marunji Expressway Corridor, Pune, Maharashtra",
+    "possessionDate": "Ready for Registration",
+    "reraId": "P52100054321",
+    "floorPlans": [
+      {
+        "type": "Plot Layout Plan",
+        "image": "/images/projects/floor_plan.jpg"
+      },
+      {
+        "type": "Master Community Plan",
+        "image": "/images/projects/floor_plan-2.jpg"
+      }
+    ],
+    "mapLocation": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d121059.04360431872!2d73.79292671607519!3d18.52460355342417!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc2bf2e67461101%3A0x828d43bf9d3e3f32!2sPune%2C%20Maharashtra!5e0!3m2!1sen!2sin!4v1689000000000!5m2!1sen!2sin"
   }
 ];

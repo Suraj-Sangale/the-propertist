@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 
 const IMAGES = [
@@ -150,6 +151,7 @@ export default function ImageMarquee() {
     };
   }, []);
 
+  const router = useRouter();
   return (
     <>
       <style>{`
@@ -349,7 +351,7 @@ export default function ImageMarquee() {
         <div className="imq-wrap">
           <div className="imq-track" ref={trackRef}>
             {TRACK.map((img, idx) => (
-              <div className="imq-card" key={idx}>
+              <div onClick={() => router.push("/listings")} className="imq-card" key={idx}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   className="imq-img"

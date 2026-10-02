@@ -14,6 +14,7 @@ type FilterOption = { key: string; label: string };
 // key: "" = "show all" (removes param from URL)
 const LOCALITIES: FilterOption[] = [
   { key: "",               label: "All Localities" },
+  { key: "pune",           label: "Pune" },
   { key: "kandivali_east", label: "Kandivali East" },
   { key: "jokhandwala",    label: "Jokhandwala" },
   { key: "andheri_west",   label: "Andheri West" },
@@ -25,7 +26,8 @@ const LOCALITIES: FilterOption[] = [
 ];
 
 const CONFIGURATIONS: FilterOption[] = [
-  { key: "",        label: "All BHK" },
+  { key: "",        label: "All Configurations" },
+  { key: "plot",     label: "Plots & Land" },
   { key: "1_bhk",   label: "1 BHK" },
   { key: "2_bhk",   label: "2 BHK" },
   { key: "2_3_bhk", label: "2 & 3 BHK" },
@@ -687,6 +689,7 @@ export default function ListingsPage() {
   const status    = searchParams.get("status")   ?? "";
   const developer = searchParams.get("developer")  ?? "";
   const budget    = searchParams.get("budget")   ?? "";
+  const type      = searchParams.get("type")     ?? "";
   const sort      = searchParams.get("sort")     ?? "Relevance";
   const view      = (searchParams.get("view")    ?? "grid") as "grid" | "list";
 
@@ -786,6 +789,7 @@ export default function ListingsPage() {
       developer: "",
       budget: "",
       status: "",
+      type: "",
       q: "",
       mode: "buy",
     });
@@ -806,6 +810,14 @@ export default function ListingsPage() {
       category: "Mode",
       label: "Rent",
       onRemove: () => updateParams({ mode: "buy" }),
+    });
+  }
+  if (type) {
+    appliedFilters.push({
+      key: "type",
+      category: "Type",
+      label: type === "plot" ? "Plots & Land" : type === "house" ? "Houses & Villas" : type.charAt(0).toUpperCase() + type.slice(1),
+      onRemove: () => updateParams({ type: "" }),
     });
   }
 

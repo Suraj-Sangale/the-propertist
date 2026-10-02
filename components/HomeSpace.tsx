@@ -41,16 +41,19 @@ const CATEGORY_CARDS = [
     src: "/images/projects/Untitled-design-18.webp",
     title: "Luxury Apartments",
     sub: "In Mumbai",
+    link: "/listings?mode=buy&type=apartment&locality=mumbai",
   },
   {
     src: "/images/cat/banglow.png",
     title: "Independent Houses",
     sub: "In Bangalore",
+    link: "/listings?mode=buy&type=house&locality=bangalore",
   },
   {
     src: "/images/cat/plot.jpg",
     title: "Plots & Land",
     sub: "In Pune",
+    link: "/listings?mode=buy&type=plot&locality=pune",
   },
 ];
 
@@ -1191,14 +1194,14 @@ export default function HomeSpace() {
             {/* CATEGORY TILT CARDS */}
             <div className="hs-cats">
               {CATEGORY_CARDS.map((c, i) => (
-                <div className="hs-cat" key={c.title+i}>
+                <Link href={c.link} className="hs-cat" key={c.title+i}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={c.src} alt={c.title} />
                   <div className="hs-cat-body">
                     <b>{c.title}</b>
                     <small>{c.sub}</small>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>

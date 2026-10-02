@@ -303,6 +303,14 @@ export default function Header() {
           gap: 20px;
         }
 
+        .hs-hdr-left {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          flex-shrink: 0;
+          min-width: 0;
+        }
+
         /* ─── Logo ───────────────────────────────────── */
         .hs-hdr-logo {
           display: flex;
@@ -559,6 +567,8 @@ export default function Header() {
           box-shadow: 0 6px 20px rgba(200, 168, 75, 0.35);
           transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
           border: 1px solid rgba(255, 255, 255, 0.25);
+          flex-shrink: 0;
+          white-space: nowrap;
         }
         .hs-btn-list-prop:hover {
           transform: translateY(-2px);
@@ -591,6 +601,7 @@ export default function Header() {
           background: rgba(255, 255, 255, 0.08);
           border: 1px solid rgba(200, 168, 75, 0.3);
           transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+          flex-shrink: 0;
         }
         .hs-wishlist-btn:hover {
           background: rgba(244, 63, 94, 0.15);
@@ -630,6 +641,7 @@ export default function Header() {
           cursor: pointer;
           color: #ffffff;
           transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+          flex-shrink: 0;
         }
         .hs-mobile-toggle:hover {
           background: rgba(200, 168, 75, 0.15);
@@ -663,6 +675,8 @@ export default function Header() {
           bottom: 0;
           width: 100%;
           max-width: 400px;
+          height: 100%;
+          height: 100dvh;
           background: linear-gradient(180deg, #0a0e1e 0%, #10162f 100%);
           z-index: 2010;
           display: flex;
@@ -695,6 +709,7 @@ export default function Header() {
           position: sticky;
           top: 0;
           z-index: 10;
+          flex-shrink: 0;
         }
         .hs-d-close-btn {
           width: 36px;
@@ -707,6 +722,7 @@ export default function Header() {
           cursor: pointer;
           color: #cbd5e1;
           transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+          flex-shrink: 0;
         }
         .hs-d-close-btn:hover {
           background: #ef4444;
@@ -717,14 +733,15 @@ export default function Header() {
 
         /* Drawer Scroll Area */
         .hs-d-scroll {
-          flex: 1;
+          flex: 1 1 auto;
           overflow-y: auto;
-          padding: 18px 18px 80px;
+          padding: 18px 18px 24px;
           display: flex;
           flex-direction: column;
           gap: 16px;
           scrollbar-width: thin;
           scrollbar-color: rgba(200, 168, 75, 0.3) transparent;
+          -webkit-overflow-scrolling: touch;
         }
         .hs-d-scroll::-webkit-scrollbar {
           width: 5px;
@@ -913,12 +930,9 @@ export default function Header() {
 
         /* Sticky Drawer Bottom Footer */
         .hs-d-fixed-footer {
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          padding: 12px 20px;
-          background: rgba(10, 14, 30, 0.96);
+          flex-shrink: 0;
+          padding: 14px 20px;
+          background: rgba(10, 14, 30, 0.98);
           backdrop-filter: blur(12px);
           border-top: 1px solid rgba(200, 168, 75, 0.2);
           display: flex;
@@ -950,9 +964,14 @@ export default function Header() {
         }
 
         @media (max-width: 520px) {
+          .hs-header-sticky.scrolled {
+            margin: 10px 10px 0 10px;
+            border-radius: 20px;
+          }
           .hs-header-container {
-            height: 66px;
-            padding: 0 16px;
+            height: 64px;
+            padding: 0 14px;
+            gap: 8px;
           }
           .hs-hdr-logo-title {
             font-size: 18px;
@@ -961,12 +980,131 @@ export default function Header() {
             width: 34px;
             height: 34px;
           }
+          .hs-hdr-actions {
+            gap: 8px;
+            flex-shrink: 0;
+          }
           .hs-btn-list-prop {
-            padding: 8px 14px;
-            font-size: 12.5px;
+            padding: 8px 12px;
+            font-size: 12px;
           }
           .hs-btn-free-badge {
             display: none;
+          }
+          .hs-adv-drawer {
+            max-width: 100%;
+            border-left: none;
+            border-radius: 0;
+          }
+        }
+
+        @media (max-width: 450px) {
+          .hs-header-sticky.scrolled {
+            margin: 8px 8px 0 8px;
+            border-radius: 16px;
+          }
+          .hs-header-container {
+            height: 58px;
+            padding: 0 10px;
+            gap: 6px;
+          }
+          .hs-hdr-left {
+            gap: 8px;
+          }
+          .hs-hdr-logo {
+            gap: 8px;
+          }
+          .hs-hdr-logo-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+          }
+          .hs-hdr-logo-title {
+            font-size: 16px;
+          }
+          .hs-hdr-logo-sub {
+            font-size: 8px;
+            letter-spacing: 0.12em;
+          }
+          .hs-hdr-actions {
+            gap: 6px;
+          }
+          .hs-wishlist-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+          }
+          .hs-mobile-toggle {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+          }
+          .hs-btn-list-prop {
+            height: 36px;
+            padding: 0 10px;
+            font-size: 11.5px;
+            gap: 4px;
+            border-radius: 10px;
+          }
+          /* Drawer adjustments on < 450px */
+          .hs-d-header {
+            padding: 12px 14px;
+          }
+          .hs-d-scroll {
+            padding: 14px 14px 20px;
+            gap: 12px;
+          }
+          .hs-drawer-modes {
+            gap: 8px;
+          }
+          .hs-drawer-mode-btn {
+            padding: 10px 8px;
+            font-size: 12.5px;
+            gap: 5px;
+          }
+          .hs-drawer-saved-card {
+            padding: 10px 12px;
+          }
+          .hs-d-nav-btn {
+            padding: 11px 12px;
+          }
+          .hs-d-nav-title {
+            font-size: 13.5px;
+          }
+          .hs-d-sublist {
+            padding: 5px 8px 10px;
+          }
+          .hs-d-sublink {
+            padding: 8px 8px;
+          }
+          .hs-drawer-post-btn {
+            padding: 11px 14px;
+            font-size: 13.5px;
+          }
+          .hs-d-fixed-footer {
+            padding: 10px 14px;
+          }
+        }
+
+        @media (max-width: 380px) {
+          .hs-header-container {
+            padding: 0 8px;
+            gap: 4px;
+          }
+          .hs-hdr-logo-title {
+            font-size: 14.5px;
+          }
+          .hs-hdr-logo-sub {
+            display: none;
+          }
+          .hs-btn-list-prop-text {
+            display: none;
+          }
+          .hs-btn-list-prop {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            justify-content: center;
           }
         }
       `}</style>
@@ -975,7 +1113,7 @@ export default function Header() {
       <header className={`hs-header-sticky ${scrolled ? "scrolled" : ""}`}>
         <div className="hs-header-container">
           {/* LEFT: Logo & Locality Picker */}
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <div className="hs-hdr-left">
             <Link href="/" className="hs-hdr-logo">
               <div className="hs-hdr-logo-icon">
                 <Building2 size={20} strokeWidth={2.2} />
@@ -1100,9 +1238,9 @@ export default function Header() {
               )}
             </Link>
 
-            <Link href="/list-property" className="hs-btn-list-prop">
+            <Link href="/list-property" className="hs-btn-list-prop" title="List Property" aria-label="List Property">
               <Plus size={16} strokeWidth={2.6} />
-              <span>List Property</span>
+              <span className="hs-btn-list-prop-text">List Property</span>
               {/* <span className="hs-btn-free-badge">Free</span> */}
             </Link>
 
@@ -1113,7 +1251,7 @@ export default function Header() {
               onClick={() => setMobileMenuOpen(true)}
               aria-label="Open Navigation Drawer"
             >
-              <Menu size={22} strokeWidth={2.2} />
+              <Menu size={20} strokeWidth={2.2} />
             </button>
           </div>
         </div>
