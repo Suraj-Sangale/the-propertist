@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import PropertyCarousel from "./PropertyCarousel";
 import type { Property } from "./PropertyCarousel";
 import StatsBanner from "./StatsBanner";
@@ -11,11 +13,27 @@ import { ALL_PROPERTIES } from "@/utilities/masterData";
 
 const SEARCH_TABS = ["Buy", "Rent", "New Projects"];
 
+const PROPERTY_TYPE_OPTIONS = [
+  { value: "", label: "Any Type" },
+  { value: "1_bhk", label: "1 BHK" },
+  { value: "2_bhk", label: "2 BHK" },
+  { value: "3_bhk", label: "3 BHK" },
+  { value: "4_bhk", label: "4+ BHK" },
+];
+
+const BUDGET_OPTIONS = [
+  { value: "", label: "Any Budget" },
+  { value: "0-1.5", label: "Under ₹1.5 Cr" },
+  { value: "1.5-3", label: "₹1.5 - 3 Cr" },
+  { value: "3-5", label: "₹3 - 5 Cr" },
+  { value: "5+", label: "₹5 Cr+" },
+];
+
 const POPULAR_SEARCHES = [
-  { label: "2 BHK in Mumbai", href: "#" },
-  { label: "3 BHK in Pune", href: "#" },
-  { label: "Villas in Bangalore", href: "#" },
-  { label: "Commercial in Delhi", href: "#" },
+  { label: "2 BHK in Mumbai", href: "/listings?q=2+BHK+Mumbai&config=2_bhk" },
+  { label: "3 BHK in Mumbai", href: "/listings?q=3+BHK+Mumbai&config=3_bhk" },
+  { label: "Luxury Residences", href: "/listings?q=Luxury" },
+  { label: "Ready to Move", href: "/listings?status=ready_to_move" },
 ];
 
 const CATEGORY_CARDS = [
@@ -138,7 +156,80 @@ const IconBath = () => (
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function HomeSpace() {
-  const [activeTab, setActiveTab] = useState(0);
+  const router = useRouter();
+  const [activeTab, setActiveTab] = useState(0); // 0: Buy, 1: Rent, 2: New Projects
+  const [query, setQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const [propertyType, setPropertyType] = useState("");
+  const [budget, setBudget] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchWrapRef = useRef<HTMLDivElement>(null);
+
+  // Debounce search query for suggestions dropdown
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(query.trim());
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [query]);
+
+  // Close suggestions dropdown on click outside
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (searchWrapRef.current && !searchWrapRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleSearch = (overrideQuery?: string) => {
+    setShowSuggestions(false);
+    const q = overrideQuery !== undefined ? overrideQuery : query;
+    const params = new URLSearchParams();
+
+    if (activeTab === 1) {
+      params.set("mode", "rent");
+    } else {
+      params.set("mode", "buy");
+      if (activeTab === 2) {
+        params.set("status", "new_launch");
+      }
+    }
+
+    if (q.trim()) {
+      params.set("q", q.trim());
+    }
+    if (propertyType) {
+      params.set("config", propertyType);
+    }
+    if (budget) {
+      params.set("budget", budget);
+    }
+
+    router.push(`/listings?${params.toString()}`);
+  };
+
+  const suggestions = debouncedQuery.length >= 2
+    ? ALL_PROPERTIES.filter((p) => {
+        const mode = activeTab === 1 ? "rent" : "buy";
+        if (p.mode && p.mode !== mode) return false;
+        const q = debouncedQuery.toLowerCase();
+        const corpus = [
+          p.name,
+          p.projectName,
+          p.developer,
+          p.locality,
+          p.locality_label,
+          p.address,
+          p.config,
+          p.config_label,
+          p.beds,
+        ].filter(Boolean).join(" ").toLowerCase();
+        return q.split(/\s+/).every((term) => corpus.includes(term));
+      }).slice(0, 5)
+    : [];
 
   return (
     <>
@@ -223,6 +314,7 @@ export default function HomeSpace() {
           background: #fff; border-radius: 0 26px 26px 26px;
           padding: 12px 14px; display: flex; gap: 10px; align-items: center;
           box-shadow: 0 20px 50px rgba(20,30,80,.12);
+          position: relative;
         }
         .hs-field {
           display: flex; align-items: center; gap: 10px;
@@ -230,18 +322,68 @@ export default function HomeSpace() {
           height: 48px; padding: 0 14px;
           font-size: 12px; color: #666;
           white-space: nowrap;
+          position: relative;
         }
-        .hs-field.grow { flex: 1; overflow: hidden; text-overflow: ellipsis; }
-        .hs-field.sel { width: 155px; justify-content: space-between; }
+        .hs-field.grow { flex: 1; min-width: 220px; }
+        .hs-field.sel { width: 175px; justify-content: space-between; cursor: pointer; }
         .hs-field small { display: block; font-size: 10px; color: #666; }
-        .hs-field b { display: block; font-size: 12px; color: #111; font-weight: 600; }
+        .hs-field b { display: block; font-size: 12px; color: #111; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px; }
+        .hs-search-input {
+          flex: 1; border: 0; outline: none; background: transparent;
+          font: 500 13px 'Inter', sans-serif; color: #111; width: 100%;
+        }
+        .hs-search-input::placeholder { color: #71717a; }
+        .hs-clear-btn {
+          border: 0; background: transparent; color: #94a3b8;
+          cursor: pointer; font-size: 13px; padding: 2px 6px; line-height: 1;
+          border-radius: 50%;
+        }
+        .hs-clear-btn:hover { color: #1e293b; }
+        .hs-sel-chevron { font-size: 11px; color: #8892a4; pointer-events: none; }
+        .hs-select-overlay {
+          position: absolute; inset: 0; width: 100%; height: 100%;
+          opacity: 0; cursor: pointer; appearance: none; -webkit-appearance: none;
+          z-index: 2;
+        }
         .hs-go {
           background: #2f3cf0; color: #fff; border: 0;
           border-radius: 12px; height: 48px; width: 110px;
-          font: 600 13.5px 'Inter'; cursor: pointer; transition: background .15s;
-          flex-shrink: 0;
+          font: 600 13.5px 'Inter'; cursor: pointer; transition: background .15s, transform .1s, box-shadow .15s;
+          flex-shrink: 0; box-shadow: 0 4px 14px rgba(47,60,240,.3);
         }
-        .hs-go:hover { background: #2531d6; }
+        .hs-go:hover { background: #2531d6; transform: translateY(-1px); box-shadow: 0 6px 18px rgba(47,60,240,.4); }
+        .hs-go:active { transform: translateY(0); }
+
+        /* LIVE SUGGESTIONS POPUP */
+        .hs-sugg-box {
+          position: absolute; top: calc(100% + 8px); left: 0; right: 0;
+          background: #ffffff; border-radius: 16px;
+          box-shadow: 0 18px 40px rgba(15, 23, 42, 0.16), 0 2px 8px rgba(15, 23, 42, 0.08);
+          border: 1px solid #e2e8f0; padding: 8px 0; z-index: 50; overflow: hidden;
+        }
+        .hs-sugg-item {
+          display: flex; align-items: center; justify-content: space-between;
+          padding: 10px 16px; cursor: pointer; transition: background 0.12s ease;
+          text-decoration: none; color: inherit;
+        }
+        .hs-sugg-item:hover { background: #f8fafc; }
+        .hs-sugg-title {
+          font-size: 13px; font-weight: 600; color: #0f172a;
+          white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .hs-sugg-sub { font-size: 11.5px; color: #64748b; margin-top: 2px; }
+        .hs-sugg-price {
+          font-size: 12px; font-weight: 700; color: #2563eb;
+          white-space: nowrap; margin-left: 12px;
+        }
+        .hs-sugg-footer {
+          display: block; padding: 10px 16px; text-align: center;
+          font-size: 12px; font-weight: 600; color: #2f3cf0;
+          border-top: 1px solid #f1f5f9; background: #fafbfd;
+          cursor: pointer; border: 0; width: 100%; transition: background .12s;
+        }
+        .hs-sugg-footer:hover { background: #f1f5f9; }
+
         .hs-popular { display: flex; align-items: center; gap: 10px; margin-top: 16px; color: #fff; font-size: 12.5px; font-weight: 500; flex-wrap: wrap; }
         .hs-popular a {
           border: 1px solid rgba(255,255,255,.55);
@@ -455,11 +597,12 @@ export default function HomeSpace() {
             </div>
 
             {/* SEARCH */}
-            <div className="hs-search-area">
+            <div className="hs-search-area" ref={searchWrapRef}>
               <div className="hs-tabs">
                 {SEARCH_TABS.map((tab, i) => (
                   <button
                     key={tab}
+                    type="button"
                     className={activeTab === i ? "on" : ""}
                     onClick={() => setActiveTab(i)}
                   >
@@ -471,38 +614,110 @@ export default function HomeSpace() {
               <div className="hs-bar">
                 <div className="hs-field grow">
                   <IconSearch />
-                  Search by city, locality, project or builder...
+                  <input
+                    type="text"
+                    className="hs-search-input"
+                    placeholder="Search by city, locality, project or builder..."
+                    value={query}
+                    onChange={(e) => {
+                      setQuery(e.target.value);
+                      setShowSuggestions(true);
+                    }}
+                    onFocus={() => setShowSuggestions(true)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        handleSearch();
+                      }
+                    }}
+                  />
+                  {query && (
+                    <button
+                      type="button"
+                      className="hs-clear-btn"
+                      onClick={() => setQuery("")}
+                      aria-label="Clear search"
+                    >
+                      ✕
+                    </button>
+                  )}
                 </div>
 
                 <div className="hs-field sel">
-                  <span style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                  <span style={{ display: "flex", gap: 10, alignItems: "center" }}>
                     <IconHome />
                     <span>
                       <small>Property Type</small>
-                      <b>Any</b>
+                      <b>{PROPERTY_TYPE_OPTIONS.find((o) => o.value === propertyType)?.label || "Any"}</b>
                     </span>
                   </span>
-                  <span>⌄</span>
+                  <span className="hs-sel-chevron">⌄</span>
+                  <select
+                    className="hs-select-overlay"
+                    value={propertyType}
+                    onChange={(e) => setPropertyType(e.target.value)}
+                    aria-label="Select Property Type"
+                  >
+                    {PROPERTY_TYPE_OPTIONS.map((o) => (
+                      <option key={o.value} value={o.value}>{o.label}</option>
+                    ))}
+                  </select>
                 </div>
 
                 <div className="hs-field sel">
-                  <span style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                  <span style={{ display: "flex", gap: 10, alignItems: "center" }}>
                     <IconBudget />
                     <span>
                       <small>Budget</small>
-                      <b>Any</b>
+                      <b>{BUDGET_OPTIONS.find((o) => o.value === budget)?.label || "Any"}</b>
                     </span>
                   </span>
-                  <span>⌄</span>
+                  <span className="hs-sel-chevron">⌄</span>
+                  <select
+                    className="hs-select-overlay"
+                    value={budget}
+                    onChange={(e) => setBudget(e.target.value)}
+                    aria-label="Select Budget"
+                  >
+                    {BUDGET_OPTIONS.map((o) => (
+                      <option key={o.value} value={o.value}>{o.label}</option>
+                    ))}
+                  </select>
                 </div>
 
-                <button className="hs-go">Search</button>
+                <button type="button" className="hs-go" onClick={() => handleSearch()}>Search</button>
+
+                {/* Live debounced suggestions popup */}
+                {showSuggestions && suggestions.length > 0 && (
+                  <div className="hs-sugg-box">
+                    {suggestions.map((p) => (
+                      <Link
+                        key={p.id}
+                        href={`/property/${p.slug}`}
+                        className="hs-sugg-item"
+                        onClick={() => setShowSuggestions(false)}
+                      >
+                        <div>
+                          <div className="hs-sugg-title">{p.projectName || p.name}</div>
+                          <div className="hs-sugg-sub">{p.config} • {p.locality}</div>
+                        </div>
+                        <div className="hs-sugg-price">{p.priceFrom || p.priceLabel}</div>
+                      </Link>
+                    ))}
+                    <button
+                      type="button"
+                      className="hs-sugg-footer"
+                      onClick={() => handleSearch()}
+                    >
+                      View all results for &ldquo;{query}&rdquo; in Listings →
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div className="hs-popular">
                 Popular Searches:
                 {POPULAR_SEARCHES.map((s,i) => (
-                  <a key={s.label+i} href={s.href}>{s.label}</a>
+                  <Link key={s.label+i} href={s.href}>{s.label}</Link>
                 ))}
               </div>
             </div>

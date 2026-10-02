@@ -443,11 +443,12 @@ export default function PropertyCarousel({
 
       {/* Section header */}
       <div className="pc-header">
-        <div>
-          {pill && <div className="pc-pill">{pill}</div>}
+        <div className="pc-header-left">
+          {/* {pill && <div className="pc-pill">{pill}</div>} */}
           <h2>{heading}</h2>
           {subheading && <p>{subheading}</p>}
         </div>
+          <Link href="/listings" className="pc-view-btn">View All<span>→</span></Link>
       </div>
 
       {/* Carousel */}

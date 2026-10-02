@@ -1,9 +1,9 @@
 "use client";
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { Fragment, useCallback, useState, useTransition } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
-import {ALL_PROPERTIES} from "@/utilities/masterData"
+import { ALL_PROPERTIES } from "@/utilities/masterData";
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
@@ -52,6 +52,14 @@ const DEVELOPERS: FilterOption[] = [
   { key: "rustomjee", label: "Rustomjee" },
 ];
 
+const BUDGET_OPTIONS: FilterOption[] = [
+  { key: "",      label: "All Budgets" },
+  { key: "0-1.5", label: "Under ₹1.5 Cr" },
+  { key: "1.5-3", label: "₹1.5 - 3 Cr" },
+  { key: "3-5",   label: "₹3 - 5 Cr" },
+  { key: "5+",    label: "₹5 Cr+" },
+];
+
 
 const OFFERS = [
   {
@@ -81,10 +89,48 @@ const OFFERS = [
 ];
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
+// Parse comma-separated URL param into array of keys
+function parseMultiKeys(paramValue: string | null): string[] {
+  if (!paramValue) return [];
+  return paramValue
+    .split(",")
+    .map((k) => k.trim())
+    .filter(Boolean);
+}
+
+// Convert array of keys back to comma-separated string (or "" if empty)
+function serializeMultiKeys(keys: string[]): string {
+  return Array.from(new Set(keys.filter(Boolean))).join(",");
+}
+
+// Toggle a key in a multi-key list
+function toggleMultiKey(currentKeys: string[], targetKey: string): string {
+  if (!targetKey) return "";
+  const exists = currentKeys.includes(targetKey);
+  const next = exists
+    ? currentKeys.filter((k) => k !== targetKey)
+    : [...currentKeys, targetKey];
+  return serializeMultiKeys(next);
+}
+
 // Match a property against the active config key (key="" means no filter)
 function matchConfig(propConfigKeys: string[], filterKey: string): boolean {
   if (!filterKey) return true;
   return propConfigKeys.includes(filterKey);
+}
+
+// Match a property against multiple config keys (empty array means no filter)
+function matchMultiConfig(propConfigKeys: string[], filterKeys: string[]): boolean {
+  if (!filterKeys || filterKeys.length === 0) return true;
+  if (!propConfigKeys || !Array.isArray(propConfigKeys)) return false;
+  return filterKeys.some((fk) => propConfigKeys.includes(fk));
+}
+
+// Match property against multiple budget range keys (empty array means no filter)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function matchMultiBudget(property: any, budgetKeys: string[]): boolean {
+  if (!budgetKeys || budgetKeys.length === 0) return true;
+  return budgetKeys.some((bk) => matchBudget(property, bk));
 }
 
 // Get display label for an active filter key
@@ -92,11 +138,91 @@ function getLabel(options: FilterOption[], key: string): string {
   return options.find((o) => o.key === key)?.label ?? key;
 }
 
+// Parse property price string (e.g. '₹ 4.95 Cr.+++', '₹ 85 Lakh') to numeric value for accurate sorting
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function parsePropertyPrice(property: any): number {
+  const str = (property?.priceFrom || property?.priceLabel || property?.price || "").toString();
+  const numMatch = str.match(/[\d,.]+/);
+  if (!numMatch) return 0;
+  const num = parseFloat(numMatch[0].replace(/,/g, ""));
+  if (isNaN(num)) return 0;
+
+  const lower = str.toLowerCase();
+  if (lower.includes("cr") || lower.includes("crore")) {
+    return num * 10000000;
+  }
+  if (lower.includes("lakh") || lower.includes("lac") || lower.includes("l")) {
+    return num * 100000;
+  }
+  if (lower.includes("k") || lower.includes("thousand")) {
+    return num * 1000;
+  }
+  return num;
+}
+
+// Match property against multi-term search query across all records and fields
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function matchesSearch(property: any, query: string): boolean {
+  if (!query || !query.trim()) return true;
+
+  const terms = query
+    .toLowerCase()
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+
+  if (terms.length === 0) return true;
+
+  const corpus = [
+    property.name,
+    property.projectName,
+    property.developer,
+    property.developer_key,
+    property.locality,
+    property.locality_key,
+    property.locality_label,
+    property.address,
+    property.config,
+    property.config_label,
+    property.beds,
+    property.status,
+    property.status_key,
+    property.badge,
+    property.mode,
+    property.description,
+    Array.isArray(property.features) ? property.features.join(" ") : "",
+    Array.isArray(property.amenities) ? property.amenities.join(" ") : "",
+    Array.isArray(property.config_keys) ? property.config_keys.join(" ") : "",
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  const corpusNoSpaces = corpus.replace(/\s+/g, "");
+
+  return terms.every((term) => {
+    const cleanTerm = term.replace(/\s+/g, "");
+    return corpus.includes(term) || corpusNoSpaces.includes(cleanTerm);
+  });
+}
+
+// Match property against budget range key
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function matchBudget(property: any, budgetKey: string): boolean {
+  if (!budgetKey) return true;
+  const price = parsePropertyPrice(property);
+  if (budgetKey === "0-1.5") return price > 0 && price <= 15000000;
+  if (budgetKey === "1.5-3") return price >= 15000000 && price <= 30000000;
+  if (budgetKey === "3-5") return price >= 30000000 && price <= 50000000;
+  if (budgetKey === "5+") return price >= 50000000;
+  return true;
+}
+
 // ─── Icons ───────────────────────────────────────────────────────────────────
 
 function ChevronIcon() {
   return (
-    <svg className="lp-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2}>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} style={{ width: "100%", height: "100%", display: "block" }}>
       <path d="m6 9 6 6 6-6" />
     </svg>
   );
@@ -173,30 +299,156 @@ function ListIcon({ active }: { active: boolean }) {
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
-// Desktop dropdown — emits the selected option's key
-function SelectFilter({ id, label, options, value, onChange }: {
+function CheckmarkIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" style={{ width: 11, height: 11 }}>
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  );
+}
+
+// Custom multi-select dropdown with luxury design
+function MultiSelectFilter({
+  id,
+  label,
+  options,
+  selectedKeys,
+  isOpen,
+  onToggleOpen,
+  onToggleKey,
+  onClear,
+}: {
   id: string;
   label: string;
   options: FilterOption[];
-  value: string;           // current active key from URL
-  onChange: (key: string) => void;
+  selectedKeys: string[];
+  isOpen: boolean;
+  onToggleOpen: () => void;
+  onToggleKey: (key: string) => void;
+  onClear: () => void;
 }) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  // Close when clicking outside or pressing Escape
+  useEffect(() => {
+    if (!isOpen) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        onToggleOpen();
+      }
+    }
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        onToggleOpen();
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, onToggleOpen]);
+
+  // Meaningful non-empty options
+  const filterOptions = options.filter((o) => o.key !== "");
+  const hasSelection = selectedKeys.length > 0;
+
+  // Compute trigger label
+  let triggerText = `All ${label}s`;
+  if (label.toLowerCase() === "status") triggerText = "All Statuses";
+  if (label.toLowerCase() === "locality") triggerText = "All Localities";
+  if (label.toLowerCase() === "configuration") triggerText = "All BHK";
+  if (label.toLowerCase() === "developer") triggerText = "All Developers";
+  if (label.toLowerCase() === "budget") triggerText = "All Budgets";
+
+  if (selectedKeys.length === 1) {
+    const match = filterOptions.find((o) => o.key === selectedKeys[0]);
+    if (match) triggerText = match.label;
+  } else if (selectedKeys.length === 2) {
+    const l1 = filterOptions.find((o) => o.key === selectedKeys[0])?.label ?? "";
+    const l2 = filterOptions.find((o) => o.key === selectedKeys[1])?.label ?? "";
+    const short1 = l1.replace(" Group", "").replace(" Realty", "");
+    const short2 = l2.replace(" Group", "").replace(" Realty", "");
+    const combined = `${short1}, ${short2}`;
+    triggerText = combined.length <= 18 ? combined : "2 selected";
+  } else if (selectedKeys.length > 2) {
+    triggerText = `${selectedKeys.length} selected`;
+  }
+
   return (
-    <div className="lp-filter-group">
-      <label htmlFor={id} className="lp-filter-label">{label}</label>
-      <div className="lp-select-wrap">
-        <select
-          id={id}
-          className="lp-select"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-        >
-          {options.map((o) => (
-            <option key={o.key} value={o.key}>{o.label}</option>
-          ))}
-        </select>
-        <ChevronIcon />
-      </div>
+    <div className="lp-custom-dropdown" ref={ref} id={`wrap-${id}`}>
+      <span className="lp-filter-label">{label}</span>
+      <button
+        id={id}
+        type="button"
+        className={`lp-dropdown-btn${isOpen ? " open" : ""}${hasSelection ? " has-value" : ""}`}
+        onClick={onToggleOpen}
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+      >
+        <span className="lp-dropdown-text" title={hasSelection ? selectedKeys.map((k) => getLabel(options, k)).join(", ") : triggerText}>
+          {triggerText}
+        </span>
+        <div className="lp-dropdown-right">
+          {selectedKeys.length > 1 && (
+            <span className="lp-dropdown-badge">{selectedKeys.length}</span>
+          )}
+          <span className="lp-dropdown-chevron">
+            <ChevronIcon />
+          </span>
+        </div>
+      </button>
+
+      {isOpen && (
+        <div className="lp-dropdown-menu" role="listbox" aria-multiselectable="true">
+          <div className="lp-dropdown-header">
+            <span>{hasSelection ? `${selectedKeys.length} selected` : "Select options"}</span>
+            {hasSelection && (
+              <button
+                type="button"
+                className="lp-dropdown-clear-link"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onClear();
+                }}
+              >
+                Clear
+              </button>
+            )}
+          </div>
+          <div className="lp-dropdown-list">
+            <button
+              type="button"
+              className={`lp-dropdown-item${!hasSelection ? " selected" : ""}`}
+              onClick={() => onClear()}
+            >
+              <span className="lp-dropdown-check">
+                {!hasSelection && <CheckmarkIcon />}
+              </span>
+              <span>All {label === "Configuration" ? "BHK" : label + "s"}</span>
+            </button>
+            {filterOptions.map((opt) => {
+              const isSelected = selectedKeys.includes(opt.key);
+              return (
+                <button
+                  key={opt.key}
+                  type="button"
+                  className={`lp-dropdown-item${isSelected ? " selected" : ""}`}
+                  onClick={() => onToggleKey(opt.key)}
+                  role="option"
+                  aria-selected={isSelected}
+                >
+                  <span className="lp-dropdown-check">
+                    {isSelected && <CheckmarkIcon />}
+                  </span>
+                  <span>{opt.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -222,7 +474,7 @@ function PropertyCard({ property, view }: { property: Property; view: "grid" | "
           {property.verified && <span className="lp-badge lp-badge--green"><VerifiedIcon /> Verified Project</span>}
           {property.rera && <span className="lp-badge lp-badge--outline"><RERAIcon /> RERA Approved</span>}
         </div>
-        <div className="lp-view-btn">View Details <span>→</span></div>
+        {/* <div className="lp-view-btn">View Details <span>→</span></div> */}
       </div>
     </div>
   );
@@ -276,10 +528,20 @@ export default function ListingsPage() {
   const config    = searchParams.get("config")   ?? "";
   const status    = searchParams.get("status")   ?? "";
   const developer = searchParams.get("developer")  ?? "";
+  const budget    = searchParams.get("budget")   ?? "";
   const sort      = searchParams.get("sort")     ?? "Relevance";
   const view      = (searchParams.get("view")    ?? "grid") as "grid" | "list";
 
+  const selectedLocalities = parseMultiKeys(locality);
+  const selectedConfigs    = parseMultiKeys(config);
+  const selectedDevelopers = parseMultiKeys(developer);
+  const selectedBudgets    = parseMultiKeys(budget);
+  const selectedStatuses   = parseMultiKeys(status);
+
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [search, setSearch] = useState(searchParams.get("q") ?? "");
+  const [debouncedSearch, setDebouncedSearch] = useState(searchParams.get("q") ?? "");
+  const [isSearchingDebounce, setIsSearchingDebounce] = useState(false);
   const [drawer, setDrawer] = useState<DrawerPanel>(null);
   const [isClosing, setIsClosing] = useState(false);
 
@@ -292,6 +554,127 @@ export default function ListingsPage() {
     },
     [searchParams, pathname, router]
   );
+
+  // Debounced search: update debouncedSearch state and URL search param `q` 300ms after user pauses typing
+  useEffect(() => {
+    if (search === debouncedSearch) {
+      setIsSearchingDebounce(false);
+      return;
+    }
+
+    setIsSearchingDebounce(true);
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setIsSearchingDebounce(false);
+      const currentQ = searchParams.get("q") ?? "";
+      if (search.trim() !== currentQ) {
+        updateParams({ q: search.trim() });
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [search, debouncedSearch, searchParams, updateParams]);
+
+  // Keep search state in sync when URL changes (e.g. navigation from HomeSpace, back/forward)
+  useEffect(() => {
+    const currentQ = searchParams.get("q") ?? "";
+    if (currentQ !== search) {
+      setSearch(currentQ);
+      setDebouncedSearch(currentQ);
+      setIsSearchingDebounce(false);
+    }
+  }, [searchParams, search]);
+
+  const handleSearchSubmit = () => {
+    setDebouncedSearch(search);
+    setIsSearchingDebounce(false);
+    updateParams({ q: search.trim() });
+  };
+
+  const handleClearSearch = () => {
+    setSearch("");
+    setDebouncedSearch("");
+    setIsSearchingDebounce(false);
+    updateParams({ q: "" });
+  };
+
+  const handleClearAllFilters = () => {
+    setSearch("");
+    setDebouncedSearch("");
+    setIsSearchingDebounce(false);
+    updateParams({
+      locality: "",
+      config: "",
+      developer: "",
+      budget: "",
+      status: "",
+      q: "",
+      mode: "buy",
+    });
+  };
+
+  const appliedFilters: { key: string; category: string; label: string; onRemove: () => void }[] = [];
+  if (debouncedSearch.trim()) {
+    appliedFilters.push({
+      key: "search",
+      category: "Search",
+      label: `"${debouncedSearch.trim()}"`,
+      onRemove: handleClearSearch,
+    });
+  }
+  if (mode === "rent") {
+    appliedFilters.push({
+      key: "mode",
+      category: "Mode",
+      label: "Rent",
+      onRemove: () => updateParams({ mode: "buy" }),
+    });
+  }
+
+  selectedLocalities.forEach((locKey) => {
+    appliedFilters.push({
+      key: `loc-${locKey}`,
+      category: "Locality",
+      label: getLabel(LOCALITIES, locKey),
+      onRemove: () => updateParams({ locality: toggleMultiKey(selectedLocalities, locKey) }),
+    });
+  });
+
+  selectedConfigs.forEach((cfgKey) => {
+    appliedFilters.push({
+      key: `cfg-${cfgKey}`,
+      category: "Config",
+      label: getLabel(CONFIGURATIONS, cfgKey),
+      onRemove: () => updateParams({ config: toggleMultiKey(selectedConfigs, cfgKey) }),
+    });
+  });
+
+  selectedDevelopers.forEach((devKey) => {
+    appliedFilters.push({
+      key: `dev-${devKey}`,
+      category: "Developer",
+      label: getLabel(DEVELOPERS, devKey),
+      onRemove: () => updateParams({ developer: toggleMultiKey(selectedDevelopers, devKey) }),
+    });
+  });
+
+  selectedBudgets.forEach((bKey) => {
+    appliedFilters.push({
+      key: `bud-${bKey}`,
+      category: "Budget",
+      label: getLabel(BUDGET_OPTIONS, bKey),
+      onRemove: () => updateParams({ budget: toggleMultiKey(selectedBudgets, bKey) }),
+    });
+  });
+
+  selectedStatuses.forEach((stKey) => {
+    appliedFilters.push({
+      key: `st-${stKey}`,
+      category: "Status",
+      label: getLabel(STATUS_OPTIONS, stKey),
+      onRemove: () => updateParams({ status: toggleMultiKey(selectedStatuses, stKey) }),
+    });
+  });
 
   // Trigger close animation then unmount
   const closeDrawer = useCallback(() => {
@@ -308,18 +691,46 @@ export default function ListingsPage() {
   const applyFilters = () => { closeDrawer(); };
 
   // Count active (non-empty) filter params for the badge
-  const activeFilterCount = [locality, config, developer, status].filter(Boolean).length;
+  const activeFilterCount =
+    selectedLocalities.length +
+    selectedConfigs.length +
+    selectedDevelopers.length +
+    selectedBudgets.length +
+    selectedStatuses.length;
 
+  const hasSearch = Boolean(debouncedSearch.trim());
+
+  // Search from ALL records across the entire database when searching, not just existing filtered results
   const filtered = ALL_PROPERTIES.filter((p) => {
+    if (hasSearch) {
+      return matchesSearch(p, debouncedSearch);
+    }
+
     if (p.mode !== mode) return false;
-    if (locality  && p.locality_key  !== locality)             return false;
-    if (config    && !matchConfig(p.config_keys, config))      return false;
-    if (status    && p.status_key    !== status)               return false;
-    if (developer && p.developer_key !== developer)            return false;
-    if (search && !p.name.toLowerCase().includes(search.toLowerCase())
-               && !p.locality.toLowerCase().includes(search.toLowerCase())
-               && !p.developer.toLowerCase().includes(search.toLowerCase())) return false;
+    if (selectedLocalities.length > 0 && !selectedLocalities.includes(p.locality_key)) return false;
+    if (selectedConfigs.length > 0 && !matchMultiConfig(p.config_keys, selectedConfigs)) return false;
+    if (selectedStatuses.length > 0 && !selectedStatuses.includes(p.status_key)) return false;
+    if (selectedDevelopers.length > 0 && !selectedDevelopers.includes(p.developer_key)) return false;
+    if (selectedBudgets.length > 0 && !matchMultiBudget(p, selectedBudgets)) return false;
     return true;
+  }).sort((a, b) => {
+    if (sort === "Price: Low to High") {
+      return parsePropertyPrice(a) - parsePropertyPrice(b);
+    }
+    if (sort === "Price: High to Low") {
+      return parsePropertyPrice(b) - parsePropertyPrice(a);
+    }
+    if (sort === "Newest First") {
+      return (Number(b.id) || 0) - (Number(a.id) || 0);
+    }
+    if (debouncedSearch) {
+      const q = debouncedSearch.toLowerCase();
+      const aStarts = (a.name || "").toLowerCase().startsWith(q) || (a.projectName || "").toLowerCase().startsWith(q);
+      const bStarts = (b.name || "").toLowerCase().startsWith(q) || (b.projectName || "").toLowerCase().startsWith(q);
+      if (aStarts && !bStarts) return -1;
+      if (!aStarts && bStarts) return 1;
+    }
+    return 0;
   });
 
   return (
@@ -357,12 +768,217 @@ export default function ListingsPage() {
         .lp-search-field:focus-within { border-color: #c8a84b; }
         .lp-search-field input { flex: 1; border: 0; background: transparent; outline: none; font: inherit; color: #222; }
         .lp-search-field svg { width: 16px; height: 16px; color: #aaa; flex-shrink: 0; }
+        @keyframes lp-spin {
+          to { transform: rotate(360deg); }
+        }
+        .lp-search-spinner {
+          display: inline-block;
+          width: 14px;
+          height: 14px;
+          border: 2px solid #eaecf0;
+          border-top-color: #c8a84b;
+          border-radius: 50%;
+          animation: lp-spin 0.6s linear infinite;
+          flex-shrink: 0;
+        }
+        .lp-search-clear {
+          border: none;
+          background: transparent;
+          color: #999;
+          cursor: pointer;
+          font-size: 14px;
+          padding: 4px 6px;
+          line-height: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: color .15s;
+        }
+        .lp-search-clear:hover {
+          color: #1a1a2e;
+        }
         .lp-filter-group { display: flex; flex-direction: column; gap: 4px; }
         .lp-filter-label { font-size: 9.5px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: #aaa; padding-left: 2px; }
         .lp-select-wrap { position: relative; }
         .lp-select { appearance: none; -webkit-appearance: none; background: #f8f9fb; border: 1.5px solid #eaecf0; border-radius: 10px; height: 48px; padding: 0 36px 0 14px; font: 500 13px 'Inter'; color: #222; cursor: pointer; width: 100%; outline: none; transition: border-color .15s; }
-        .lp-select:focus { border-color: #c8a84b; }
-        .lp-chevron { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #aaa; pointer-events: none; }
+        .lp-select-wrap .lp-chevron { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #aaa; pointer-events: none; }
+
+        /* CUSTOM LUXURY MULTI-SELECT DROPDOWN */
+        .lp-custom-dropdown {
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          min-width: 140px;
+        }
+        .lp-dropdown-btn {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 8px;
+          background: #f8f9fb;
+          border: 1.5px solid #eaecf0;
+          border-radius: 10px;
+          height: 48px;
+          padding: 0 12px;
+          font: 500 13px 'Inter', sans-serif;
+          color: #222;
+          cursor: pointer;
+          width: 100%;
+          outline: none;
+          transition: border-color .15s, background .15s, box-shadow .15s;
+          user-select: none;
+        }
+        .lp-dropdown-btn:hover {
+          border-color: #cbd5e1;
+          background: #f1f5f9;
+        }
+        .lp-dropdown-btn.open,
+        .lp-dropdown-btn.has-value {
+          border-color: #c8a84b;
+          background: #fdfbf7;
+        }
+        .lp-dropdown-btn.open {
+          box-shadow: 0 0 0 3px rgba(200, 168, 75, 0.15);
+        }
+        .lp-dropdown-text {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-width: 110px;
+          text-align: left;
+        }
+        .lp-dropdown-right {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          flex-shrink: 0;
+          margin-left: auto;
+        }
+        .lp-dropdown-badge {
+          background: #c8a84b;
+          color: #fff;
+          font-size: 10px;
+          font-weight: 700;
+          border-radius: 999px;
+          padding: 1px 6px;
+          line-height: 1.3;
+        }
+        .lp-dropdown-chevron {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 14px;
+          height: 14px;
+          color: #94a3b8;
+          transform-origin: center center;
+          transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s ease;
+          flex-shrink: 0;
+        }
+        .lp-dropdown-chevron svg {
+          width: 12px;
+          height: 12px;
+          display: block;
+        }
+        .lp-dropdown-btn.open .lp-dropdown-chevron {
+          transform: rotate(180deg);
+          color: #c8a84b;
+        }
+
+        /* Dropdown Popup Menu */
+        .lp-dropdown-menu {
+          position: absolute;
+          top: calc(100% + 6px);
+          left: 0;
+          min-width: 220px;
+          background: #ffffff;
+          border: 1.5px solid #e2e8f0;
+          border-radius: 14px;
+          box-shadow: 0 16px 40px rgba(15, 23, 42, 0.14), 0 2px 8px rgba(15, 23, 42, 0.05);
+          z-index: 150;
+          overflow: hidden;
+          animation: lpMenuIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        @keyframes lpMenuIn {
+          from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+          to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .lp-dropdown-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 9px 14px;
+          background: #f8fafc;
+          border-bottom: 1px solid #f1f5f9;
+          font-size: 11px;
+          font-weight: 600;
+          color: #64748b;
+        }
+        .lp-dropdown-clear-link {
+          background: none;
+          border: none;
+          color: #b8963c;
+          font-size: 11px;
+          font-weight: 700;
+          cursor: pointer;
+          padding: 0;
+        }
+        .lp-dropdown-clear-link:hover {
+          text-decoration: underline;
+        }
+        .lp-dropdown-list {
+          max-height: 250px;
+          overflow-y: auto;
+          padding: 6px;
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+        .lp-dropdown-item {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 9px 10px;
+          border-radius: 8px;
+          border: 0;
+          background: transparent;
+          width: 100%;
+          font: 500 13px 'Inter', sans-serif;
+          color: #334155;
+          cursor: pointer;
+          text-align: left;
+          transition: background .12s, color .12s;
+          user-select: none;
+        }
+        .lp-dropdown-item:hover {
+          background: #f1f5f9;
+          color: #0f172a;
+        }
+        .lp-dropdown-item.selected {
+          background: #fdf8ec;
+          color: #1e293b;
+          font-weight: 600;
+        }
+        .lp-dropdown-check {
+          width: 18px;
+          height: 18px;
+          border-radius: 5px;
+          border: 1.5px solid #cbd5e1;
+          display: grid;
+          place-items: center;
+          flex-shrink: 0;
+          background: #fff;
+          transition: all .15s;
+        }
+        .lp-dropdown-item.selected .lp-dropdown-check {
+          background: #c8a84b;
+          border-color: #c8a84b;
+        }
+        .lp-dropdown-check svg {
+          width: 11px;
+          height: 11px;
+          color: #fff;
+        }
         .lp-apply-btn { height: 48px; padding: 0 28px; background: #c8a84b; color: #fff; border: 0; border-radius: 10px; font: 700 13.5px 'Inter'; cursor: pointer; display: flex; align-items: center; gap: 8px; white-space: nowrap; transition: background .15s, transform .1s, box-shadow .15s; flex-shrink: 0; box-shadow: 0 4px 14px rgba(200,168,75,0.35); }
         .lp-apply-btn:hover { background: #b8963c; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(200,168,75,0.45); }
         .lp-apply-btn:active { transform: translateY(0); }
@@ -371,6 +987,105 @@ export default function ListingsPage() {
         .lp-mode-toggle { display: inline-flex; border: 1.5px solid #eaecf0; border-radius: 10px; overflow: hidden; background: #f8f9fb; height: 48px; align-self: flex-end; }
         .lp-mode-btn { padding: 0 24px; font: 600 13px 'Inter'; border: 0; background: transparent; cursor: pointer; color: #888; transition: background .15s, color .15s; }
         .lp-mode-btn.active { background: #0d1b2a; color: #fff; }
+
+        /* APPLIED FILTER CHIPS */
+        .lp-applied-bar {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          flex-wrap: wrap;
+          padding-top: 14px;
+          margin-top: 6px;
+          border-top: 1px solid #f0f2f5;
+        }
+        .lp-applied-title {
+          font-size: 11px;
+          font-weight: 700;
+          letter-spacing: 0.8px;
+          text-transform: uppercase;
+          color: #94a3b8;
+          white-space: nowrap;
+        }
+        .lp-applied-chips {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+        .lp-applied-chip {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 4px 6px 4px 12px;
+          border-radius: 999px;
+          background: #fdf8ec;
+          border: 1px solid #ebd9a2;
+          color: #927228;
+          font: 600 12.5px 'Inter', sans-serif;
+          transition: background .15s, border-color .15s;
+        }
+        .lp-applied-chip:hover {
+          background: #faf0d7;
+          border-color: #c8a84b;
+        }
+        .lp-applied-chip-cat {
+          font-weight: 500;
+          color: #a88a45;
+          font-size: 11.5px;
+        }
+        .lp-applied-chip-text {
+          line-height: 1;
+        }
+        .lp-applied-chip-x {
+          width: 18px;
+          height: 18px;
+          border-radius: 50%;
+          background: rgba(200, 168, 75, 0.2);
+          border: 0;
+          color: #927228;
+          font-size: 11px;
+          font-weight: 700;
+          cursor: pointer;
+          display: grid;
+          place-items: center;
+          line-height: 1;
+          padding: 0;
+          transition: background .15s, color .15s;
+        }
+        .lp-applied-chip-x:hover {
+          background: #c8a84b;
+          color: #fff;
+        }
+        .lp-applied-clear-all {
+          border: 0;
+          background: transparent;
+          color: #ef4444;
+          font: 600 12px 'Inter', sans-serif;
+          cursor: pointer;
+          padding: 4px 6px;
+          text-decoration: underline;
+          text-underline-offset: 2px;
+          transition: color .15s;
+        }
+        .lp-applied-clear-all:hover {
+          color: #dc2626;
+        }
+        .lp-mob-applied-row {
+          display: none;
+          width: 100%;
+          align-items: center;
+          gap: 8px;
+          flex-wrap: wrap;
+          margin-top: 10px;
+          padding-top: 10px;
+          border-top: 1px solid #e2e8f0;
+        }
+        @media (max-width: 720px) {
+          .lp-mob-applied-row {
+            display: flex;
+          }
+        }
 
         /* RESULTS HEADER */
         .lp-results-header { max-width: 1280px; margin: 30px auto 16px; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
@@ -793,41 +1508,146 @@ export default function ListingsPage() {
               <input
                 id="lp-search"
                 type="text"
-                placeholder="Search by project, locality or developer..."
+                placeholder="Search all properties..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && applyFilters()}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSearchSubmit();
+                  }
+                }}
               />
+              {isSearchingDebounce && (
+                <span
+                  className="lp-search-spinner"
+                  title="Searching all records..."
+                />
+              )}
+              {search && (
+                <button
+                  type="button"
+                  onClick={handleClearSearch}
+                  aria-label="Clear search"
+                  className="lp-search-clear"
+                >
+                  ✕
+                </button>
+              )}
             </div>
 
-            {/* Desktop dropdowns: each change updates ONLY that one URL param */}
-            <SelectFilter
-              id="lp-locality" label="Locality"
-              options={LOCALITIES} value={locality}
-              onChange={(key) => updateParams({ locality: key })}
+            {/* Desktop custom luxury multi-select dropdowns */}
+            <MultiSelectFilter
+              id="lp-locality"
+              label="Locality"
+              options={LOCALITIES}
+              selectedKeys={selectedLocalities}
+              isOpen={openDropdown === "locality"}
+              onToggleOpen={() => setOpenDropdown((prev) => (prev === "locality" ? null : "locality"))}
+              onToggleKey={(key) => updateParams({ locality: toggleMultiKey(selectedLocalities, key) })}
+              onClear={() => updateParams({ locality: "" })}
             />
-            <SelectFilter
-              id="lp-config" label="Configuration"
-              options={CONFIGURATIONS} value={config}
-              onChange={(key) => updateParams({ config: key })}
+            <MultiSelectFilter
+              id="lp-config"
+              label="Configuration"
+              options={CONFIGURATIONS}
+              selectedKeys={selectedConfigs}
+              isOpen={openDropdown === "config"}
+              onToggleOpen={() => setOpenDropdown((prev) => (prev === "config" ? null : "config"))}
+              onToggleKey={(key) => updateParams({ config: toggleMultiKey(selectedConfigs, key) })}
+              onClear={() => updateParams({ config: "" })}
             />
-            <SelectFilter
-              id="lp-developer" label="Developer"
-              options={DEVELOPERS} value={developer}
-              onChange={(key) => updateParams({ developer: key })}
+            <MultiSelectFilter
+              id="lp-developer"
+              label="Developer"
+              options={DEVELOPERS}
+              selectedKeys={selectedDevelopers}
+              isOpen={openDropdown === "developer"}
+              onToggleOpen={() => setOpenDropdown((prev) => (prev === "developer" ? null : "developer"))}
+              onToggleKey={(key) => updateParams({ developer: toggleMultiKey(selectedDevelopers, key) })}
+              onClear={() => updateParams({ developer: "" })}
             />
-            <SelectFilter
-              id="lp-status" label="Status"
-              options={STATUS_OPTIONS} value={status}
-              onChange={(key) => updateParams({ status: key })}
+            <MultiSelectFilter
+              id="lp-budget"
+              label="Budget"
+              options={BUDGET_OPTIONS}
+              selectedKeys={selectedBudgets}
+              isOpen={openDropdown === "budget"}
+              onToggleOpen={() => setOpenDropdown((prev) => (prev === "budget" ? null : "budget"))}
+              onToggleKey={(key) => updateParams({ budget: toggleMultiKey(selectedBudgets, key) })}
+              onClear={() => updateParams({ budget: "" })}
             />
+            <MultiSelectFilter
+              id="lp-status"
+              label="Status"
+              options={STATUS_OPTIONS}
+              selectedKeys={selectedStatuses}
+              isOpen={openDropdown === "status"}
+              onToggleOpen={() => setOpenDropdown((prev) => (prev === "status" ? null : "status"))}
+              onToggleKey={(key) => updateParams({ status: toggleMultiKey(selectedStatuses, key) })}
+              onClear={() => updateParams({ status: "" })}
+            />
+
+            {/* Applied filter chips */}
+            {appliedFilters.length > 0 && (
+              <div className="lp-applied-bar">
+                <span className="lp-applied-title">Applied Filters:</span>
+                <div className="lp-applied-chips">
+                  {appliedFilters.map((f) => (
+                    <span key={f.key} className="lp-applied-chip">
+                      <span className="lp-applied-chip-cat">{f.category}:</span>
+                      <span className="lp-applied-chip-text">{f.label}</span>
+                      <button
+                        type="button"
+                        className="lp-applied-chip-x"
+                        onClick={f.onRemove}
+                        aria-label={`Remove filter ${f.label}`}
+                      >
+                        ✕
+                      </button>
+                    </span>
+                  ))}
+                  {appliedFilters.length > 1 && (
+                    <button
+                      type="button"
+                      className="lp-applied-clear-all"
+                      onClick={handleClearAllFilters}
+                    >
+                      Clear All
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
         {/* ── RESULTS HEADER ─────────────────────── */}
         <div className="lp-results-header">
           <p className="lp-count">
-            <strong>{filtered.length}</strong> properties found
+            <strong>{filtered.length}</strong> {filtered.length === 1 ? "property" : "properties"} found
+            {debouncedSearch && (
+              <span style={{ color: "#475569" }}>
+                {" "}for &ldquo;<strong>{debouncedSearch}</strong>&rdquo;
+                <span style={{ marginLeft: 8, fontSize: 11, background: "#fdf8ec", color: "#b8963c", border: "1px solid #ebd9a2", padding: "2px 8px", borderRadius: 4, fontWeight: 600 }}>
+                  All Records
+                </span>
+                <button
+                  type="button"
+                  onClick={handleClearSearch}
+                  style={{
+                    marginLeft: 8,
+                    background: "none",
+                    border: "none",
+                    color: "#999",
+                    fontSize: 12,
+                    textDecoration: "underline",
+                    cursor: "pointer",
+                  }}
+                >
+                  Clear
+                </button>
+              </span>
+            )}
           </p>
           <div className="lp-sort-row">
             <span className="lp-sort-label">Sort by</span>
@@ -850,6 +1670,38 @@ export default function ListingsPage() {
               </button>
             </div>
           </div>
+
+          {/* Mobile applied filter chips */}
+          {appliedFilters.length > 0 && (
+            <div className="lp-mob-applied-row">
+              <span className="lp-applied-title">Applied:</span>
+              <div className="lp-applied-chips">
+                {appliedFilters.map((f) => (
+                  <span key={f.key} className="lp-applied-chip">
+                    <span className="lp-applied-chip-cat">{f.category}:</span>
+                    <span className="lp-applied-chip-text">{f.label}</span>
+                    <button
+                      type="button"
+                      className="lp-applied-chip-x"
+                      onClick={f.onRemove}
+                      aria-label={`Remove filter ${f.label}`}
+                    >
+                      ✕
+                    </button>
+                  </span>
+                ))}
+                {appliedFilters.length > 1 && (
+                  <button
+                    type="button"
+                    className="lp-applied-clear-all"
+                    onClick={handleClearAllFilters}
+                  >
+                    Clear All
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* ── PROPERTY GRID ──────────────────────── */}
@@ -857,9 +1709,33 @@ export default function ListingsPage() {
           <div className={`lp-grid${view === "list" ? " lp-grid--list" : ""}`}>
             {filtered.length === 0 ? (
               <div className="lp-empty">
-                <div className="lp-empty-icon">🏡</div>
-                <h3>No properties found</h3>
-                <p>Try adjusting your filters or switch between Buy / Rent.</p>
+                <div className="lp-empty-icon">{debouncedSearch ? "🔍" : "🏡"}</div>
+                {/* <h3>{debouncedSearch ? `No properties found for "${debouncedSearch}"` : "No properties found"}</h3> */}
+                <p>
+                  {debouncedSearch
+                    ? "We searched across all records, localities, and developers in Mumbai. Try checking for typos or searching with broader keywords like 'Bandra', '3 BHK', or 'Godrej'."
+                    : "Try adjusting your filters or switch between Buy / Rent."}
+                </p>
+                {debouncedSearch && (
+                  <button
+                    type="button"
+                    onClick={handleClearSearch}
+                    style={{
+                      marginTop: 16,
+                      padding: "9px 20px",
+                      borderRadius: 8,
+                      border: "none",
+                      background: "#c8a84b",
+                      color: "#fff",
+                      fontWeight: 600,
+                      fontSize: 13,
+                      cursor: "pointer",
+                      boxShadow: "0 2px 8px rgba(200,168,75,0.3)",
+                    }}
+                  >
+                    Clear Search &amp; View All
+                  </button>
+                )}
               </div>
             ) : (
               filtered.map((p, index) => (
@@ -987,43 +1863,97 @@ export default function ListingsPage() {
                 </div>
               )}
 
-              {/* FILTER PANEL — each chip immediately updates its own URL param */}
+              {/* FILTER PANEL — each chip toggles its own key in the multi-select array */}
               {drawer === "filter" && (
                 <div>
                   <div className="lp-drawer-group">
                     <div className="lp-drawer-group-label">Locality</div>
                     <div className="lp-drawer-chips">
-                      {LOCALITIES.map((loc) => (
-                        <button
-                          key={loc.key}
-                          className={`lp-drawer-chip${locality === loc.key ? " selected" : ""}`}
-                          onClick={() => updateParams({ locality: loc.key })}
-                        >{loc.label}</button>
-                      ))}
+                      {LOCALITIES.filter((l) => l.key !== "").map((loc) => {
+                        const isSel = selectedLocalities.includes(loc.key);
+                        return (
+                          <button
+                            key={loc.key}
+                            className={`lp-drawer-chip${isSel ? " selected" : ""}`}
+                            onClick={() => updateParams({ locality: toggleMultiKey(selectedLocalities, loc.key) })}
+                          >
+                            {isSel && <span style={{ marginRight: 4, fontWeight: 700 }}>✓</span>}
+                            {loc.label}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                   <div className="lp-drawer-group">
                     <div className="lp-drawer-group-label">Configuration</div>
                     <div className="lp-drawer-chips">
-                      {CONFIGURATIONS.map((cfg) => (
-                        <button
-                          key={cfg.key}
-                          className={`lp-drawer-chip${config === cfg.key ? " selected" : ""}`}
-                          onClick={() => updateParams({ config: cfg.key })}
-                        >{cfg.label}</button>
-                      ))}
+                      {CONFIGURATIONS.filter((c) => c.key !== "").map((cfg) => {
+                        const isSel = selectedConfigs.includes(cfg.key);
+                        return (
+                          <button
+                            key={cfg.key}
+                            className={`lp-drawer-chip${isSel ? " selected" : ""}`}
+                            onClick={() => updateParams({ config: toggleMultiKey(selectedConfigs, cfg.key) })}
+                          >
+                            {isSel && <span style={{ marginRight: 4, fontWeight: 700 }}>✓</span>}
+                            {cfg.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div className="lp-drawer-group">
+                    <div className="lp-drawer-group-label">Developer</div>
+                    <div className="lp-drawer-chips">
+                      {DEVELOPERS.filter((d) => d.key !== "").map((dev) => {
+                        const isSel = selectedDevelopers.includes(dev.key);
+                        return (
+                          <button
+                            key={dev.key}
+                            className={`lp-drawer-chip${isSel ? " selected" : ""}`}
+                            onClick={() => updateParams({ developer: toggleMultiKey(selectedDevelopers, dev.key) })}
+                          >
+                            {isSel && <span style={{ marginRight: 4, fontWeight: 700 }}>✓</span>}
+                            {dev.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div className="lp-drawer-group">
+                    <div className="lp-drawer-group-label">Budget</div>
+                    <div className="lp-drawer-chips">
+                      {BUDGET_OPTIONS.filter((b) => b.key !== "").map((b) => {
+                        const isSel = selectedBudgets.includes(b.key);
+                        return (
+                          <button
+                            key={b.key}
+                            className={`lp-drawer-chip${isSel ? " selected" : ""}`}
+                            onClick={() => updateParams({ budget: toggleMultiKey(selectedBudgets, b.key) })}
+                          >
+                            {isSel && <span style={{ marginRight: 4, fontWeight: 700 }}>✓</span>}
+                            {b.label}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                   <div className="lp-drawer-group">
                     <div className="lp-drawer-group-label">Status</div>
                     <div className="lp-drawer-chips">
-                      {STATUS_OPTIONS.map((st) => (
-                        <button
-                          key={st.key}
-                          className={`lp-drawer-chip${status === st.key ? " selected" : ""}`}
-                          onClick={() => updateParams({ status: st.key })}
-                        >{st.label}</button>
-                      ))}
+                      {STATUS_OPTIONS.filter((s) => s.key !== "").map((st) => {
+                        const isSel = selectedStatuses.includes(st.key);
+                        return (
+                          <button
+                            key={st.key}
+                            className={`lp-drawer-chip${isSel ? " selected" : ""}`}
+                            onClick={() => updateParams({ status: toggleMultiKey(selectedStatuses, st.key) })}
+                          >
+                            {isSel && <span style={{ marginRight: 4, fontWeight: 700 }}>✓</span>}
+                            {st.label}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
@@ -1032,9 +1962,10 @@ export default function ListingsPage() {
 
             {drawer === "filter" && (
               <div className="lp-drawer-foot">
-                {/* Reset: clears all four filter params from URL */}
+                {/* Reset: clears all filter and search params from URL */}
                 <button className="lp-drawer-reset" onClick={() => {
-                  updateParams({ locality: "", config: "", status: "", developer: "" });
+                  setSearch("");
+                  updateParams({ locality: "", config: "", status: "", developer: "", budget: "", q: "" });
                 }}>Reset</button>
                 <button className="lp-drawer-apply" onClick={applyFilters}>Done</button>
               </div>
