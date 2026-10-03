@@ -117,10 +117,10 @@ export default function Footer() {
                 </div>
                 <div className="flex flex-col">
                   <span className="text-[21px] font-black tracking-tight leading-none text-white">
-                    HomeSpace
+                    The Propertist
                   </span>
                   <span className="text-[9.5px] font-bold tracking-[0.2em] text-[#c8a84b] uppercase mt-1">
-                    THE PROPERTIST
+                    LUXURY REAL ESTATE
                   </span>
                 </div>
               </Link>
@@ -326,7 +326,7 @@ export default function Footer() {
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-20 md:pb-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-400">
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 sm:gap-3 text-center md:text-left">
-              <span>© {new Date().getFullYear()} HomeSpace • THE PROPERTIST. All rights reserved.</span>
+              <span>© {new Date().getFullYear()} The Propertist. All rights reserved.</span>
               <span className="hidden sm:inline text-slate-700">•</span>
               <span className="text-slate-400">
                 Direct Developer Real Estate Portal

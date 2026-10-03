@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "HomeSpace | Luxury Real Estate & Verified Properties",
+  title: "The Propertist | Luxury Real Estate & Verified Properties",
   description:
     "Discover a better way to find home. Explore verified luxury properties, modern villas, apartments, compare prices, and connect with RERA certified agents.",
 };

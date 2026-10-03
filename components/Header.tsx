@@ -1119,8 +1119,8 @@ export default function Header() {
                 <Building2 size={20} strokeWidth={2.2} />
               </div>
               <div className="hs-hdr-logo-text">
-                <span className="hs-hdr-logo-title">HomeSpace</span>
-                <span className="hs-hdr-logo-sub">The Propertist</span>
+                <span className="hs-hdr-logo-title">The Propertist</span>
+                <span className="hs-hdr-logo-sub">Luxury Real Estate</span>
               </div>
             </Link>
 
@@ -1271,8 +1271,8 @@ export default function Header() {
               <Building2 size={18} strokeWidth={2.2} />
             </div>
             <div className="hs-hdr-logo-text">
-              <span className="hs-hdr-logo-title" style={{ fontSize: 18 }}>HomeSpace</span>
-              <span className="hs-hdr-logo-sub">The Propertist</span>
+              <span className="hs-hdr-logo-title" style={{ fontSize: 18 }}>The Propertist</span>
+              <span className="hs-hdr-logo-sub">Luxury Real Estate</span>
             </div>
           </Link>
 
@@ -1411,7 +1411,7 @@ export default function Header() {
         {/* Minimalist Drawer Sticky Footer */}
         <div className="hs-d-fixed-footer">
           <div className="hs-footer-terms">
-            © 2026 HomeSpace • The Propertist
+            © 2026 The Propertist. All rights reserved.
           </div>
           <Link
             href="/listings"

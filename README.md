@@ -1,4 +1,4 @@
-# HomeSpace | Luxury Real Estate & Verified Properties Portal
+# The Propertist | Luxury Real Estate & Verified Properties Portal
 
 A Modern, and fully responsive real estate web application built with **Next.js (App Router)**, **TypeScript**, and **Tailwind CSS**. Designed for seamless property discovery, robust filtering, and instant developer inquiries.
 

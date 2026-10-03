@@ -3,8 +3,8 @@ import Link from "next/link";
 import { Building2, Home, ArrowLeft, Search, Compass, Phone } from "lucide-react";
 
 export const metadata = {
-  title: "404 - Page Not Found | HomeSpace",
-  description: "The page you are looking for cannot be found. Explore verified luxury properties in Mumbai on HomeSpace.",
+  title: "404 - Page Not Found | The Propertist",
+  description: "The page you are looking for cannot be found. Explore verified luxury properties in Mumbai on The Propertist.",
 };
 
 export default function NotFound() {

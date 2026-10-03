@@ -954,7 +954,7 @@ export default function ListingsPage() {
         .lp-hero-eyebrow-text { font-size: 10.5px; font-weight: 700; letter-spacing: 3.5px; color: #c8a84b; text-transform: uppercase; }
         .lp-hero-h1 { font-size: clamp(30px, 4.2vw, 54px); font-weight: 800; color: #fff; line-height: 1.08; margin: 0 0 18px; letter-spacing: -1px; }
         .lp-hero-h1 em { font-family: 'Playfair Display', serif; font-style: italic; color: #c8a84b; }
-        .lp-hero-sub { color: rgba(255,255,255,0.65); font-size: 15px; line-height: 1.7; max-width: 500px; margin: 0 auto 36px; }
+        .lp-hero-sub { color: rgba(255,255,255,0.65); font-size: 15px; line-height: 1.7; max-width: 500px; margin: 0 auto 0px; }
         .lp-trust-row { display: flex; justify-content: center; gap: 0; flex-wrap: wrap; }
         .lp-trust-item { display: flex; align-items: center; gap: 12px; color: rgba(255,255,255,0.8); font-size: 13px; padding: 0 36px; }
         .lp-trust-icon { width: 40px; height: 40px; border-radius: 50%; background: rgba(200,168,75,0.15); border: 1px solid rgba(200,168,75,0.35); display: grid; place-items: center; flex-shrink: 0; }
@@ -1700,11 +1700,11 @@ export default function ListingsPage() {
           <div className="lp-hero-bg" aria-hidden="true" />
           <div className="lp-hero-overlay" aria-hidden="true" />
           <div className="lp-hero-inner">
-            <div className="lp-hero-eyebrow" aria-hidden="true">
+            {/* <div className="lp-hero-eyebrow" aria-hidden="true">
               <div className="lp-hero-eyebrow-line" />
               <span className="lp-hero-eyebrow-text">The Propertist</span>
               <div className="lp-hero-eyebrow-line" />
-            </div>
+            </div> */}
             <h1 className="lp-hero-h1">
               Verified ₹2 Crore+ Homes <em>in Mumbai</em>
             </h1>
@@ -1712,7 +1712,7 @@ export default function ListingsPage() {
               Handpicked properties from Kalpataru, Godrej, Lodha, Oberoi &amp; more.<br />
               Zero brokerage for buyers.
             </p>
-            <div className="lp-trust-row" role="list">
+            {/* <div className="lp-trust-row" role="list">
               <div className="lp-trust-item" role="listitem">
                 <div className="lp-trust-icon">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}>
@@ -1752,7 +1752,7 @@ export default function ListingsPage() {
                   <span>Direct from Developers</span>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         </section>
 
