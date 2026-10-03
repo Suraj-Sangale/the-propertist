@@ -113,7 +113,7 @@ const CSS = `
   .pc-section * { box-sizing: border-box; }
 
   /* Header */
-  .pc-header { display: flex; align-items: flex-end; justify-content: space-between; margin: 48px 0 24px; }
+  .pc-header { display: flex; align-items: center; justify-content: space-between; margin: 48px 0 24px; }
   .pc-header h2 { font-size: 26px; font-weight: 700; color: #0d0d12; letter-spacing: -0.4px; }
   .pc-header p  { font-size: 14.5px; color: #64748b; margin-top: 4px; }
   .pc-pill {
@@ -124,6 +124,16 @@ const CSS = `
     margin-bottom: 8px;
   }
 
+  .pc-view-btn{
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: 1px solid #d0d1d3;
+  background: #f9f9f9;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a2e;
+  cursor: pointer;
+  }
   /* Carousel container */
   .pc-carousel-container {
     position: relative;
@@ -186,6 +196,20 @@ const CSS = `
     .pc-arrow-prev { left: 8px; }
     .pc-arrow-next { right: 8px; }
   }
+    
+          .pc-header h2{
+          font-size: 20px;
+          }
+          
+          .pc-header p{
+          font-size: 12px;
+          }
+          .pc-header-left{
+          width:60%;
+          }
+          .pc-view-btn{
+            font-size: 12px;
+          } 
 
   /* Property Card */
   .pc-card {
@@ -456,7 +480,7 @@ export default function PropertyCarousel({
           <h2>{heading}</h2>
           {subheading && <p>{subheading}</p>}
         </div>
-          <Link href="/listings" className="pc-view-btn">View All<span>→</span></Link>
+          <Link href="/listings" className="pc-view-btn">View All <span>→</span></Link>
       </div>
 
       {/* Carousel */}

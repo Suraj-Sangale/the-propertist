@@ -66,9 +66,6 @@ export default function PropertyDetailsClient({ property }: { property: any }) {
 
   return (
     <div ref={containerRef} className="min-h-screen bg-[#f3f4f6] text-[#1a1a2e] selection:bg-[#c8a84b] selection:text-white">
-      {/* 1. TOP NAVIGATION */}
-      <Header />
-
       <main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pb-20 pt-28">
         
         {/* 2. BREADCRUMB */}
@@ -147,9 +144,6 @@ export default function PropertyDetailsClient({ property }: { property: any }) {
       {/* 18. FINAL CTA */}
       <FinalCTA />
 
-      {/* 19. FOOTER */}
-      <Footer />
-
       {/* LIGHTBOX GALLERY MODAL */}
       {isGalleryOpen && (
         <FullscreenGallery property={property} onClose={() => setIsGalleryOpen(false)} />
@@ -162,70 +156,7 @@ export default function PropertyDetailsClient({ property }: { property: any }) {
 // COMPONENTS
 // ============================================================================
 
-function Header() {
-  const { count: wishlistCount, isLoaded: isWishlistLoaded } = useWishlist();
 
-  return (
-    <header className="fixed top-0 inset-x-0 z-50 bg-white/80 backdrop-blur-md shadow-[0_4px_30px_rgba(0,0,0,0.03)] border-b border-slate-100 h-20 flex items-center transition-all duration-300">
-      <div className="max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-        <div className="flex items-center gap-10">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#D9A441] to-[#b3832c] flex items-center justify-center shadow-lg shadow-amber-500/20 group-hover:scale-105 transition-transform">
-              <Building2 className="w-4 h-4 text-white" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-[17px] font-black tracking-tight leading-none text-[#101A35]">ZEROBRO</span>
-              <span className="text-[9px] font-bold tracking-[0.2em] text-[#D9A441] uppercase mt-0.5">Properties</span>
-            </div>
-          </Link>
-
-          <nav className="hidden lg:flex items-center gap-7">
-            {['Buy', 'Projects', 'About Us', 'Services', 'Contact'].map((item) => (
-              <Link key={item} href="#" className="text-sm font-semibold text-slate-600 hover:text-[#c8a84b] transition-colors">
-                {item}
-              </Link>
-            ))}
-          </nav>
-        </div>
-
-        <div className="hidden lg:flex items-center gap-4">
-          <div className="relative group">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-[#c8a84b] transition-colors" />
-            <input 
-              type="text" 
-              placeholder="Search location, project or builder..." 
-              className="w-[280px] h-[42px] bg-slate-50 border border-slate-200 rounded-full pl-10 pr-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#c8a84b]/20 focus:border-[#c8a84b] transition-all placeholder:text-slate-400"
-            />
-          </div>
-          <Link 
-            href="/saved" 
-            className="relative w-10 h-10 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-50 hover:text-red-500 transition-colors"
-            title="Saved Properties"
-          >
-            <Heart 
-              className="w-5 h-5" 
-              fill={isWishlistLoaded && wishlistCount > 0 ? "#ef4444" : "none"} 
-              stroke={isWishlistLoaded && wishlistCount > 0 ? "#ef4444" : "currentColor"} 
-            />
-            {isWishlistLoaded && wishlistCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-sm">
-                {wishlistCount}
-              </span>
-            )}
-          </Link>
-          <button className="h-[42px] px-6 rounded-full border border-slate-200 text-[#1a1a2e] font-semibold text-sm hover:bg-[#1a1a2e] hover:text-white hover:border-[#1a1a2e] transition-all flex items-center gap-2">
-            <User className="w-4 h-4" />
-            Login / Sign Up
-          </button>
-        </div>
-
-        <button className="lg:hidden w-10 h-10 flex items-center justify-center text-slate-700">
-          <Menu className="w-6 h-6" />
-        </button>
-      </div>
-    </header>
-  );
-}
 
 function PropertyGallery({ property, onOpenFullscreen }: { property: any, onOpenFullscreen: () => void }) {
   const { isLiked, toggle } = useWishlistItem(property?.id ?? property?.slug ?? "");
@@ -1087,55 +1018,7 @@ function FinalCTA() {
   );
 }
 
-function Footer() {
-  return (
-    <footer className="bg-[#0f0f1c] text-slate-400 py-16 text-sm font-medium border-t border-white/5">
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-16">
-          <div className="col-span-2">
-            <Link href="/" className="flex items-center gap-2 mb-6">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#D9A441] to-[#b3832c] flex items-center justify-center">
-                <Building2 className="w-4 h-4 text-white" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[17px] font-black tracking-tight leading-none text-white">ZEROBRO</span>
-                <span className="text-[9px] font-bold tracking-[0.2em] text-[#D9A441] uppercase mt-0.5">Properties</span>
-              </div>
-            </Link>
-            <p className="max-w-xs mb-6 text-slate-500">Premium real estate portal for finding verified zero brokerage homes directly from top developers.</p>
-          </div>
-          <div>
-            <h4 className="text-white font-bold mb-4">Company</h4>
-            <ul className="flex flex-col gap-3">
-              <li><Link href="#" className="hover:text-white transition-colors">About Us</Link></li>
-              <li><Link href="#" className="hover:text-white transition-colors">Careers</Link></li>
-              <li><Link href="#" className="hover:text-white transition-colors">Contact</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-white font-bold mb-4">Properties</h4>
-            <ul className="flex flex-col gap-3">
-              <li><Link href="#" className="hover:text-white transition-colors">Mumbai</Link></li>
-              <li><Link href="#" className="hover:text-white transition-colors">Pune</Link></li>
-              <li><Link href="#" className="hover:text-white transition-colors">Bangalore</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-white font-bold mb-4">Legal</h4>
-            <ul className="flex flex-col gap-3">
-              <li><Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link></li>
-              <li><Link href="#" className="hover:text-white transition-colors">Terms of Use</Link></li>
-              <li><Link href="#" className="hover:text-white transition-colors">RERA Disclaimer</Link></li>
-            </ul>
-          </div>
-        </div>
-        <div className="border-t border-white/10 pt-8 text-center text-xs text-slate-600 font-semibold">
-          © 2026 ZeroBro Properties. All rights reserved.
-        </div>
-      </div>
-    </footer>
-  );
-}
+
 
 function FullscreenGallery({ property, onClose }: { property: any; onClose: () => void }) {
   const gallery: string[] = property?.gallery || [];
