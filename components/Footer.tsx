@@ -179,7 +179,7 @@ export default function Footer() {
                 { name: "Bandra West", key: "bandra_west", tag: "Prime" },
                 { name: "Andheri West", key: "andheri_west", tag: "Popular" },
                 { name: "Powai", key: "powai", tag: "Lakeside" },
-                { name: "Jokhandwala", key: "jokhandwala", tag: "Luxury" },
+                { name: "Lokhandwala", key: "lokhandwala", tag: "Luxury" },
                 { name: "Kandivali East", key: "kandivali_east", tag: "Top Picks" },
                 { name: "Goregaon West", key: "goregaon_west", tag: "High Rise" },
                 { name: "Malad West", key: "malad_west", tag: "Modern" },

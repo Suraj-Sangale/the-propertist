@@ -181,9 +181,9 @@ const NAV_LINKS: NavCategory[] = [
         icon: MapPin,
       },
       {
-        title: "Jokhandwala",
+        title: "Lokhandwala",
         desc: "Prestigious residences with elite dining & shopping",
-        href: "/listings?locality=jokhandwala",
+        href: "/listings?locality=lokhandwala",
         icon: MapPin,
       },
       {
@@ -208,7 +208,7 @@ const LOCALITIES_LIST = [
   { name: "Bandra West", key: "bandra_west", count: "Prime" },
   { name: "Andheri West", key: "andheri_west", count: "Popular" },
   { name: "Powai", key: "powai", count: "Lakeside" },
-  { name: "Jokhandwala", key: "jokhandwala", count: "Luxury" },
+  { name: "Lokhandwala", key: "lokhandwala", count: "Luxury" },
   { name: "Kandivali East", key: "kandivali_east", count: "Family" },
   { name: "Malad West", key: "malad_west", count: "Trending" },
   { name: "Borivali West", key: "borivali_west", count: "Suburbs" },

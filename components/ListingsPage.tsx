@@ -17,7 +17,7 @@ const LOCALITIES: FilterOption[] = [
   { key: "bangalore",      label: "Bangalore" },
   { key: "pune",           label: "Pune" },
   { key: "kandivali_east", label: "Kandivali East" },
-  { key: "jokhandwala",    label: "Jokhandwala" },
+  { key: "lokhandwala",    label: "Lokhandwala" },
   { key: "andheri_west",   label: "Andheri West" },
   { key: "bandra_west",    label: "Bandra West" },
   { key: "powai",          label: "Powai" },

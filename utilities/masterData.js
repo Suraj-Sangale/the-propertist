@@ -4,9 +4,9 @@ export const ALL_PROPERTIES = [
     "name": "KALPATARU VIAN",
     "projectName": "Kalpataru Vian",
     "developer": "KALPATARU LIMITED",
-    "locality": "Jokhandwala",
-    "locality_key": "jokhandwala",
-    "locality_label": "JOKHANDWALA",
+    "locality": "Lokhandwala",
+    "locality_key": "lokhandwala",
+    "locality_label": "LOKHANDWALA",
     "config": "3, 4 & 4.5 BHK",
     "config_keys": [
       "3_bhk",
