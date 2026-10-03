@@ -41,7 +41,7 @@ const CATEGORY_CARDS = [
     src: "/images/projects/Untitled-design-18.webp",
     title: "Luxury Apartments",
     sub: "In Mumbai",
-    link: "/listings?mode=buy&type=apartment&locality=mumbai",
+    link: "/listings?mode=buy&locality=kandivali_east%2Cjokhandwala%2Candheri_west%2Cbandra_west%2Cpowai%2Cmalad_west%2Cborivali_west%2Cgoregaon_west",
   },
   {
     src: "/images/cat/banglow.png",

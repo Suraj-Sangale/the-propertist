@@ -3830,5 +3830,145 @@ export const ALL_PROPERTIES = [
       }
     ],
     "mapLocation": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d121059.04360431872!2d73.79292671607519!3d18.52460355342417!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc2bf2e67461101%3A0x828d43bf9d3e3f32!2sPune%2C%20Maharashtra!5e0!3m2!1sen!2sin!4v1689000000000!5m2!1sen!2sin"
+  },
+  {
+    "id": 60,
+    "name": "PRESTIGE GOLFSHIRE LUXURY VILLAS",
+    "projectName": "Prestige Golfshire",
+    "developer": "PRESTIGE GROUP",
+    "developer_key": "prestige",
+    "locality": "Bangalore",
+    "locality_key": "bangalore",
+    "locality_label": "BANGALORE",
+    "config": "4 & 5 BHK Luxury Villas",
+    "config_keys": [
+      "4_bhk",
+      "5_bhk",
+      "4_5_bhk",
+      "house",
+      "villa"
+    ],
+    "config_label": "4 & 5 BHK Independent Villas in PRESTIGE GOLFSHIRE",
+    "area": "5,892 – 9,905 sq.ft",
+    "beds": "4 & 5 BHK Villas",
+    "priceFrom": "₹ 7.50 Cr*",
+    "priceLabel": "From ₹7.50 Cr*",
+    "status": "Ready to Move",
+    "status_key": "ready_to_move",
+    "mode": "buy",
+    "type": "house",
+    "propertyType": "house",
+    "verified": true,
+    "rera": true,
+    "badge": "LUXURY VILLA",
+    "features": [
+      "Private Plunge Pool & Sun Deck",
+      "18-Hole Championship Golf Course View",
+      "Private Landscaped Lawn & Double Garage",
+      "Ultra-Luxury Italian Marble Finishes",
+      "Nandi Hills Panoramic Vista"
+    ],
+    "slug": "4-5-bhk-independent-villas-prestige-golfshire-bangalore",
+    "description": "Magnificent bespoke independent mansions and luxury golf villas situated at the foothills of Nandi Hills in Bangalore. Features dedicated private pools, expansive personal gardens, double-height living spaces, smart home automation, and world-class concierge management by JW Marriott.",
+    "amenities": [
+      "18-Hole Golf Course",
+      "Private Swimming Pool",
+      "Convention Clubhouse",
+      "Spa & Wellness Center",
+      "Tennis & Squash Courts",
+      "Helipad Facility",
+      "24/7 Gated Security",
+      "Fine Dining Restaurant"
+    ],
+    "gallery": [
+      "/images/cat/banglow.png",
+      "/images/projects/Untitled-design-22.webp",
+      "/images/projects/inner-4.jpg",
+      "/images/projects/inner-5.jpg"
+    ],
+    "address": "Nandi Hills Road, Devanahalli, Bangalore, Karnataka",
+    "possessionDate": "Ready to Move",
+    "reraId": "PRM/KA/RERA/1250/303/PR/171014/000210",
+    "floorPlans": [
+      {
+        "type": "Ground Floor Plan",
+        "image": "/images/projects/floor_plan.jpg"
+      },
+      {
+        "type": "First Floor & Terrace Plan",
+        "image": "/images/projects/floor_plan-2.jpg"
+      }
+    ],
+    "mapLocation": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d248756.1264871988!2d77.46612711640624!3d13.0011776!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae1670c9b44e6d%3A0xf8dfc3e8517e4fe0!2sBengaluru%2C%20Karnataka!5e0!3m2!1sen!2sin!4v1689000000000!5m2!1sen!2sin"
+  },
+  {
+    "id": 61,
+    "name": "SOBHA EMERALD INDEPENDENT HOUSES",
+    "projectName": "Sobha Emerald Villas",
+    "developer": "SOBHA LIMITED",
+    "developer_key": "sobha",
+    "locality": "Bangalore",
+    "locality_key": "bangalore",
+    "locality_label": "BANGALORE",
+    "config": "3 & 4 BHK Independent Houses",
+    "config_keys": [
+      "3_bhk",
+      "4_bhk",
+      "3_4_bhk",
+      "house",
+      "villa"
+    ],
+    "config_label": "3 & 4 BHK Independent Houses in SOBHA EMERALD",
+    "area": "3,200 – 4,800 sq.ft",
+    "beds": "3 & 4 BHK Houses",
+    "priceFrom": "₹ 4.25 Cr*",
+    "priceLabel": "From ₹4.25 Cr*",
+    "status": "Under Construction",
+    "status_key": "under_construction",
+    "mode": "buy",
+    "type": "house",
+    "propertyType": "house",
+    "verified": true,
+    "rera": true,
+    "badge": "HOT DEAL",
+    "features": [
+      "Independent Private Compound",
+      "Private Garden & Rooftop Gazebo",
+      "German Modular Kitchen Included",
+      "EV Charging Point in Private Garage",
+      "Close to International Tech Park (ITPB)"
+    ],
+    "slug": "3-4-bhk-independent-houses-sobha-emerald-bangalore",
+    "description": "Architectural masterpiece offering luxury independent duplex houses in Bangalore's premier IT corridor. Built with Sobha's signature German engineering and construction quality, surrounded by 70% open green landscapes.",
+    "amenities": [
+      "Grand Clubhouse",
+      "Swimming Pool",
+      "Gymnasium & Aerobics Studio",
+      "Children's Play Park",
+      "Badminton Court",
+      "24/7 Security & Video Surveillance",
+      "Jogging Track",
+      "Landscaped Pergolas"
+    ],
+    "gallery": [
+      "/images/cat/banglow.png",
+      "/images/projects/Untitled-design-21.webp",
+      "/images/projects/inner-7.jpg",
+      "/images/projects/inner-8.jpg"
+    ],
+    "address": "Whitefield - Sarjapur Road Corridor, Bangalore, Karnataka",
+    "possessionDate": "March 2026",
+    "reraId": "PRM/KA/RERA/1251/446/PR/190823/002812",
+    "floorPlans": [
+      {
+        "type": "Duplex Layout Plan",
+        "image": "/images/projects/floor_plan.jpg"
+      },
+      {
+        "type": "Site Layout Masterplan",
+        "image": "/images/projects/floor_plan-2.jpg"
+      }
+    ],
+    "mapLocation": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d248756.1264871988!2d77.46612711640624!3d13.0011776!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae1670c9b44e6d%3A0xf8dfc3e8517e4fe0!2sBengaluru%2C%20Karnataka!5e0!3m2!1sen!2sin!4v1689000000000!5m2!1sen!2sin"
   }
 ];

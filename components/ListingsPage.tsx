@@ -14,6 +14,7 @@ type FilterOption = { key: string; label: string };
 // key: "" = "show all" (removes param from URL)
 const LOCALITIES: FilterOption[] = [
   { key: "",               label: "All Localities" },
+  { key: "bangalore",      label: "Bangalore" },
   { key: "pune",           label: "Pune" },
   { key: "kandivali_east", label: "Kandivali East" },
   { key: "jokhandwala",    label: "Jokhandwala" },
@@ -27,6 +28,7 @@ const LOCALITIES: FilterOption[] = [
 
 const CONFIGURATIONS: FilterOption[] = [
   { key: "",        label: "All Configurations" },
+  { key: "house",    label: "Villas & Houses" },
   { key: "plot",     label: "Plots & Land" },
   { key: "1_bhk",   label: "1 BHK" },
   { key: "2_bhk",   label: "2 BHK" },
@@ -48,6 +50,8 @@ const STATUS_OPTIONS: FilterOption[] = [
 
 const DEVELOPERS: FilterOption[] = [
   { key: "",          label: "All Developers" },
+  { key: "prestige",  label: "Prestige Group" },
+  { key: "sobha",     label: "Sobha Limited" },
   { key: "kalpataru", label: "Kalpataru" },
   { key: "godrej",    label: "Godrej Properties" },
   { key: "lodha",     label: "Lodha Group" },
@@ -903,6 +907,7 @@ export default function ListingsPage() {
       if (selectedStatuses.length > 0 && !selectedStatuses.includes(p.status_key)) return false;
       if (selectedDevelopers.length > 0 && !selectedDevelopers.includes(p.developer_key)) return false;
       if (selectedBudgets.length > 0 && !matchMultiBudget(p, selectedBudgets)) return false;
+      if (type && p.type !== type && p.propertyType !== type) return false;
       return true;
     }).sort((a, b) => {
       if (sort === "Price: Low to High") {
@@ -933,6 +938,7 @@ export default function ListingsPage() {
     selectedDevelopers,
     selectedBudgets,
     sort,
+    type,
   ]);
 
   return (
