@@ -1092,6 +1092,8 @@ export default function HomeSpace() {
           font-size: 10px;
           font-weight: 600;
           }
+          .hs-tabs{
+        width:100%;}
         }
         @media (max-width: 380px) {
           .hs-cats {

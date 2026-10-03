@@ -159,7 +159,6 @@ export default function ImageMarquee() {
         .imq-root {
           width: 100%;
           overflow: hidden;
-          padding: clamp(36px, 6vw, 68px) 0 clamp(44px, 7vw, 76px);
           position: relative;
         }
 
