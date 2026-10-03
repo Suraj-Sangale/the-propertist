@@ -661,11 +661,13 @@ export default function Header() {
           z-index: 2000;
           opacity: 0;
           visibility: hidden;
+          pointer-events: none;
           transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.35s ease;
         }
         .hs-drawer-overlay.open {
           opacity: 1;
           visibility: visible;
+          pointer-events: auto;
         }
 
         .hs-adv-drawer {
@@ -681,9 +683,11 @@ export default function Header() {
           z-index: 2010;
           display: flex;
           flex-direction: column;
-          box-shadow: -15px 0 50px rgba(0, 0, 0, 0.6);
-          transform: translateX(100%);
-          transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+          box-shadow: none;
+          transform: translateX(105%);
+          visibility: hidden;
+          pointer-events: none;
+          transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.35s ease, box-shadow 0.35s ease;
           border-left: 1px solid rgba(200, 168, 75, 0.25);
           overflow: hidden;
         }
@@ -695,6 +699,9 @@ export default function Header() {
         }
         .hs-adv-drawer.open {
           transform: translateX(0);
+          visibility: visible;
+          pointer-events: auto;
+          box-shadow: -15px 0 50px rgba(0, 0, 0, 0.6);
         }
 
         /* Drawer Header */
