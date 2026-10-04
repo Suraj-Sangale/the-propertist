@@ -332,7 +332,7 @@ function PropertySummary({ property }: { property: any }) {
               if (firstInput) (firstInput as HTMLInputElement).focus();
             }
           }}
-          className="flex-1 h-12 rounded-xl bg-gradient-to-r from-[#D9A441] to-[#b3832c] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-amber-500/25 hover:opacity-95 transition-all cursor-pointer"
+          className="flex-1 h-12 py-3 rounded-xl bg-gradient-to-r from-[#D9A441] to-[#b3832c] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-amber-500/25 hover:opacity-95 transition-all cursor-pointer"
         >
           <Sparkles className="w-4 h-4" /> Instant VIP Enquiry
         </button>
