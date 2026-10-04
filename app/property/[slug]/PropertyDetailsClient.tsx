@@ -126,7 +126,7 @@ export default function PropertyDetailsClient({ property }: { property: any }) {
           </div>
 
           {/* Right Sticky Column */}
-          <div className="w-full lg:w-[35%] lg:sticky lg:top-[96px] z-20 flex flex-col gap-6">
+          <div className="w-full lg:w-[35%] lg:sticky lg:top-[120px] flex flex-col gap-6">
             {/* 6. ENQUIRY FORM */}
             <div id="enquiry-form" className="scroll-mt-28">
               <EnquiryForm property={property} />
