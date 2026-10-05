@@ -16,7 +16,7 @@ export const ALL_PROPERTIES = [
     "config_label": "3, 4 & 4.5 BHK in KALPATARU VIAN",
     "area": "1116 – 2688 sq.ft",
     "beds": "3, 4 & 4.5 BHK",
-    "priceFrom": "₹ 4.95 Cr.+++",
+    "priceFrom": "₹ 4.95 Cr.+",
     "priceLabel": "From ₹4.95 Cr.*",
     "status": "Under Construction",
     "status_key": "under_construction",
