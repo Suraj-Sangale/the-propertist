@@ -835,7 +835,7 @@ export default function HomeSpace() {
         }
 
         /* FEATURES */
-        .hs-features { display: flex; gap: 44px; margin-top: -4px; position: relative; z-index: 3; }
+        .hs-features { display: flex; gap: 44px; margin-top: -4px; position: relative; z-index: 3; justify-content: flex-end; }
         .hs-feat { display: flex; align-items: center; gap: 14px; }
         .hs-ic { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0; }
         .hs-feat b { font-size: 12.5px; display: block; font-weight: 600; }
