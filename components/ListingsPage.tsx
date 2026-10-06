@@ -467,15 +467,19 @@ function MultiSelectFilter({
 
 // Fast typing Search Field with debounced parent emission & Advanced Voice-to-Text
 const SearchField = memo(function SearchField({
+  id = "lp-search",
   value,
   onSearch,
   onClear,
   isLoading,
+  placeholder = "Search all properties...",
 }: {
+  id?: string;
   value: string;
   onSearch: (query: string) => void;
   onClear: () => void;
   isLoading?: boolean;
+  placeholder?: string;
 }) {
   const [localText, setLocalText] = useState(value);
   const [isDebouncing, setIsDebouncing] = useState(false);
@@ -657,12 +661,12 @@ const SearchField = memo(function SearchField({
         <path d="m20 20-4-4" />
       </svg>
       <input
-        id="lp-search"
+        id={id}
         type="text"
         placeholder={
           isListening
             ? "Listening... Speak now (e.g. '3 BHK in Bandra')"
-            : "Search all properties..."
+            : placeholder
         }
         value={localText}
         onChange={handleChange}
@@ -700,6 +704,7 @@ const SearchField = memo(function SearchField({
       {/* Mic button with active pulse */}
       <button
         type="button"
+        id={`${id}-mic`}
         onClick={toggleListening}
         className={`lp-search-mic${isListening ? " listening" : ""}`}
         aria-label={isListening ? "Stop voice search" : "Search by voice"}
@@ -1283,6 +1288,11 @@ export default function ListingsPage() {
           color: #fff;
         }
 
+        /* MOBILE TOP-OF-LIST SEARCH BAR (hidden on desktop) */
+        .lp-mob-search-bar {
+          display: none;
+        }
+
         /* SKELETON SHIMMER & STYLES */
         @keyframes lp-shimmer {
           0% { background-position: -200% 0; }
@@ -1783,6 +1793,74 @@ export default function ListingsPage() {
           .lp-trust-row { gap: 8px 0; }
           .lp-grid-wrap { margin-bottom: 100px; }
 
+          /* Mobile Search Bar at Top of List */
+          .lp-mob-search-bar {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 14px 16px 4px;
+            padding: 14px 14px 12px;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.02);
+            border: 1.5px solid #eaecf0;
+          }
+          .lp-mob-search-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+          }
+          .lp-mob-mode-toggle {
+            display: inline-flex;
+            background: #f1f4f9;
+            padding: 3px;
+            border-radius: 9px;
+            gap: 2px;
+          }
+          .lp-mob-mode-btn {
+            padding: 6px 18px;
+            font: 600 12.5px 'Inter', sans-serif;
+            border: none;
+            border-radius: 7px;
+            background: transparent;
+            color: #64748b;
+            cursor: pointer;
+            transition: all .15s ease;
+          }
+          .lp-mob-mode-btn.active {
+            background: #0d1b2a;
+            color: #ffffff;
+            box-shadow: 0 2px 6px rgba(13, 27, 42, 0.2);
+          }
+          .lp-mob-search-count {
+            font-size: 11.5px;
+            font-weight: 600;
+            color: #64748b;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 4px 10px;
+            border-radius: 20px;
+            white-space: nowrap;
+          }
+          .lp-mob-search-count strong {
+            color: #c8a84b;
+            font-weight: 700;
+          }
+          .lp-mob-search-bar .lp-search-field {
+            width: 100%;
+            min-width: 0;
+            height: 46px;
+            background: #f8f9fb;
+            border-color: #eaecf0;
+          }
+          .lp-mob-search-bar .lp-search-field input {
+            font-size: 15px;
+          }
+          .lp-results-header {
+            margin: 12px auto 10px;
+          }
+
           /* Mobile Promo Banner */
           .lp-promo-banner { flex-direction: column; align-items: flex-start; padding: 24px; }
           .lp-promo-banner h3 { font-size: 20px; }
@@ -2147,6 +2225,35 @@ export default function ListingsPage() {
               </div>
             )}
           </div>
+        </div>
+
+        {/* ── MOBILE TOP SEARCH BAR (At Top of List) ────── */}
+        <div className="lp-mob-search-bar" role="search" aria-label="Mobile property search">
+          <div className="lp-mob-search-top">
+            <div className="lp-mob-mode-toggle" role="group" aria-label="Listing mode">
+              {(["buy", "rent"] as const).map((m) => (
+                <button
+                  key={m}
+                  id={`mob-mode-${m}`}
+                  className={`lp-mob-mode-btn${mode === m ? " active" : ""}`}
+                  onClick={() => updateParams({ mode: m })}
+                >
+                  {m === "buy" ? "Buy" : "Rent"}
+                </button>
+              ))}
+            </div>
+            <div className="lp-mob-search-count">
+              <strong>{filtered.length}</strong> {filtered.length === 1 ? "Property" : "Properties"}
+            </div>
+          </div>
+          <SearchField
+            id="lp-mob-search"
+            value={debouncedSearch}
+            onSearch={handleSearchCommit}
+            onClear={handleClearSearch}
+            isLoading={isSearchLoading}
+            placeholder={mode === "rent" ? "Search rent homes, localities..." : "Search properties, localities..."}
+          />
         </div>
 
         {/* ── RESULTS HEADER ─────────────────────── */}
