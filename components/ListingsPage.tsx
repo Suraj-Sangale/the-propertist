@@ -885,6 +885,30 @@ export default function ListingsPage() {
   const searchLoadingTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [drawer, setDrawer] = useState<DrawerPanel>(null);
   const [isClosing, setIsClosing] = useState(false);
+  const [isMobSearchStuck, setIsMobSearchStuck] = useState(false);
+  const mobSentinelRef = useRef<HTMLDivElement>(null);
+
+  // Detect when mobile search bar sticks at top (throttled with rAF for silky smoothness)
+  useEffect(() => {
+    let ticking = false;
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          if (mobSentinelRef.current) {
+            const rect = mobSentinelRef.current.getBoundingClientRect();
+            setIsMobSearchStuck(rect.top <= 76);
+          }
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Default initial loading skeleton on mount
   useEffect(() => {
@@ -1142,8 +1166,8 @@ export default function ListingsPage() {
         .lp-trust-text span { font-size: 11.5px; color: rgba(255,255,255,0.5); }
         .lp-trust-divider { width: 1px; height: 44px; background: rgba(255,255,255,0.1); }
 
-        /* FILTER BAR */
-        .lp-filter-bar-wrap { max-width: 1280px; margin: -26px auto 0; padding: 0 32px; position: relative; z-index: 10; }
+        /* FILTER BAR (Sticky on desktop scroll) */
+        .lp-filter-bar-wrap { max-width: 1280px; margin: -26px auto 0; padding: 0 32px; position: sticky; top: 86px; z-index: 110; }
         .lp-filter-bar { background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,0.13), 0 1px 6px rgba(0,0,0,0.05); padding: 18px 22px; display: flex; align-items: flex-end; gap: 14px; flex-wrap: wrap; }
         .lp-search-field { position: relative; flex: 1; min-width: 220px; display: flex; align-items: center; gap: 8px; background: #f8f9fb; border: 1.5px solid #eaecf0; border-radius: 10px; height: 48px; padding: 0 10px 0 14px; font-size: 13px; color: #555; transition: border-color .15s, background .15s; }
         .lp-search-field:focus-within { border-color: #c8a84b; }
@@ -1793,23 +1817,53 @@ export default function ListingsPage() {
           .lp-trust-row { gap: 8px 0; }
           .lp-grid-wrap { margin-bottom: 100px; }
 
-          /* Mobile Search Bar at Top of List */
+          /* Mobile Search Bar at Top of List (Sticky on scroll) */
           .lp-mob-search-bar {
             display: flex;
             flex-direction: column;
-            gap: 12px;
             margin: 14px 16px 4px;
             padding: 14px 14px 12px;
-            background: #ffffff;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.02);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.02);
             border: 1.5px solid #eaecf0;
+            position: sticky;
+            top: 76px;
+            z-index: 120;
+            overflow: hidden;
+            transition: padding 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        box-shadow 0.3s ease,
+                        border-radius 0.3s ease;
+          }
+          .lp-mob-search-bar.is-stuck {
+            padding: 9px 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
           }
           .lp-mob-search-top {
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 10px;
+            max-height: 48px;
+            margin-bottom: 10px;
+            opacity: 1;
+            overflow: hidden;
+            transform-origin: top;
+            transform: translateY(0);
+            transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        opacity 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+                        margin-bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        transform 0.26s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: max-height, opacity, margin-bottom, transform;
+          }
+          .lp-mob-search-bar.is-stuck .lp-mob-search-top {
+            max-height: 0;
+            margin-bottom: 0;
+            opacity: 0;
+            transform: translateY(-8px);
+            pointer-events: none;
           }
           .lp-mob-mode-toggle {
             display: inline-flex;
@@ -1860,6 +1914,22 @@ export default function ListingsPage() {
           .lp-results-header {
             margin: 12px auto 10px;
           }
+        }
+
+        @media (max-width: 520px) {
+          .lp-mob-search-bar {
+            top: 72px;
+            margin: 10px 12px 4px;
+            padding: 12px 12px 10px;
+          }
+        }
+
+        @media (max-width: 450px) {
+          .lp-mob-search-bar {
+            top: 66px;
+            margin: 8px 10px 4px;
+          }
+        }
 
           /* Mobile Promo Banner */
           .lp-promo-banner { flex-direction: column; align-items: flex-start; padding: 24px; }
@@ -2227,8 +2297,11 @@ export default function ListingsPage() {
           </div>
         </div>
 
+        {/* Mobile sticky sentinel */}
+        <div ref={mobSentinelRef} style={{ height: 1, marginTop: -1, pointerEvents: "none" }} />
+
         {/* ── MOBILE TOP SEARCH BAR (At Top of List) ────── */}
-        <div className="lp-mob-search-bar" role="search" aria-label="Mobile property search">
+        <div className={`lp-mob-search-bar${isMobSearchStuck ? " is-stuck" : ""}`} role="search" aria-label="Mobile property search">
           <div className="lp-mob-search-top">
             <div className="lp-mob-mode-toggle" role="group" aria-label="Listing mode">
               {(["buy", "rent"] as const).map((m) => (
