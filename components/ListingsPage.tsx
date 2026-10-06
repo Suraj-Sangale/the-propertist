@@ -167,9 +167,14 @@ function parsePropertyPrice(property: any): number {
   return num;
 }
 
-// Match property against multi-term search query across all records and fields
+// Match property against multi-term search query across all records and fields (optionally filtered by mode)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function matchesSearch(property: any, query: string): boolean {
+function matchesSearch(property: any, query: string, mode?: string): boolean {
+  if (mode) {
+    const propMode = property?.mode || "buy";
+    if (propMode !== mode) return false;
+  }
+
   if (!query || !query.trim()) return true;
 
   const terms = query
@@ -894,14 +899,16 @@ export default function ListingsPage() {
 
   const hasSearch = Boolean(debouncedSearch.trim());
 
-  // Search from ALL records across the entire database when searching, not just existing filtered results
+  // Search from ALL records matching current mode when searching, not just existing filtered results
   const filtered = useMemo(() => {
     return ALL_PROPERTIES.filter((p) => {
-      if (hasSearch) {
-        return matchesSearch(p, debouncedSearch);
-      }
+      const propMode = p.mode || "buy";
+      console.log("🚀 ~ propMode:", propMode, mode)
+      if (propMode !== mode) return false;
 
-      if (p.mode !== mode) return false;
+      if (hasSearch) {
+        return matchesSearch(p, debouncedSearch, mode);
+      }
       if (selectedLocalities.length > 0 && !selectedLocalities.includes(p.locality_key)) return false;
       if (selectedConfigs.length > 0 && !matchMultiConfig(p.config_keys, selectedConfigs)) return false;
       if (selectedStatuses.length > 0 && !selectedStatuses.includes(p.status_key)) return false;
