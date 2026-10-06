@@ -684,13 +684,6 @@ const SearchField = memo(function SearchField({
         autoComplete="off"
         spellCheck="false"
       />
-      {/* Real-time status indicator showing what system is doing */}
-      {isListening && (
-        <span className="lp-voice-live-badge" title="Live speech transcription active">
-          <span className="lp-voice-live-dot" />
-          <span className="lp-voice-live-text">{localText ? "T..." : "L..."}</span>
-        </span>
-      )}
 
       {(isDebouncing || isLoading) && !isListening && (
         <span
@@ -1190,18 +1183,18 @@ export default function ListingsPage() {
         .lp-search-field { position: relative; flex: 1; min-width: 220px; display: flex; align-items: center; gap: 8px; background: #f8f9fb; border: 1.5px solid #eaecf0; border-radius: 10px; height: 48px; padding: 0 10px 0 14px; font-size: 13px; color: #555; transition: border-color .15s, background .15s; }
         .lp-search-field:focus-within { border-color: #c8a84b; }
         .lp-search-field.is-listening {
-          border-color: #ef4444;
-          background: #fff8f8;
-          box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.14);
+          border-color: #c8a84b;
+          background: #fffdf8;
+          box-shadow: 0 0 0 3px rgba(200, 168, 75, 0.18);
         }
         .lp-search-field.is-listening input {
           color: #111827;
           font-weight: 500;
         }
         .lp-search-field.is-listening input::placeholder {
-          color: #dc2626;
+          color: #c8a84b;
           font-style: italic;
-          opacity: 0.85;
+          opacity: 0.9;
         }
         .lp-search-field input { flex: 1; border: 0; background: transparent; outline: none; font: inherit; color: #222; min-width: 100px; }
         .lp-search-field svg.lp-search-icon { width: 16px; height: 16px; color: #aaa; flex-shrink: 0; }
@@ -1257,12 +1250,12 @@ export default function ListingsPage() {
           color: #c8a84b;
         }
         .lp-search-mic.listening {
-          background: #fee2e2;
-          color: #ef4444;
+          background: rgba(200, 168, 75, 0.16);
+          color: #c8a84b;
         }
         .lp-search-mic.listening:hover {
-          background: #fecaca;
-          color: #dc2626;
+          background: rgba(200, 168, 75, 0.25);
+          color: #b5953e;
         }
         .lp-search-mic svg {
           width: 16px;
@@ -1285,7 +1278,7 @@ export default function ListingsPage() {
           position: absolute;
           inset: -2px;
           border-radius: 10px;
-          background: rgba(239, 68, 68, 0.45);
+          background: rgba(200, 168, 75, 0.45);
           animation: lp-pulse-ring 1.4s cubic-bezier(0.24, 0, 0.38, 1) infinite;
           z-index: 1;
           pointer-events: none;
@@ -1307,7 +1300,7 @@ export default function ListingsPage() {
         .lp-wave-line {
           width: 2.5px;
           height: 6px;
-          background: #ef4444;
+          background: #c8a84b;
           border-radius: 2px;
           animation: lp-voice-wave 0.8s ease-in-out infinite;
         }
@@ -1317,9 +1310,9 @@ export default function ListingsPage() {
           display: inline-flex;
           align-items: center;
           gap: 5px;
-          background: #fee2e2;
-          color: #dc2626;
-          border: 1px solid rgba(239, 68, 68, 0.25);
+          background: #fdf8ed;
+          color: #b5953e;
+          border: 1px solid rgba(200, 168, 75, 0.3);
           border-radius: 9999px;
           padding: 3px 8px;
           font-size: 11px;
@@ -1332,7 +1325,7 @@ export default function ListingsPage() {
           width: 6px;
           height: 6px;
           border-radius: 50%;
-          background: #ef4444;
+          background: #c8a84b;
           animation: lp-live-dot-pulse 1s ease-in-out infinite;
         }
         @keyframes lp-live-dot-pulse {
