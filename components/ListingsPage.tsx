@@ -1166,8 +1166,8 @@ export default function ListingsPage() {
         .lp-trust-text span { font-size: 11.5px; color: rgba(255,255,255,0.5); }
         .lp-trust-divider { width: 1px; height: 44px; background: rgba(255,255,255,0.1); }
 
-        /* FILTER BAR (Sticky on desktop scroll) */
-        .lp-filter-bar-wrap { max-width: 1280px; margin: -26px auto 0; padding: 0 32px; position: sticky; top: 86px; z-index: 110; }
+        /* FILTER BAR (Non-sticky on desktop) */
+        .lp-filter-bar-wrap { max-width: 1280px; margin: -26px auto 0; padding: 0 32px; position: relative; z-index: 10; }
         .lp-filter-bar { background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,0.13), 0 1px 6px rgba(0,0,0,0.05); padding: 18px 22px; display: flex; align-items: flex-end; gap: 14px; flex-wrap: wrap; }
         .lp-search-field { position: relative; flex: 1; min-width: 220px; display: flex; align-items: center; gap: 8px; background: #f8f9fb; border: 1.5px solid #eaecf0; border-radius: 10px; height: 48px; padding: 0 10px 0 14px; font-size: 13px; color: #555; transition: border-color .15s, background .15s; }
         .lp-search-field:focus-within { border-color: #c8a84b; }
@@ -1800,13 +1800,171 @@ export default function ListingsPage() {
         /* DESKTOP: hide apply btn */
         .lp-apply-btn { display: none; }
 
-        /* RESPONSIVE */
+        /* ── MOBILE BOTTOM TOOLBAR (Hidden by default on Desktop) ─────────────────────── */
+        .lp-mob-toolbar {
+          display: none;
+          position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+          background: #fff;
+          border-top: 1px solid #e8eaed;
+          box-shadow: 0 -4px 24px rgba(0,0,0,0.10);
+          height: 64px;
+        }
+        .lp-mob-tab {
+          flex: 1;
+          display: flex; flex-direction: column;
+          align-items: center; justify-content: center;
+          gap: 2px;
+          background: transparent; border: 0;
+          cursor: pointer;
+          padding: 10px 8px 8px;
+          position: relative;
+          transition: background .12s;
+        }
+        .lp-mob-tab:not(:last-child) { border-right: 1px solid #e8eaed; }
+        .lp-mob-tab.active { background: #fdf8ec; }
+        .lp-mob-tab-label {
+          font-size: 10px; font-weight: 700; letter-spacing: 1.2px;
+          text-transform: uppercase; color: #333;
+          display: flex; align-items: center; gap: 3px;
+        }
+        .lp-mob-tab-label svg { width: 8px; height: 8px; color: #555; }
+        .lp-mob-tab-sub {
+          font-size: 11.5px; font-weight: 500; color: #1a88d4;
+        }
+        .lp-mob-tab-badge {
+          position: absolute; top: 8px; right: calc(50% - 22px);
+          min-width: 16px; height: 16px; border-radius: 999px;
+          background: #c8a84b; color: #fff;
+          font-size: 9px; font-weight: 800;
+          display: flex; align-items: center; justify-content: center;
+          padding: 0 4px;
+        }
+
+        /* ── BOTTOM SHEET DRAWER ─────────────────── */
+        .lp-drawer-backdrop {
+          display: none;
+          position: fixed; inset: 0; z-index: 300;
+          background: rgba(0,0,0,0.45);
+          animation: lpFadeIn 0.35s cubic-bezier(0.16,1,0.3,1) both;
+        }
+        .lp-drawer-backdrop.closing {
+          animation: lpFadeOut 0.3s cubic-bezier(0.4,0,1,1) both;
+        }
+        @keyframes lpFadeIn  { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes lpFadeOut { from { opacity: 1; } to { opacity: 0; } }
+
+        .lp-drawer {
+          display: none;
+          position: fixed; left: 0; right: 0; bottom: 0; z-index: 301;
+          height: 70%;
+          background: #fff;
+          border-radius: 20px 20px 0 0;
+          flex-direction: column;
+          overflow: hidden;
+          animation: lpSlideUp 0.42s cubic-bezier(0.16,1,0.3,1) both;
+          will-change: transform;
+        }
+        .lp-drawer.closing {
+          animation: lpSlideDown 0.32s cubic-bezier(0.4,0,0.6,1) both;
+        }
+        @keyframes lpSlideUp {
+          from { transform: translateY(105%); }
+          to   { transform: translateY(0); }
+        }
+        @keyframes lpSlideDown {
+          from { transform: translateY(0); }
+          to   { transform: translateY(105%); }
+        }
+        .lp-drawer-handle {
+          width: 40px; height: 4px; border-radius: 99px;
+          background: #d1d5db; margin: 12px auto 0;
+          flex-shrink: 0;
+        }
+        .lp-drawer-head {
+          display: flex; align-items: center; justify-content: space-between;
+          padding: 16px 20px 12px;
+          border-bottom: 1px solid #f0f2f5;
+          flex-shrink: 0;
+        }
+        .lp-drawer-title {
+          font-size: 15px; font-weight: 700; color: #1a1a2e;
+        }
+        .lp-drawer-close {
+          width: 30px; height: 30px; border-radius: 50%;
+          background: #f3f4f6; border: 0; cursor: pointer;
+          display: grid; place-items: center; color: #555;
+          font-size: 16px; line-height: 1;
+        }
+        .lp-drawer-body {
+          flex: 1; overflow-y: auto; padding: 16px 20px 24px;
+        }
+        .lp-drawer-options { display: flex; flex-direction: column; gap: 6px; }
+        .lp-drawer-opt {
+          display: flex; align-items: center; justify-content: space-between;
+          padding: 13px 16px; border-radius: 12px;
+          border: 1.5px solid #eaecf0; background: #fff;
+          font: 500 14px 'Inter'; color: #333; cursor: pointer;
+          transition: border-color .15s, background .15s;
+        }
+        .lp-drawer-opt.selected {
+          border-color: #c8a84b; background: #fdf8ec; color: #1a1a2e; font-weight: 600;
+        }
+        .lp-drawer-opt-check {
+          width: 20px; height: 20px; border-radius: 50%;
+          border: 2px solid #d1d5db;
+          display: grid; place-items: center; flex-shrink: 0;
+        }
+        .lp-drawer-opt.selected .lp-drawer-opt-check {
+          border-color: #c8a84b; background: #c8a84b;
+        }
+        .lp-drawer-opt.selected .lp-drawer-opt-check::after {
+          content: '';
+          width: 5px; height: 9px;
+          border-right: 2px solid #fff; border-bottom: 2px solid #fff;
+          transform: rotate(45deg) translateY(-1px);
+          display: block;
+        }
+        .lp-drawer-group { margin-bottom: 20px; }
+        .lp-drawer-group-label {
+          font-size: 11px; font-weight: 700; letter-spacing: 1.2px;
+          text-transform: uppercase; color: #aaa; margin-bottom: 10px;
+        }
+        .lp-drawer-chips {
+          display: flex; flex-wrap: wrap; gap: 8px;
+        }
+        .lp-drawer-chip {
+          padding: 8px 16px; border-radius: 999px;
+          border: 1.5px solid #eaecf0; background: #fff;
+          font: 500 13px 'Inter'; color: #333; cursor: pointer;
+          transition: border-color .12s, background .12s;
+        }
+        .lp-drawer-chip.selected {
+          border-color: #c8a84b; background: #fdf8ec;
+          color: #b8963c; font-weight: 600;
+        }
+        .lp-drawer-foot {
+          padding: 12px 20px 20px; flex-shrink: 0;
+          border-top: 1px solid #f0f2f5;
+          display: flex; gap: 10px;
+        }
+        .lp-drawer-reset {
+          flex: 1; height: 48px; border-radius: 10px;
+          border: 1.5px solid #ddd; background: #fff;
+          font: 600 14px 'Inter'; color: #555; cursor: pointer;
+        }
+        .lp-drawer-apply {
+          flex: 2; height: 48px; border-radius: 10px;
+          border: 0; background: #c8a84b; color: #fff;
+          font: 700 14px 'Inter'; cursor: pointer;
+          box-shadow: 0 4px 14px rgba(200,168,75,.35);
+        }
+
+        /* ── RESPONSIVE MEDIA QUERIES ─────────────────────── */
         @media (max-width: 1100px) {
           .lp-grid { grid-template-columns: repeat(2, 1fr); }
           .lp-grid.lp-grid--list { grid-template-columns: 1fr; }
         }
 
-        /* ── MOBILE (≤720px) ─────────────────────── */
         @media (max-width: 720px) {
           .lp-hero { padding-top: 86px; }
           .lp-grid { grid-template-columns: 1fr; }
@@ -1914,22 +2072,6 @@ export default function ListingsPage() {
           .lp-results-header {
             margin: 12px auto 10px;
           }
-        }
-
-        @media (max-width: 520px) {
-          .lp-mob-search-bar {
-            top: 72px;
-            margin: 10px 12px 4px;
-            padding: 12px 12px 10px;
-          }
-        }
-
-        @media (max-width: 450px) {
-          .lp-mob-search-bar {
-            top: 66px;
-            margin: 8px 10px 4px;
-          }
-        }
 
           /* Mobile Promo Banner */
           .lp-promo-banner { flex-direction: column; align-items: flex-start; padding: 24px; }
@@ -1953,7 +2095,7 @@ export default function ListingsPage() {
           .lp-card--list .lp-card-footer { margin-top: 6px; }
           .lp-card--list .lp-view-btn { padding: 6px 12px; font-size: 10.5px; }
 
-          /* Sticky mobile footer toolbar */
+          /* Sticky mobile footer toolbar - DISPLAYED ON MOBILE */
           .lp-mob-toolbar {
             display: flex !important;
           }
@@ -1962,167 +2104,19 @@ export default function ListingsPage() {
           .lp-drawer { display: flex !important; }
         }
 
-        /* ── MOBILE TOOLBAR ─────────────────────── */
-        .lp-mob-toolbar {
-          display: none;
-          position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
-          background: #fff;
-          border-top: 1px solid #e8eaed;
-          box-shadow: 0 -4px 24px rgba(0,0,0,0.10);
-          height: 64px;
-        }
-        .lp-mob-tab {
-          flex: 1;
-          display: flex; flex-direction: column;
-          align-items: center; justify-content: center;
-          gap: 2px;
-          background: transparent; border: 0;
-          cursor: pointer;
-          padding: 10px 8px 8px;
-          position: relative;
-          transition: background .12s;
-        }
-        .lp-mob-tab:not(:last-child) { border-right: 1px solid #e8eaed; }
-        .lp-mob-tab.active { background: #fdf8ec; }
-        .lp-mob-tab-label {
-          font-size: 10px; font-weight: 700; letter-spacing: 1.2px;
-          text-transform: uppercase; color: #333;
-          display: flex; align-items: center; gap: 3px;
-        }
-        .lp-mob-tab-label svg { width: 8px; height: 8px; color: #555; }
-        .lp-mob-tab-sub {
-          font-size: 11.5px; font-weight: 500; color: #1a88d4;
-        }
-        .lp-mob-tab-badge {
-          position: absolute; top: 8px; right: calc(50% - 22px);
-          min-width: 16px; height: 16px; border-radius: 999px;
-          background: #c8a84b; color: #fff;
-          font-size: 9px; font-weight: 800;
-          display: flex; align-items: center; justify-content: center;
-          padding: 0 4px;
+        @media (max-width: 520px) {
+          .lp-mob-search-bar {
+            top: 72px;
+            margin: 10px 12px 4px;
+            padding: 12px 12px 10px;
+          }
         }
 
-        /* ── BOTTOM SHEET DRAWER ─────────────────── */
-        .lp-drawer-backdrop {
-          display: none;
-          position: fixed; inset: 0; z-index: 300;
-          background: rgba(0,0,0,0.45);
-          animation: lpFadeIn 0.35s cubic-bezier(0.16,1,0.3,1) both;
-        }
-        .lp-drawer-backdrop.closing {
-          animation: lpFadeOut 0.3s cubic-bezier(0.4,0,1,1) both;
-        }
-        @keyframes lpFadeIn  { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes lpFadeOut { from { opacity: 1; } to { opacity: 0; } }
-
-        .lp-drawer {
-          display: none;
-          position: fixed; left: 0; right: 0; bottom: 0; z-index: 301;
-          height: 70%;
-          background: #fff;
-          border-radius: 20px 20px 0 0;
-          flex-direction: column;
-          overflow: hidden;
-          /* Open: spring curve — feels physical */
-          animation: lpSlideUp 0.42s cubic-bezier(0.16,1,0.3,1) both;
-          will-change: transform;
-        }
-        .lp-drawer.closing {
-          animation: lpSlideDown 0.32s cubic-bezier(0.4,0,0.6,1) both;
-        }
-        @keyframes lpSlideUp {
-          from { transform: translateY(105%); }
-          to   { transform: translateY(0); }
-        }
-        @keyframes lpSlideDown {
-          from { transform: translateY(0); }
-          to   { transform: translateY(105%); }
-        }
-        .lp-drawer-handle {
-          width: 40px; height: 4px; border-radius: 99px;
-          background: #d1d5db; margin: 12px auto 0;
-          flex-shrink: 0;
-        }
-        .lp-drawer-head {
-          display: flex; align-items: center; justify-content: space-between;
-          padding: 16px 20px 12px;
-          border-bottom: 1px solid #f0f2f5;
-          flex-shrink: 0;
-        }
-        .lp-drawer-title {
-          font-size: 15px; font-weight: 700; color: #1a1a2e;
-        }
-        .lp-drawer-close {
-          width: 30px; height: 30px; border-radius: 50%;
-          background: #f3f4f6; border: 0; cursor: pointer;
-          display: grid; place-items: center; color: #555;
-          font-size: 16px; line-height: 1;
-        }
-        .lp-drawer-body {
-          flex: 1; overflow-y: auto; padding: 16px 20px 24px;
-        }
-        /* Drawer option list */
-        .lp-drawer-options { display: flex; flex-direction: column; gap: 6px; }
-        .lp-drawer-opt {
-          display: flex; align-items: center; justify-content: space-between;
-          padding: 13px 16px; border-radius: 12px;
-          border: 1.5px solid #eaecf0; background: #fff;
-          font: 500 14px 'Inter'; color: #333; cursor: pointer;
-          transition: border-color .15s, background .15s;
-        }
-        .lp-drawer-opt.selected {
-          border-color: #c8a84b; background: #fdf8ec; color: #1a1a2e; font-weight: 600;
-        }
-        .lp-drawer-opt-check {
-          width: 20px; height: 20px; border-radius: 50%;
-          border: 2px solid #d1d5db;
-          display: grid; place-items: center; flex-shrink: 0;
-        }
-        .lp-drawer-opt.selected .lp-drawer-opt-check {
-          border-color: #c8a84b; background: #c8a84b;
-        }
-        .lp-drawer-opt.selected .lp-drawer-opt-check::after {
-          content: '';
-          width: 5px; height: 9px;
-          border-right: 2px solid #fff; border-bottom: 2px solid #fff;
-          transform: rotate(45deg) translateY(-1px);
-          display: block;
-        }
-        /* Drawer filter groups */
-        .lp-drawer-group { margin-bottom: 20px; }
-        .lp-drawer-group-label {
-          font-size: 11px; font-weight: 700; letter-spacing: 1.2px;
-          text-transform: uppercase; color: #aaa; margin-bottom: 10px;
-        }
-        .lp-drawer-chips {
-          display: flex; flex-wrap: wrap; gap: 8px;
-        }
-        .lp-drawer-chip {
-          padding: 8px 16px; border-radius: 999px;
-          border: 1.5px solid #eaecf0; background: #fff;
-          font: 500 13px 'Inter'; color: #333; cursor: pointer;
-          transition: border-color .12s, background .12s;
-        }
-        .lp-drawer-chip.selected {
-          border-color: #c8a84b; background: #fdf8ec;
-          color: #b8963c; font-weight: 600;
-        }
-        /* Drawer footer */
-        .lp-drawer-foot {
-          padding: 12px 20px 20px; flex-shrink: 0;
-          border-top: 1px solid #f0f2f5;
-          display: flex; gap: 10px;
-        }
-        .lp-drawer-reset {
-          flex: 1; height: 48px; border-radius: 10px;
-          border: 1.5px solid #ddd; background: #fff;
-          font: 600 14px 'Inter'; color: #555; cursor: pointer;
-        }
-        .lp-drawer-apply {
-          flex: 2; height: 48px; border-radius: 10px;
-          border: 0; background: #c8a84b; color: #fff;
-          font: 700 14px 'Inter'; cursor: pointer;
-          box-shadow: 0 4px 14px rgba(200,168,75,.35);
+        @media (max-width: 450px) {
+          .lp-mob-search-bar {
+            top: 66px;
+            margin: 8px 10px 4px;
+          }
         }
       `}</style>
 
