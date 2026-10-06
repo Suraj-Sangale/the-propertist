@@ -550,6 +550,21 @@ function PropertyTabs({ activeTab, setActiveTab }: { activeTab: string, setActiv
     { id: 'developer', label: 'Developer' },
     { id: 'reviews', label: 'Reviews' },
   ];
+  const onClickTab =(tab:any)=>{
+    setActiveTab(tab.id);
+    const el = document.getElementById(tab.id);
+      if (el) {
+    const headerHeight = 96;
+    const extraGap = 70;
+      const rect = el.getBoundingClientRect();
+      const scrollTop =
+      window.scrollY + rect.top - headerHeight - extraGap;
+      window.scrollTo({
+        top: scrollTop,
+        behavior: "smooth",
+      });
+    }
+  }
 
   return (
     <div className="bg-white rounded-2xl p-2 shadow-[0_4px_20px_rgba(20,35,70,0.04)] border border-slate-100 sticky top-[96px] z-30 animate-up overflow-hidden">
@@ -557,13 +572,7 @@ function PropertyTabs({ activeTab, setActiveTab }: { activeTab: string, setActiv
         {tabs.map(tab => (
           <button 
             key={tab.id}
-            onClick={() => {
-  setActiveTab(tab.id);
-  document.getElementById(tab.id)?.scrollIntoView({
-    behavior: "smooth",
-    block: "start",
-  });
-}}
+            onClick={() => onClickTab(tab)}
             className={`px-5 py-2.5 text-sm font-semibold rounded-xl whitespace-nowrap transition-all ${activeTab === tab.id ? 'bg-[#1a1a2e] text-[#c8a84b]' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'}`}
           >
             {tab.label}
