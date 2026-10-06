@@ -465,7 +465,7 @@ function MultiSelectFilter({
   );
 }
 
-// Fast typing Search Field with debounced parent emission
+// Fast typing Search Field with debounced parent emission & Advanced Voice-to-Text
 const SearchField = memo(function SearchField({
   value,
   onSearch,
@@ -479,6 +479,9 @@ const SearchField = memo(function SearchField({
 }) {
   const [localText, setLocalText] = useState(value);
   const [isDebouncing, setIsDebouncing] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [voiceError, setVoiceError] = useState<string | null>(null);
+  const recognitionRef = useRef<any>(null);
   const lastEmittedRef = useRef(value);
   const onSearchRef = useRef(onSearch);
   const onClearRef = useRef(onClear);
@@ -515,12 +518,121 @@ const SearchField = memo(function SearchField({
     return () => clearTimeout(timer);
   }, [localText]);
 
+  // Auto-dismiss voice feedback after 4 seconds
+  useEffect(() => {
+    if (!voiceError) return;
+    const timer = setTimeout(() => setVoiceError(null), 4000);
+    return () => clearTimeout(timer);
+  }, [voiceError]);
+
+  // Clean up recognition instance on unmount
+  useEffect(() => {
+    return () => {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.abort();
+        } catch {}
+      }
+    };
+  }, []);
+
+  const stopListening = useCallback(() => {
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch {}
+    }
+    setIsListening(false);
+  }, []);
+
+  const toggleListening = useCallback(() => {
+    if (isListening) {
+      stopListening();
+      return;
+    }
+
+    if (typeof window === "undefined") return;
+
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      setVoiceError("Voice search is not supported by your browser. Try Chrome, Edge, or Safari.");
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.lang =
+        typeof navigator !== "undefined" && navigator.language?.startsWith("en")
+          ? navigator.language
+          : "en-IN";
+      recognition.maxAlternatives = 1;
+
+      recognition.onstart = () => {
+        setIsListening(true);
+        setVoiceError(null);
+      };
+
+      recognition.onresult = (event: any) => {
+        let interim = "";
+        let final = "";
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          const transcript = event.results[i][0]?.transcript || "";
+          if (event.results[i].isFinal) {
+            final += transcript;
+          } else {
+            interim += transcript;
+          }
+        }
+        const spoken = (final || interim).trim();
+        if (spoken) {
+          setLocalText(spoken);
+        }
+        if (final) {
+          const cleaned = final.trim();
+          lastEmittedRef.current = cleaned;
+          setIsDebouncing(false);
+          onSearchRef.current(cleaned);
+        }
+      };
+
+      recognition.onerror = (e: any) => {
+        if (e.error === "not-allowed" || e.error === "service-not-allowed") {
+          setVoiceError("Microphone access denied. Please allow microphone permissions.");
+        } else if (e.error !== "no-speech") {
+          setVoiceError(`Voice error (${e.error}). Please try again.`);
+        }
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+      recognition.start();
+    } catch (err: any) {
+      console.error("Speech recognition error:", err);
+      setVoiceError("Could not access microphone. Please check permissions.");
+      setIsListening(false);
+    }
+  }, [isListening, stopListening]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (isListening) {
+      stopListening();
+    }
     setLocalText(e.target.value);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
+      if (isListening) {
+        stopListening();
+      }
       const trimmed = localText.trim();
       lastEmittedRef.current = trimmed;
       setIsDebouncing(false);
@@ -529,6 +641,9 @@ const SearchField = memo(function SearchField({
   };
 
   const handleClear = () => {
+    if (isListening) {
+      stopListening();
+    }
     setLocalText("");
     lastEmittedRef.current = "";
     setIsDebouncing(false);
@@ -536,15 +651,19 @@ const SearchField = memo(function SearchField({
   };
 
   return (
-    <div className="lp-search-field">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+    <div className={`lp-search-field${isListening ? " is-listening" : ""}`}>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="lp-search-icon">
         <circle cx="11" cy="11" r="7" />
         <path d="m20 20-4-4" />
       </svg>
       <input
         id="lp-search"
         type="text"
-        placeholder="Search all properties..."
+        placeholder={
+          isListening
+            ? "Listening... Speak now (e.g. '3 BHK in Bandra')"
+            : "Search all properties..."
+        }
         value={localText}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
@@ -566,6 +685,49 @@ const SearchField = memo(function SearchField({
         >
           ✕
         </button>
+      )}
+
+      {/* Voice wave bars when microphone is listening */}
+      {isListening && (
+        <div className="lp-voice-wave-indicator" title="Listening to voice input...">
+          <span className="lp-wave-line" style={{ animationDelay: "0ms" }} />
+          <span className="lp-wave-line" style={{ animationDelay: "150ms" }} />
+          <span className="lp-wave-line" style={{ animationDelay: "300ms" }} />
+          <span className="lp-wave-line" style={{ animationDelay: "450ms" }} />
+        </div>
+      )}
+
+      {/* Mic button with active pulse */}
+      <button
+        type="button"
+        onClick={toggleListening}
+        className={`lp-search-mic${isListening ? " listening" : ""}`}
+        aria-label={isListening ? "Stop voice search" : "Search by voice"}
+        title={isListening ? "Listening... Click to stop" : "Search by voice"}
+      >
+        {isListening && <span className="lp-mic-pulse-ring" />}
+        <svg
+          viewBox="0 0 24 24"
+          fill={isListening ? "currentColor" : "none"}
+          stroke="currentColor"
+          strokeWidth={2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+          <line x1="12" x2="12" y1="19" y2="22" />
+        </svg>
+      </button>
+
+      {/* Floating feedback message for voice status / permission denied */}
+      {voiceError && (
+        <div className="lp-voice-toast" role="alert">
+          <span>{voiceError}</span>
+          <button type="button" onClick={() => setVoiceError(null)} aria-label="Dismiss message">
+            ✕
+          </button>
+        </div>
       )}
     </div>
   );
@@ -978,10 +1140,11 @@ export default function ListingsPage() {
         /* FILTER BAR */
         .lp-filter-bar-wrap { max-width: 1280px; margin: -26px auto 0; padding: 0 32px; position: relative; z-index: 10; }
         .lp-filter-bar { background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,0.13), 0 1px 6px rgba(0,0,0,0.05); padding: 18px 22px; display: flex; align-items: flex-end; gap: 14px; flex-wrap: wrap; }
-        .lp-search-field { flex: 1; min-width: 200px; display: flex; align-items: center; gap: 10px; background: #f8f9fb; border: 1.5px solid #eaecf0; border-radius: 10px; height: 48px; padding: 0 14px; font-size: 13px; color: #555; transition: border-color .15s; }
+        .lp-search-field { position: relative; flex: 1; min-width: 220px; display: flex; align-items: center; gap: 8px; background: #f8f9fb; border: 1.5px solid #eaecf0; border-radius: 10px; height: 48px; padding: 0 10px 0 14px; font-size: 13px; color: #555; transition: border-color .15s, background .15s; }
         .lp-search-field:focus-within { border-color: #c8a84b; }
-        .lp-search-field input { flex: 1; border: 0; background: transparent; outline: none; font: inherit; color: #222; }
-        .lp-search-field svg { width: 16px; height: 16px; color: #aaa; flex-shrink: 0; }
+        .lp-search-field.is-listening { border-color: #ef4444; background: #fffbfb; }
+        .lp-search-field input { flex: 1; border: 0; background: transparent; outline: none; font: inherit; color: #222; min-width: 100px; }
+        .lp-search-field svg.lp-search-icon { width: 16px; height: 16px; color: #aaa; flex-shrink: 0; }
         @keyframes lp-spin {
           to { transform: rotate(360deg); }
         }
@@ -1006,9 +1169,118 @@ export default function ListingsPage() {
           align-items: center;
           justify-content: center;
           transition: color .15s;
+          padding: 4px;
         }
         .lp-search-clear:hover {
           color: #1a1a2e;
+        }
+
+        /* VOICE SEARCH MIC & ANIMATIONS */
+        .lp-search-mic {
+          position: relative;
+          width: 32px;
+          height: 32px;
+          border-radius: 8px;
+          border: none;
+          background: transparent;
+          color: #6b7280;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: background .18s, color .18s, transform .12s;
+          flex-shrink: 0;
+          padding: 0;
+        }
+        .lp-search-mic:hover {
+          background: #eaecf0;
+          color: #c8a84b;
+        }
+        .lp-search-mic.listening {
+          background: #fee2e2;
+          color: #ef4444;
+        }
+        .lp-search-mic.listening:hover {
+          background: #fecaca;
+          color: #dc2626;
+        }
+        .lp-search-mic svg {
+          width: 16px;
+          height: 16px;
+          position: relative;
+          z-index: 2;
+          color: inherit;
+          flex-shrink: 0;
+        }
+        .lp-search-mic:active svg {
+          transform: scale(0.92);
+        }
+
+        @keyframes lp-pulse-ring {
+          0% { transform: scale(0.85); opacity: 0.9; }
+          60% { transform: scale(1.45); opacity: 0.25; }
+          100% { transform: scale(1.85); opacity: 0; }
+        }
+        .lp-mic-pulse-ring {
+          position: absolute;
+          inset: -2px;
+          border-radius: 10px;
+          background: rgba(239, 68, 68, 0.45);
+          animation: lp-pulse-ring 1.4s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+          z-index: 1;
+          pointer-events: none;
+        }
+
+        /* Real-time wave bars while listening */
+        .lp-voice-wave-indicator {
+          display: flex;
+          align-items: center;
+          gap: 2.5px;
+          height: 18px;
+          flex-shrink: 0;
+          padding: 0 4px;
+        }
+        @keyframes lp-voice-wave {
+          0%, 100% { height: 4px; }
+          50% { height: 16px; }
+        }
+        .lp-wave-line {
+          width: 2.5px;
+          height: 6px;
+          background: #ef4444;
+          border-radius: 2px;
+          animation: lp-voice-wave 0.8s ease-in-out infinite;
+        }
+
+        /* Voice error & status toast */
+        .lp-voice-toast {
+          position: absolute;
+          top: calc(100% + 8px);
+          right: 0;
+          z-index: 100;
+          background: #0f172a;
+          color: #f8fafc;
+          font-size: 12px;
+          padding: 8px 12px;
+          border-radius: 8px;
+          box-shadow: 0 10px 25px rgba(0,0,0,0.22);
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          border: 1px solid rgba(255,255,255,0.1);
+          white-space: nowrap;
+          animation: lp-shimmer 0.2s ease-out;
+        }
+        .lp-voice-toast button {
+          background: none;
+          border: none;
+          color: #94a3b8;
+          cursor: pointer;
+          font-size: 11px;
+          padding: 2px 4px;
+        }
+        .lp-voice-toast button:hover {
+          color: #fff;
         }
 
         /* SKELETON SHIMMER & STYLES */
