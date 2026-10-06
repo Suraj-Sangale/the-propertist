@@ -902,7 +902,7 @@ export default function ListingsPage() {
   // Search from ALL records matching current mode when searching, not just existing filtered results
   const filtered = useMemo(() => {
     return ALL_PROPERTIES.filter((p) => {
-      const propMode = p.mode.toLowerCase() || "buy";
+      const propMode = p.mode?.toLowerCase() || "buy";
       if (propMode !== mode) return false;
 
       if (hasSearch) {
