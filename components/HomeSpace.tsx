@@ -371,7 +371,7 @@ export default function HomeSpace() {
         }
 
         .hs-wrap { max-width: 1320px; margin: 0rem auto; padding: 0 24px; position: relative; }
-        .hs-features-section { margin-top: 4rem; }
+        // .hs-features-section { margin-top: 4rem; }
         /* HERO */
         .hs-hero {
           position: relative;
@@ -835,7 +835,7 @@ export default function HomeSpace() {
         }
 
         /* FEATURES */
-        .hs-features { display: flex; gap: 44px; margin-top: -4px; position: relative; z-index: 3; justify-content: flex-end; }
+        .hs-features { display: flex; gap: 44px; margin-top: -4px; position: relative; z-index: 3; }
         .hs-feat { display: flex; align-items: center; gap: 14px; }
         .hs-ic { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0; }
         .hs-feat b { font-size: 12.5px; display: block; font-weight: 600; }
@@ -921,7 +921,9 @@ export default function HomeSpace() {
             perspective: none;
             justify-content: center;
           }
-            .hs-features-section { margin-top: 0rem; }
+            .hs-features-section { margin-top: 0rem; justify-content: flex-end;}
+            .hs-features{ gap:0px}
+            .hs-feat { gap:5px}
           .hs-cat {
             transform: none;
             width: 100%;
