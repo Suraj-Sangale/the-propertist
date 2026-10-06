@@ -486,6 +486,7 @@ const SearchField = memo(function SearchField({
   const [isListening, setIsListening] = useState(false);
   const [voiceError, setVoiceError] = useState<string | null>(null);
   const recognitionRef = useRef<any>(null);
+  const latestTranscriptRef = useRef("");
   const lastEmittedRef = useRef(value);
   const onSearchRef = useRef(onSearch);
   const onClearRef = useRef(onClear);
@@ -578,28 +579,30 @@ const SearchField = memo(function SearchField({
       recognition.onstart = () => {
         setIsListening(true);
         setVoiceError(null);
+        latestTranscriptRef.current = "";
+        // Clear previous query so user sees live spoken words typed freshly
+        setLocalText("");
       };
 
       recognition.onresult = (event: any) => {
-        let interim = "";
-        let final = "";
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
+        let fullFinal = "";
+        let currentInterim = "";
+
+        // Iterate through all results to concatenate finalized and currently spoken interim words
+        for (let i = 0; i < event.results.length; ++i) {
           const transcript = event.results[i][0]?.transcript || "";
           if (event.results[i].isFinal) {
-            final += transcript;
+            fullFinal += transcript + " ";
           } else {
-            interim += transcript;
+            currentInterim += transcript;
           }
         }
-        const spoken = (final || interim).trim();
+
+        const spoken = (fullFinal + currentInterim).trim();
         if (spoken) {
+          // Immediately update input field with live speech-to-text
           setLocalText(spoken);
-        }
-        if (final) {
-          const cleaned = final.trim();
-          lastEmittedRef.current = cleaned;
-          setIsDebouncing(false);
-          onSearchRef.current(cleaned);
+          latestTranscriptRef.current = spoken;
         }
       };
 
@@ -614,6 +617,13 @@ const SearchField = memo(function SearchField({
 
       recognition.onend = () => {
         setIsListening(false);
+        const finalQuery = latestTranscriptRef.current.trim();
+        if (finalQuery) {
+          setLocalText(finalQuery);
+          lastEmittedRef.current = finalQuery;
+          setIsDebouncing(false);
+          onSearchRef.current(finalQuery);
+        }
       };
 
       recognitionRef.current = recognition;
@@ -665,7 +675,7 @@ const SearchField = memo(function SearchField({
         type="text"
         placeholder={
           isListening
-            ? "Listening... Speak now (e.g. '3 BHK in Bandra')"
+            ? "Listening..."
             : placeholder
         }
         value={localText}
@@ -674,7 +684,15 @@ const SearchField = memo(function SearchField({
         autoComplete="off"
         spellCheck="false"
       />
-      {(isDebouncing || isLoading) && (
+      {/* Real-time status indicator showing what system is doing */}
+      {isListening && (
+        <span className="lp-voice-live-badge" title="Live speech transcription active">
+          <span className="lp-voice-live-dot" />
+          <span className="lp-voice-live-text">{localText ? "T..." : "L..."}</span>
+        </span>
+      )}
+
+      {(isDebouncing || isLoading) && !isListening && (
         <span
           className="lp-search-spinner"
           title="Searching all records..."
@@ -1171,7 +1189,20 @@ export default function ListingsPage() {
         .lp-filter-bar { background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,0.13), 0 1px 6px rgba(0,0,0,0.05); padding: 18px 22px; display: flex; align-items: flex-end; gap: 14px; flex-wrap: wrap; }
         .lp-search-field { position: relative; flex: 1; min-width: 220px; display: flex; align-items: center; gap: 8px; background: #f8f9fb; border: 1.5px solid #eaecf0; border-radius: 10px; height: 48px; padding: 0 10px 0 14px; font-size: 13px; color: #555; transition: border-color .15s, background .15s; }
         .lp-search-field:focus-within { border-color: #c8a84b; }
-        .lp-search-field.is-listening { border-color: #ef4444; background: #fffbfb; }
+        .lp-search-field.is-listening {
+          border-color: #ef4444;
+          background: #fff8f8;
+          box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.14);
+        }
+        .lp-search-field.is-listening input {
+          color: #111827;
+          font-weight: 500;
+        }
+        .lp-search-field.is-listening input::placeholder {
+          color: #dc2626;
+          font-style: italic;
+          opacity: 0.85;
+        }
         .lp-search-field input { flex: 1; border: 0; background: transparent; outline: none; font: inherit; color: #222; min-width: 100px; }
         .lp-search-field svg.lp-search-icon { width: 16px; height: 16px; color: #aaa; flex-shrink: 0; }
         @keyframes lp-spin {
@@ -1279,6 +1310,34 @@ export default function ListingsPage() {
           background: #ef4444;
           border-radius: 2px;
           animation: lp-voice-wave 0.8s ease-in-out infinite;
+        }
+
+        /* Real-time speech transcription badge */
+        .lp-voice-live-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          background: #fee2e2;
+          color: #dc2626;
+          border: 1px solid rgba(239, 68, 68, 0.25);
+          border-radius: 9999px;
+          padding: 3px 8px;
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 0.02em;
+          flex-shrink: 0;
+          user-select: none;
+        }
+        .lp-voice-live-dot {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: #ef4444;
+          animation: lp-live-dot-pulse 1s ease-in-out infinite;
+        }
+        @keyframes lp-live-dot-pulse {
+          0%, 100% { transform: scale(0.85); opacity: 0.6; }
+          50% { transform: scale(1.35); opacity: 1; }
         }
 
         /* Voice error & status toast */
