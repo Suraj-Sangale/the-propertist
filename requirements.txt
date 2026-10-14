@@ -1,0 +1,8 @@
+# Core Scraping Dependencies
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+urllib3>=2.0.0
+
+# Optional: Headless Browser Rendering (when permitted & required for heavy SPAs)
+# Note: Install browser binaries via `playwright install` after installing playwright.
+# playwright>=1.40.0
